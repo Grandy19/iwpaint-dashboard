@@ -26,11 +26,8 @@ export const Sidebar = () => {
         isSidebarCollapsed ? "justify-center" : "justify-between"
       )}>
         {!isSidebarCollapsed && (
-          <div className="flex items-center gap-2">
-            <div className="font-bold text-2xl italic flex flex-col items-end">
-              <span className="text-[#e11d48]">iw</span>
-              <span className="text-black text-sm uppercase -mt-2">paint</span>
-            </div>
+          <div className="flex items-center">
+            <img src="/logo.png" alt="IW Paint Logo" className="h-13 object-contain" />
           </div>
         )}
         
