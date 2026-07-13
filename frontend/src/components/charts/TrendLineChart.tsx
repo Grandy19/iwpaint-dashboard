@@ -138,6 +138,7 @@ export const TrendLineChart = ({ title = "Tren Penjualan" }: TrendLineChartProps
               value={periode} 
               onChange={setPeriode} 
               options={['Hari', 'Minggu', 'Bulan']} 
+              showSearch={false}
             />
           </div>
         </div>
