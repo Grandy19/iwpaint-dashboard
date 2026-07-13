@@ -6,6 +6,7 @@ import { Filter, TrendingUp, Package, Activity, Banknote, Wallet, Download } fro
 import { CustomSelect } from '../components/ui/CustomSelect';
 import { CustomerTable } from '../components/charts/customer/CustomerTable';
 import { CustomerDonutChart } from '../components/charts/customer/CustomerDonutChart';
+import { formatShortCurrency, formatShortNumber } from '../utils/formatters';
 import { CustomerTrendChart } from '../components/charts/customer/CustomerTrendChart';
 import { CustomerTopProductsChart } from '../components/charts/customer/CustomerTopProductsChart';
 import { Link } from 'react-router-dom';
@@ -128,7 +129,7 @@ export const CustomerPage = () => {
                     <Banknote size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Rp 450.000.000</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortCurrency(450000000)}</h2>
                 <span className="text-xs text-[#10b981] flex items-center gap-1">
                   <TrendingUp size={12} /> +8.4% dibanding bulan lalu
                 </span>
@@ -141,7 +142,7 @@ export const CustomerPage = () => {
                     <Package size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">5890 Kg</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(5890)} Kg</h2>
                 <span className="text-xs text-[#10b981] flex items-center gap-1">
                   <TrendingUp size={12} /> +8.2% dibanding bulan lalu
                 </span>
@@ -154,7 +155,7 @@ export const CustomerPage = () => {
                     <Wallet size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">350</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(350)}</h2>
                 <span className="text-xs text-gray-400">Periode Juni 2026</span>
               </div>
 
@@ -184,7 +185,7 @@ export const CustomerPage = () => {
                     <Banknote size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Rp 2.450.000.000</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortCurrency(2450000000)}</h2>
                 <span className="text-xs text-[#10b981] flex items-center gap-1">
                   <TrendingUp size={12} /> +8.4% dibanding bulan lalu
                 </span>
@@ -197,7 +198,7 @@ export const CustomerPage = () => {
                     <Package size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">56.890 Kg</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(56890)} Kg</h2>
                 <span className="text-xs text-[#10b981] flex items-center gap-1">
                   <TrendingUp size={12} /> +6.2% dibanding bulan lalu
                 </span>
@@ -210,7 +211,7 @@ export const CustomerPage = () => {
                     <Wallet size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">1.245</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(1245)}</h2>
                 <span className="text-xs text-gray-400">Periode Juni 2026</span>
               </div>
             </div>

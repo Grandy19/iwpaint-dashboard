@@ -6,6 +6,7 @@ import { Filter, TrendingUp, Package, Activity, Wallet, Download, Banknote } fro
 import { CategoryPieChart } from '../components/charts/CategoryPieChart';
 import { TrendLineChart } from '../components/charts/TrendLineChart';
 import { SalesBarChart } from '../components/charts/SalesBarChart';
+import { formatShortCurrency, formatShortNumber } from '../utils/formatters';
 import { CustomSelect } from '../components/ui/CustomSelect';
 import { Link } from 'react-router-dom';
 
@@ -110,7 +111,7 @@ export const DashboardPage = () => {
                 <Banknote size={20} />
               </div>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Rp 2.450.000.000</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortCurrency(2450000000)}</h2>
             <span className="text-xs text-[#10b981] flex items-center gap-1">
               <TrendingUp size={12} /> +8.4% dibanding bulan lalu
             </span>
@@ -123,7 +124,7 @@ export const DashboardPage = () => {
                 <Package size={20} />
               </div>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">56.890 Kg</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(56890)} Kg</h2>
             <span className="text-xs text-[#10b981] flex items-center gap-1">
               <TrendingUp size={12} /> +6.2% dibanding bulan lalu
             </span>
@@ -136,7 +137,7 @@ export const DashboardPage = () => {
                 <Wallet size={20} />
               </div>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">1.245</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(1245)}</h2>
             <span className="text-xs text-gray-400">Periode Juni 2026</span>
           </div>
         </div>

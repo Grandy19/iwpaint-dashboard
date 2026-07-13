@@ -6,6 +6,7 @@ import { Filter, TrendingUp, Package, Banknote, Wallet, Download } from 'lucide-
 import { CustomSelect } from '../components/ui/CustomSelect';
 import { SalesTable } from '../components/charts/sales/SalesTable';
 import { SalesDonutChart } from '../components/charts/sales/SalesDonutChart';
+import { formatShortCurrency, formatShortNumber } from '../utils/formatters';
 import { SalesTrendChart } from '../components/charts/sales/SalesTrendChart';
 import { SalesTopProductsChart } from '../components/charts/sales/SalesTopProductsChart';
 import { SalesTransactionTable } from '../components/charts/sales/SalesTransactionTable';
@@ -124,7 +125,7 @@ export const SalesPage = () => {
                     <Banknote size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Rp 250.000.000</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortCurrency(250000000)}</h2>
                 <span className="text-xs text-[#10b981] flex items-center gap-1">
                   <TrendingUp size={12} /> +8.4% dibanding bulan lalu
                 </span>
@@ -137,7 +138,7 @@ export const SalesPage = () => {
                     <Package size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">5890 Kg</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(5890)} Kg</h2>
                 <span className="text-xs text-[#10b981] flex items-center gap-1">
                   <TrendingUp size={12} /> +8.2% dibanding bulan lalu
                 </span>
@@ -150,7 +151,7 @@ export const SalesPage = () => {
                     <Wallet size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">350</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(350)}</h2>
                 <span className="text-xs text-gray-400">Periode Juni 2026</span>
               </div>
 
@@ -161,8 +162,8 @@ export const SalesPage = () => {
                     <Package size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">12 Customer</h2>
-                <span className="text-xs text-gray-400">Customer yang dilayani</span>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(12)} Customer</h2>
+                <span className="text-xs text-gray-400">Total keseluruhan</span>
               </div>
             </div>
 
@@ -180,7 +181,7 @@ export const SalesPage = () => {
                     <Banknote size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Rp 2.450.000.000</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortCurrency(2450000000)}</h2>
                 <span className="text-xs text-[#10b981] flex items-center gap-1">
                   <TrendingUp size={12} /> +8.4% dibanding bulan lalu
                 </span>
@@ -193,7 +194,7 @@ export const SalesPage = () => {
                     <Package size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">56.890 Kg</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(56890)} Kg</h2>
                 <span className="text-xs text-[#10b981] flex items-center gap-1">
                   <TrendingUp size={12} /> +8.2% dibanding bulan lalu
                 </span>
@@ -206,7 +207,7 @@ export const SalesPage = () => {
                     <Wallet size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">1.245</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(1245)}</h2>
                 <span className="text-xs text-gray-400">Periode Juni 2026</span>
               </div>
             </div>
