@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Search, Check } from 'lucide-react';
+import { ChevronDown, Check } from 'lucide-react';
 
 interface CustomSelectProps {
   value: string;
@@ -15,12 +15,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   placeholder = 'Pilih salah satu...'
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const filteredOptions = options.filter(option => 
-    option.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -36,7 +31,6 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   const handleSelect = (option: string) => {
     onChange(option);
     setIsOpen(false);
-    setSearchTerm('');
   };
 
   return (
@@ -54,26 +48,10 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
       {isOpen && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg max-h-72 flex flex-col overflow-hidden">
           
-          {/* Search Bar */}
-          <div className="p-2 border-b border-gray-100 shrink-0 sticky top-0 bg-white">
-            <div className="relative flex items-center">
-              <Search size={14} className="absolute left-3 text-gray-400" />
-              <input 
-                type="text"
-                className="w-full bg-gray-50 border-none rounded-md py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#3b0764] text-gray-700 placeholder-gray-400"
-                placeholder="Cari..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onClick={(e) => e.stopPropagation()} // prevent closing when typing
-                autoFocus
-              />
-            </div>
-          </div>
-
           {/* Options List */}
           <div className="overflow-y-auto">
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((option, index) => (
+            {options.length > 0 ? (
+              options.map((option, index) => (
                 <div 
                   key={index}
                   className={`px-4 py-2.5 text-sm cursor-pointer flex items-center justify-between hover:bg-[#f3e8ff] transition-colors ${value === option ? 'text-[#3b0764] font-medium bg-[#fcf8ff]' : 'text-gray-700'}`}
@@ -85,7 +63,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
               ))
             ) : (
               <div className="px-4 py-3 text-sm text-gray-500 text-center">
-                Tidak ada hasil ditemukan
+                Tidak ada opsi tersedia
               </div>
             )}
           </div>
