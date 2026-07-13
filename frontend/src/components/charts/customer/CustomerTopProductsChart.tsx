@@ -17,7 +17,7 @@ export const CustomerTopProductsChart = () => {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col mb-8 h-[400px]">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="font-bold text-gray-900">Top 10 Produk Terlaris</h3>
+        <h3 className="font-bold text-gray-900 text-lg">Top 10 Produk Terlaris</h3>
         <div className="text-right">
           <p className="text-sm text-gray-500">Total:</p>
           <p className="font-bold text-gray-900 text-lg">Rp 2.450.000.000</p>

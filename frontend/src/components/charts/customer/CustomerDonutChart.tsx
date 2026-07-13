@@ -12,7 +12,7 @@ const data = [
 export const CustomerDonutChart = () => {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col h-full">
-      <h3 className="font-bold text-gray-900 mb-6">Distribusi Penjualan Berdasarkan Kategori Produk</h3>
+      <h3 className="font-bold text-gray-900 mb-6 text-lg">Distribusi Penjualan Berdasarkan Kategori Produk</h3>
       <div className="flex-1 min-h-0 relative flex flex-col">
         <div className="flex-1 min-h-0 relative">
           <ResponsiveContainer width="100%" height="100%">

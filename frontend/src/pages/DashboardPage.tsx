@@ -150,7 +150,7 @@ export const DashboardPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Top 10 Products Table */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 className="font-bold text-gray-900 mb-6">Top 10 Produk Terlaris</h3>
+            <h3 className="font-bold text-gray-900 mb-6 text-lg">Top 10 Produk Terlaris</h3>
             <div className="overflow-y-auto overflow-x-hidden max-h-[260px] custom-scroll pr-2">
               <table className="w-full text-sm text-left">
                 <thead className="text-gray-500 border-b border-gray-100 sticky top-0 bg-white z-10">
@@ -229,7 +229,7 @@ export const DashboardPage = () => {
 
           {/* Category Pie Chart */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 className="font-bold text-gray-900 mb-6">Distribusi Penjualan Berdasarkan Kategori Produk</h3>
+            <h3 className="font-bold text-gray-900 mb-6 text-lg">Distribusi Penjualan Berdasarkan Kategori Produk</h3>
             <div className="h-64 flex flex-col">
               <div className="flex-1 min-h-0">
                 <CategoryPieChart />

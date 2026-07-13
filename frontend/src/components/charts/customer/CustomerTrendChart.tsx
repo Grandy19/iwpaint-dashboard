@@ -36,7 +36,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 export const CustomerTrendChart = () => {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 h-[350px] flex flex-col mb-8">
-      <h3 className="font-bold text-gray-900 mb-6">Tren Pembelian Customer</h3>
+      <h3 className="font-bold text-gray-900 mb-6 text-lg">Tren Pembelian Customer</h3>
       <div className="flex-1 w-full relative">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart

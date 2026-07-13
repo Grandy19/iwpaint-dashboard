@@ -21,6 +21,19 @@ export const SalesPage = () => {
     setStartDate, setEndDate, setLocation, setSales, setProduct
   } = useFilterStore();
 
+  const isFransiskus = sales === 'Fransiskus';
+  const kpiData = isFransiskus ? {
+    penjualan: 250000000,
+    qty: 5890,
+    transaksi: 350,
+    customer: 380
+  } : {
+    penjualan: 2450000000,
+    qty: 45890,
+    transaksi: 1350,
+    customer: 1280
+  };
+
   const startDateOptions = ['01 Juli 2026', '01 Juni 2026'];
   const endDateOptions = ['30 Juni 2026', '31 Juli 2026'];
   
@@ -128,7 +141,7 @@ export const SalesPage = () => {
                   <Banknote size={20} />
                 </div>
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortCurrency(250000000)}</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortCurrency(kpiData.penjualan)}</h2>
               <span className="text-xs text-[#10b981] flex items-center gap-1">
                 <TrendingUp size={12} /> +8.4% dibanding bulan lalu
               </span>
@@ -141,7 +154,7 @@ export const SalesPage = () => {
                   <Package size={20} />
                 </div>
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(5890)} Kg</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(kpiData.qty)} Kg</h2>
               <span className="text-xs text-[#10b981] flex items-center gap-1">
                 <TrendingUp size={12} /> +8.2% dibanding bulan lalu
               </span>
@@ -154,7 +167,7 @@ export const SalesPage = () => {
                   <Wallet size={20} />
                 </div>
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(350)}</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(kpiData.transaksi)}</h2>
               <span className="text-xs text-gray-400">Periode Juni 2026</span>
             </div>
 
@@ -165,7 +178,7 @@ export const SalesPage = () => {
                   <Users size={20} />
                 </div>
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(380)} Customer</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(kpiData.customer)} Customer</h2>
               <span className="text-xs text-gray-400">Customer yang dilayani</span>
             </div>
           </div>

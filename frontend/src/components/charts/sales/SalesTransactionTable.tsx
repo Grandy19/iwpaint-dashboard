@@ -16,7 +16,7 @@ export const SalesTransactionTable = () => {
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col mb-8 h-[400px]">
-      <h3 className="font-bold text-gray-900 mb-6">Tabel Transaksi Sales</h3>
+      <h3 className="font-bold text-gray-900 mb-6 text-lg">Tabel Transaksi Sales</h3>
       <div className="overflow-y-auto custom-scroll pr-2 flex-1">
         <table className="w-full text-sm text-left">
           <thead className="text-gray-400 border-b border-gray-100 sticky top-0 bg-white z-10 text-xs">
