@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MainLayout } from '../components/layout/MainLayout';
 import { Topbar } from '../components/layout/Topbar';
 import { useFilterStore } from '../store/useFilterStore';
@@ -6,11 +6,14 @@ import { Filter, TrendingUp, Package, Activity, Wallet, Download, Banknote } fro
 import { CategoryPieChart } from '../components/charts/CategoryPieChart';
 import { TrendLineChart } from '../components/charts/TrendLineChart';
 import { SalesBarChart } from '../components/charts/SalesBarChart';
+import { ImportModal } from '../components/ui/ImportModal';
 import { formatShortCurrency, formatShortNumber } from '../utils/formatters';
 import { CustomSelect } from '../components/ui/CustomSelect';
 import { Link } from 'react-router-dom';
 
 export const DashboardPage = () => {
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+
   const { 
     startDate, endDate, location, product,
     setStartDate, setEndDate, setLocation, setProduct
@@ -40,17 +43,18 @@ export const DashboardPage = () => {
   ];
 
   const ImportButton = (
-    <Link 
-      to="/import" 
+    <button 
+      onClick={() => setIsImportModalOpen(true)}
       className="bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
     >
       <Download size={18} />
       Import Data
-    </Link>
+    </button>
   );
 
   return (
     <MainLayout>
+      <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
       <Topbar title="Dashboard Monitoring Penjualan" actionButton={ImportButton} />
 
       <div className="px-8 pb-10">

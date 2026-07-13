@@ -70,7 +70,11 @@ const CustomTick = (props: any) => {
   );
 };
 
-export const TrendLineChart = () => {
+interface TrendLineChartProps {
+  title?: string;
+}
+
+export const TrendLineChart = ({ title = "Tren Penjualan" }: TrendLineChartProps) => {
   const [periode, setPeriode] = useState('Hari');
   const [page, setPage] = useState(0);
   const [zoomIndex, setZoomIndex] = useState(1);
@@ -110,9 +114,9 @@ export const TrendLineChart = () => {
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col mb-8">
-      <div className="flex justify-between items-center mb-8">
-        <h3 className="font-bold text-gray-900 text-lg">Tren Penjualan</h3>
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <h3 className="font-bold text-gray-900 text-lg">{title}</h3>
+        <div className="flex items-center gap-4 w-full sm:w-auto">
           <button 
             onClick={handleZoomOut}
             disabled={zoomIndex === zoomLevels.length - 1}

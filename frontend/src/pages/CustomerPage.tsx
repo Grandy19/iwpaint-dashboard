@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MainLayout } from '../components/layout/MainLayout';
 import { Topbar } from '../components/layout/Topbar';
 import { useFilterStore } from '../store/useFilterStore';
@@ -9,9 +9,11 @@ import { CustomerDonutChart } from '../components/charts/customer/CustomerDonutC
 import { formatShortCurrency, formatShortNumber } from '../utils/formatters';
 import { CustomerTrendChart } from '../components/charts/customer/CustomerTrendChart';
 import { CustomerTopProductsChart } from '../components/charts/customer/CustomerTopProductsChart';
+import { ImportModal } from '../components/ui/ImportModal';
 import { Link } from 'react-router-dom';
 
 export const CustomerPage = () => {
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const { 
     startDate, endDate, location, customer, product,
     setStartDate, setEndDate, setLocation, setCustomer, setProduct
@@ -43,17 +45,18 @@ export const CustomerPage = () => {
   ];
 
   const ImportButton = (
-    <Link 
-      to="/import" 
+    <button 
+      onClick={() => setIsImportModalOpen(true)}
       className="bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
     >
       <Download size={18} />
       Import Data
-    </Link>
+    </button>
   );
 
   return (
     <MainLayout>
+      <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
       <Topbar title="Dashboard Monitoring Customer" actionButton={ImportButton} />
 
       <div className="px-8 pb-10">
