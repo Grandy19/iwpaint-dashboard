@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MainLayout } from '../components/layout/MainLayout';
 import { Topbar } from '../components/layout/Topbar';
 import { useFilterStore } from '../store/useFilterStore';
-import { Filter, TrendingUp, Package, Banknote, Wallet, Download } from 'lucide-react';
+import { Filter, TrendingUp, Package, Banknote, Wallet, Download, Users } from 'lucide-react';
 import { CustomSelect } from '../components/ui/CustomSelect';
 import { SalesTable } from '../components/charts/sales/SalesTable';
 import { SalesDonutChart } from '../components/charts/sales/SalesDonutChart';
@@ -162,7 +162,7 @@ export const SalesPage = () => {
               <div className="flex justify-between items-start mb-4">
                 <span className="text-gray-500 text-sm">Total Customer</span>
                 <div className="w-10 h-10 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981]">
-                  <Package size={20} />
+                  <Users size={20} />
                 </div>
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(380)} Customer</h2>

@@ -6,7 +6,6 @@ const data = [
   { name: 'Dekoratif', value: 2100000000, color: '#ef4444' },
   { name: 'Proyek', value: 1500000000, color: '#eab308' },
   { name: 'Industri', value: 980000000, color: '#a855f7' },
-  { name: 'Lainnya', value: 450000000, color: '#9ca3af' },
 ];
 
 export const SalesDonutChart = () => {
