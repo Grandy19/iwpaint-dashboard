@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Users, Briefcase, Download, Menu } from 'lucide-react';
+import { Home, Users, Briefcase, History, Menu } from 'lucide-react';
 import clsx from 'clsx';
 import { Link, useLocation } from 'react-router-dom';
 import { useUIStore } from '../../store/useUIStore';
@@ -13,7 +13,7 @@ export const Sidebar = () => {
     { name: 'Dashboard', icon: Home, path: '/' },
     { name: 'Customer', icon: Users, path: '/customer' },
     { name: 'Sales', icon: Briefcase, path: '/sales' },
-    { name: 'Import Data', icon: Download, path: '/import' },
+    { name: 'Riwayat Import', icon: History, path: '/import' },
   ];
 
   return (
