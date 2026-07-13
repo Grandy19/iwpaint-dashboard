@@ -236,10 +236,9 @@ export const DashboardPage = () => {
         {/* Trend Line Chart */}
         <TrendLineChart />
 
-        {/* Sales Bar Chart */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <h3 className="font-bold text-gray-900 mb-6">Penjualan per Sales</h3>
-          <div className="h-64">
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+          <h3 className="font-bold text-gray-900 mb-8 text-lg">Penjualan per Sales</h3>
+          <div className="h-[400px]">
             <SalesBarChart />
           </div>
         </div>
