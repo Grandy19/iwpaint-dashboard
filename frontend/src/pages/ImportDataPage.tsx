@@ -30,13 +30,25 @@ export const ImportDataPage = () => {
       <Topbar 
         title="Riwayat Import" 
         actionButton={
-          <button 
-            className="flex items-center gap-2 bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2.5 rounded-lg font-medium transition-colors text-sm"
-            onClick={() => setIsImportModalOpen(true)}
-          >
-            <Download size={18} />
-            Import Data
-          </button>
+          <div className="flex items-center gap-4">
+            <button 
+              className="bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+              onClick={() => {
+                setExportFileName('Data Riwayat Import');
+                setIsExportModalOpen(true);
+              }}
+            >
+              <Upload size={18} />
+              Export Data
+            </button>
+            <button 
+              className="bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+              onClick={() => setIsImportModalOpen(true)}
+            >
+              <Download size={18} />
+              Import Data
+            </button>
+          </div>
         }
       />
       
@@ -44,26 +56,30 @@ export const ImportDataPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-          <div className="flex flex-col md:flex-row items-end gap-6">
-            <div className="flex-1">
-              <span className="text-sm text-gray-500 mb-2 block">Periode</span>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <div className="col-span-1 md:col-span-2">
+              <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
               <div className="flex items-center gap-2">
-                <CustomSelect 
-                  value={startDate} 
-                  onChange={setStartDate} 
-                  options={['01 Juli 2026', '01 Juni 2026']} 
-                />
-                <span className="text-gray-400">-</span>
-                <CustomSelect 
-                  value={endDate} 
-                  onChange={setEndDate} 
-                  options={['30 Juni 2026', '31 Juli 2026']} 
-                />
+                <div className="flex-1">
+                  <CustomSelect 
+                    value={startDate} 
+                    onChange={setStartDate} 
+                    options={['01 Juli 2026', '01 Juni 2026']} 
+                  />
+                </div>
+                <span className="text-gray-500 font-bold">-</span>
+                <div className="flex-1">
+                  <CustomSelect 
+                    value={endDate} 
+                    onChange={setEndDate} 
+                    options={['30 Juni 2026', '31 Juli 2026']} 
+                  />
+                </div>
               </div>
             </div>
             
-            <div className="w-48">
-              <span className="text-sm text-gray-500 mb-2 block">Status</span>
+            <div className="col-span-1">
+              <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
               <CustomSelect 
                 value={status} 
                 onChange={setStatus} 
@@ -71,36 +87,39 @@ export const ImportDataPage = () => {
               />
             </div>
 
-            <div className="flex-1">
-              <span className="text-sm text-gray-500 mb-2 block">Cari Nama File</span>
+            <div className="col-span-1">
+              <label className="block text-sm text-[#475569] font-medium mb-2">Cari Nama File</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search size={16} className="text-gray-400" />
                 </div>
                 <input
                   type="text"
-                  className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b0764] focus:border-transparent placeholder-gray-400"
+                  className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b0764] focus:border-transparent placeholder-gray-400 h-[42px]"
                   placeholder="Cari Nama File ..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
-
-            <button className="bg-[#3b0764] hover:bg-[#2e054e] text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px]">
-              <Filter size={18} />
-              Terapkan
-            </button>
+            <div className="col-span-1">
+              <button className="w-full bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px]">
+                <Filter size={18} />
+                Terapkan
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-4 mt-4">
+          <div className="flex items-center gap-4 mt-6">
             <span className="text-sm text-[#10b981] flex items-center gap-1">
-              <CheckCircle size={14} /> 15 hasil ditemukan
+              <CheckCircle size={14} /> <span className="text-gray-500">15 hasil ditemukan</span>
             </span>
-            <span className="text-sm text-gray-400">Filter Aktif:</span>
-            <span className="text-sm bg-[#e0f2fe] text-[#0ea5e9] px-3 py-1 rounded-full">
-              1 Juni 2026 - 30 Juni 2026
-            </span>
+            <div className="flex items-center gap-2 ml-4">
+              <span className="text-sm text-gray-500">Filter Aktif:</span>
+              <span className="text-sm font-medium bg-[#e0f2fe] text-[#0ea5e9] px-3 py-1 rounded-md">
+                1 Juni 2026 - 30 Juni 2026
+              </span>
+            </div>
           </div>
         </div>
 
@@ -108,35 +127,35 @@ export const ImportDataPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-4">
-              <span className="font-bold text-gray-700">Total File Import</span>
-              <div className="w-8 h-8 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981]">
-                <FileText size={16} />
+              <span className="text-gray-500 text-sm">Total File Import</span>
+              <div className="w-10 h-10 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981]">
+                <FileText size={20} />
               </div>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">128 File</h2>
-            <span className="text-[10px] text-gray-400">Seluruh file yang pernah diimport</span>
+            <span className="text-xs text-gray-400">Seluruh file yang pernah diimport</span>
           </div>
           
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-4">
-              <span className="font-bold text-gray-700">Import Berhasil</span>
-              <div className="w-8 h-8 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981]">
-                <CheckCircle size={16} />
+              <span className="text-gray-500 text-sm">Import Berhasil</span>
+              <div className="w-10 h-10 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981]">
+                <CheckCircle size={20} />
               </div>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">120 File</h2>
-            <span className="text-[10px] text-gray-400">Status berhasil</span>
+            <span className="text-xs text-gray-400">Status berhasil</span>
           </div>
 
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-4">
-              <span className="font-bold text-gray-700">Import Gagal</span>
-              <div className="w-8 h-8 rounded-full bg-[#fee2e2] flex items-center justify-center text-[#ef4444]">
-                <XCircle size={16} />
+              <span className="text-gray-500 text-sm">Import Gagal</span>
+              <div className="w-10 h-10 rounded-full bg-[#fee2e2] flex items-center justify-center text-[#ef4444]">
+                <XCircle size={20} />
               </div>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">8 File</h2>
-            <span className="text-[10px] text-gray-400">Status Gagal</span>
+            <span className="text-xs text-gray-400">Status Gagal</span>
           </div>
         </div>
 
@@ -152,7 +171,6 @@ export const ImportDataPage = () => {
                   <th className="pb-4 font-medium">Jumlah Data</th>
                   <th className="pb-4 font-medium">Status</th>
                   <th className="pb-4 font-medium">Detail</th>
-                  <th className="pb-4 font-medium">Export</th>
                 </tr>
               </thead>
               <tbody>
@@ -177,18 +195,6 @@ export const ImportDataPage = () => {
                         <Eye size={16} />
                         <span>Detail</span>
                       </Link>
-                    </td>
-                    <td className="py-4">
-                      <button 
-                        className="flex items-center gap-1.5 text-gray-500 hover:text-[#3b0764] transition-colors"
-                        onClick={() => {
-                          setExportFileName(item.name);
-                          setIsExportModalOpen(true);
-                        }}
-                      >
-                        <Upload size={16} />
-                        <span>Export</span>
-                      </button>
                     </td>
                   </tr>
                 ))}

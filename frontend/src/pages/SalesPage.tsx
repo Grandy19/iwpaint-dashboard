@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MainLayout } from '../components/layout/MainLayout';
 import { Topbar } from '../components/layout/Topbar';
 import { useFilterStore } from '../store/useFilterStore';
-import { Filter, TrendingUp, Package, Banknote, Wallet, Download, Users } from 'lucide-react';
+import { Filter, TrendingUp, Package, Banknote, Wallet, Download, Users, Upload } from 'lucide-react';
 import { CustomSelect } from '../components/ui/CustomSelect';
 import { SalesTable } from '../components/charts/sales/SalesTable';
 import { SalesDonutChart } from '../components/charts/sales/SalesDonutChart';
@@ -12,10 +12,12 @@ import { SalesTopProductsChart } from '../components/charts/sales/SalesTopProduc
 import { SalesTransactionTable } from '../components/charts/sales/SalesTransactionTable';
 import { SalesBarChart } from '../components/charts/SalesBarChart';
 import { ImportModal } from '../components/ui/ImportModal';
+import { ExportModal } from '../components/ui/ExportModal';
 import { Link } from 'react-router-dom';
 
 export const SalesPage = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const { 
     startDate, endDate, location, sales, product,
     setStartDate, setEndDate, setLocation, setSales, setProduct
@@ -60,20 +62,29 @@ export const SalesPage = () => {
     'Industri'
   ];
 
-  const ImportButton = (
-    <button 
-      onClick={() => setIsImportModalOpen(true)}
-      className="bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-    >
-      <Download size={18} />
-      Import Data
-    </button>
+  const ActionButtons = (
+    <div className="flex items-center gap-4">
+      <button 
+        className="bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+        onClick={() => setIsExportModalOpen(true)}
+      >
+        <Upload size={18} />
+        Export Data
+      </button>
+      <button 
+        onClick={() => setIsImportModalOpen(true)}
+        className="bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+      >
+        <Download size={18} />
+        Import Data
+      </button>
+    </div>
   );
 
   return (
     <MainLayout>
       <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
-      <Topbar title="Dashboard Monitoring Sales" actionButton={ImportButton} />
+      <Topbar title="Dashboard Monitoring Sales" actionButton={ActionButtons} />
 
       <div className="px-8 pb-10">
         {/* Filters */}
@@ -142,8 +153,8 @@ export const SalesPage = () => {
                 </div>
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortCurrency(kpiData.penjualan)}</h2>
-              <span className="text-xs text-[#10b981] flex items-center gap-1">
-                <TrendingUp size={12} /> +8.4% dibanding bulan lalu
+              <span className="text-xs text-gray-400">
+                Rp 2.450.000.000
               </span>
             </div>
             
@@ -154,9 +165,9 @@ export const SalesPage = () => {
                   <Package size={20} />
                 </div>
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(kpiData.qty)} Kg</h2>
-              <span className="text-xs text-[#10b981] flex items-center gap-1">
-                <TrendingUp size={12} /> +8.2% dibanding bulan lalu
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">{(kpiData.qty).toLocaleString('id-ID')} Kg</h2>
+              <span className="text-xs text-gray-400">
+                Total produk terjual
               </span>
             </div>
 
@@ -167,8 +178,8 @@ export const SalesPage = () => {
                   <Wallet size={20} />
                 </div>
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(kpiData.transaksi)}</h2>
-              <span className="text-xs text-gray-400">Periode Juni 2026</span>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">{(kpiData.transaksi).toLocaleString('id-ID')} Transaksi</h2>
+              <span className="text-xs text-gray-400">Total transaksi penjualan</span>
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
@@ -178,7 +189,7 @@ export const SalesPage = () => {
                   <Users size={20} />
                 </div>
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(kpiData.customer)} Customer</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">{(kpiData.customer).toLocaleString('id-ID')} Customer</h2>
               <span className="text-xs text-gray-400">Customer yang dilayani</span>
             </div>
           </div>
@@ -199,6 +210,7 @@ export const SalesPage = () => {
         </div>
 
       </div>
+      <ExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} fileName="Data Sales" />
     </MainLayout>
   );
 };

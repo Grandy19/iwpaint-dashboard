@@ -61,8 +61,8 @@ export const SalesBarChart = () => {
         >
           {data.map((entry, index) => (
             <Cell 
-              key={`cell-${index}`} 
-              fill={activeIndex === index ? '#9a2769' : '#e0c2d8'}
+              key={`cell-${index}`}
+              fill={activeIndex === null || activeIndex === index ? '#9a2769' : '#e0c2d8'}
               onMouseEnter={() => setActiveIndex(index)}
               onMouseLeave={() => setActiveIndex(null)}
               className="transition-colors duration-300 cursor-pointer"

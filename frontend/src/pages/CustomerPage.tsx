@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MainLayout } from '../components/layout/MainLayout';
 import { Topbar } from '../components/layout/Topbar';
 import { useFilterStore } from '../store/useFilterStore';
-import { Filter, TrendingUp, Package, Activity, Banknote, Wallet, Download } from 'lucide-react';
+import { Filter, TrendingUp, Package, Activity, Banknote, Wallet, Download, Upload } from 'lucide-react';
 import { CustomSelect } from '../components/ui/CustomSelect';
 import { CustomerTable } from '../components/charts/customer/CustomerTable';
 import { CustomerDonutChart } from '../components/charts/customer/CustomerDonutChart';
@@ -10,10 +10,12 @@ import { formatShortCurrency, formatShortNumber } from '../utils/formatters';
 import { CustomerTrendChart } from '../components/charts/customer/CustomerTrendChart';
 import { CustomerTopProductsChart } from '../components/charts/customer/CustomerTopProductsChart';
 import { ImportModal } from '../components/ui/ImportModal';
+import { ExportModal } from '../components/ui/ExportModal';
 import { Link } from 'react-router-dom';
 
 export const CustomerPage = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const { 
     startDate, endDate, location, customer, product,
     setStartDate, setEndDate, setLocation, setCustomer, setProduct
@@ -44,20 +46,29 @@ export const CustomerPage = () => {
     'Industri'
   ];
 
-  const ImportButton = (
-    <button 
-      onClick={() => setIsImportModalOpen(true)}
-      className="bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-    >
-      <Download size={18} />
-      Import Data
-    </button>
+  const ActionButtons = (
+    <div className="flex items-center gap-4">
+      <button 
+        className="bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+        onClick={() => setIsExportModalOpen(true)}
+      >
+        <Upload size={18} />
+        Export Data
+      </button>
+      <button 
+        onClick={() => setIsImportModalOpen(true)}
+        className="bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+      >
+        <Download size={18} />
+        Import Data
+      </button>
+    </div>
   );
 
   return (
     <MainLayout>
       <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
-      <Topbar title="Dashboard Monitoring Customer" actionButton={ImportButton} />
+      <Topbar title="Dashboard Monitoring Customer" actionButton={ActionButtons} />
 
       <div className="px-8 pb-10">
         {/* Filters */}
@@ -158,8 +169,8 @@ export const CustomerPage = () => {
                     <Wallet size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(350)}</h2>
-                <span className="text-xs text-gray-400">Periode Juni 2026</span>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{(350).toLocaleString('id-ID')} Transaksi</h2>
+                <span className="text-xs text-gray-400">Total transaksi penjualan</span>
               </div>
 
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
@@ -214,8 +225,8 @@ export const CustomerPage = () => {
                     <Wallet size={20} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">{formatShortNumber(1245)}</h2>
-                <span className="text-xs text-gray-400">Periode Juni 2026</span>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{(1245).toLocaleString('id-ID')} Transaksi</h2>
+                <span className="text-xs text-gray-400">Total transaksi penjualan</span>
               </div>
             </div>
 
@@ -231,6 +242,7 @@ export const CustomerPage = () => {
         <CustomerTopProductsChart />
 
       </div>
+      <ExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} fileName="Data Customer" />
     </MainLayout>
   );
 };
