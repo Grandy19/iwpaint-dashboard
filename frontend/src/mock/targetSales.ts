@@ -7,7 +7,7 @@ export const targetSalesKpiData = [
     title: 'Total Sales',
     value: '45 Sales',
     description: 'Total Semua Sales',
-    icon: CustomSalesIcon,
+    icon: UserCheck,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
   },
@@ -42,9 +42,9 @@ export const targetSalesKpiData = [
 
 export const targetSalesSummary = {
   percentage: 31,
-  targetGlobal: 'Rp 12,8 M',
-  realisasi: 'Rp 10,1 M',
-  selisih: 'Rp 2,7 M'
+  targetGlobal: 'Rp 250 Jt',
+  realisasi: 'Rp 89,2 Jt',
+  selisih: 'Rp 160,8 Jt'
 };
 
 export const targetSalesTableData = [
