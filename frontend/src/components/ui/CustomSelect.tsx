@@ -1,5 +1,7 @@
-import React, { useState, useRef, useEffect, ReactNode } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { ChevronDown, Check, Search } from 'lucide-react';
+import clsx from 'clsx';
 
 interface CustomSelectProps {
   value: string;
@@ -9,6 +11,7 @@ interface CustomSelectProps {
   showSearch?: boolean;
   icon?: ReactNode;
   triggerClassName?: string;
+  dropdownPosition?: 'top' | 'bottom';
 }
 
 export const CustomSelect: React.FC<CustomSelectProps> = ({ 
@@ -18,7 +21,8 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   placeholder = 'Pilih salah satu...',
   showSearch = true,
   icon,
-  triggerClassName
+  triggerClassName,
+  dropdownPosition = 'bottom'
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -73,7 +77,10 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg max-h-72 flex flex-col overflow-hidden">
+        <div className={clsx(
+          "absolute z-50 w-full bg-white border border-gray-100 rounded-lg shadow-lg flex flex-col overflow-hidden",
+          dropdownPosition === 'top' ? 'bottom-full mb-1' : 'top-full mt-1'
+        )}>
           
           {/* Search Bar */}
           {showSearch && (
@@ -95,7 +102,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
           )}
 
           {/* Options List */}
-          <div className="overflow-y-auto">
+          <div className="overflow-y-auto max-h-60">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
                 <div 

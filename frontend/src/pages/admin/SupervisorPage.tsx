@@ -1,28 +1,25 @@
 import React, { useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Upload, Plus, CheckCircle2, XCircle, Eye, Filter } from 'lucide-react';
+import { Upload, Filter, Eye, CheckCircle2, XCircle, Plus } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
-import { DataTable } from '../../components/common/DataTable';
 import { KpiCard } from '../../components/common/KpiCard';
-import { salesAdminKpiData, salesAdminTableData } from '../../mock/salesAdmin';
-import { SalesModal } from '../../components/ui/SalesModal';
+import { DataTable } from '../../components/common/DataTable';
 import { ExportModal } from '../../components/ui/ExportModal';
+import { SupervisorModal } from '../../components/ui/SupervisorModal';
+import { supervisorKpiData, supervisorTableData } from '../../mock/supervisor';
 
-export const SalesPage = () => {
+export const SupervisorPage = () => {
   const [area, setArea] = useState('Semua Area');
-  const [supervisor, setSupervisor] = useState('Semua Supervisor');
   const [status, setStatus] = useState('Semua Status');
-  const [salesName, setSalesName] = useState('Semua Sales');
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<'create' | 'detail'>('create');
-  const [selectedSales, setSelectedSales] = useState<any>(null);
+  const [supervisor, setSupervisor] = useState('Semua Supervisor');
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isSupervisorModalOpen, setIsSupervisorModalOpen] = useState(false);
+  const [selectedSupervisor, setSelectedSupervisor] = useState<any>(null);
 
   const ActionButtons = (
-    <div className="flex items-center gap-4">
+    <div className="flex gap-4">
       <button 
         onClick={() => setIsExportModalOpen(true)}
         className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
@@ -32,33 +29,32 @@ export const SalesPage = () => {
       </button>
       <button 
         onClick={() => {
-          setSelectedSales(null);
-          setModalMode('create');
-          setIsModalOpen(true);
+          setSelectedSupervisor(null);
+          setIsSupervisorModalOpen(true);
         }}
         className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
       >
         <Plus size={18} />
-        Sales
+        Supervisor
       </button>
     </div>
-  ); 
- 
+  );
+
   const tableColumns = [
-    { key: 'namaSales', label: 'Nama Sales' },
+    { key: 'namaSupervisor', label: 'Nama Supervisor' },
     { key: 'email', label: 'Email' },
     { key: 'nomorHp', label: 'Nomor HP' },
     { key: 'area', label: 'Area' },
-    { key: 'supervisor', label: 'Supervisor' },
+    { key: 'jumlahSales', label: 'Jumlah Sales' },
     { key: 'status', label: 'Status' },
     { key: 'tanggalBergabung', label: 'Tanggal Bergabung' },
-    { key: 'action', label: 'Detail' },
+    { key: 'detail', label: 'Detail' },
   ];
 
   const renderCell = (item: any, columnKey: string) => {
     switch (columnKey) {
-      case 'namaSales':
-        return <span className="text-gray-700 font-medium">{item.namaSales}</span>;
+      case 'namaSupervisor':
+        return <span className="text-gray-700 font-medium">{item.namaSupervisor}</span>;
       case 'status':
         return item.status === 'Aktif' ? (
           <span className="flex items-center gap-1.5 text-[#10b981] font-medium">
@@ -69,13 +65,12 @@ export const SalesPage = () => {
             <XCircle size={16} /> Tidak Aktif
           </span>
         );
-      case 'action':
+      case 'detail':
         return (
           <button 
             onClick={() => {
-              setSelectedSales(item);
-              setModalMode('detail');
-              setIsModalOpen(true);
+              setSelectedSupervisor(item);
+              setIsSupervisorModalOpen(true);
             }}
             className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors"
           >
@@ -87,68 +82,49 @@ export const SalesPage = () => {
     }
   };
 
-  const parseIndonesianDate = (dateStr: string) => {
-    const months = {
-      'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5,
-      'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11
-    };
-    const parts = dateStr.split(' ');
-    if (parts.length !== 3) return 0;
-    const [day, monthStr, year] = parts;
-    return new Date(parseInt(year), (months as any)[monthStr] || 0, parseInt(day)).getTime();
-  };
-
-  const sortedSalesData = [...salesAdminTableData].sort((a, b) => {
-    return parseIndonesianDate(b.tanggalBergabung) - parseIndonesianDate(a.tanggalBergabung);
-  });
-
   return (
     <>
       <MainLayout>
-        <Topbar title="Sales" subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB" actionButton={ActionButtons} />
-
+        <Topbar 
+          title="Supervisor" 
+          subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB"
+          actionButton={ActionButtons}
+        />
+        
         <div className="px-8 pb-10">
           
-          {/* KPI Cards */}
+          {/* KPI Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 pt-4">
-            {salesAdminKpiData.map((kpi) => (
+            {supervisorKpiData.map((kpi) => (
               <KpiCard key={kpi.id} {...kpi} />
             ))}
           </div>
 
           {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                 <CustomSelect 
-                  value={area} 
-                  onChange={setArea} 
-                  options={['Semua Area', 'Cirebon', 'Bandung', 'Jakarta']} 
+                  value={area}
+                  onChange={setArea}
+                  options={['Semua Area', 'Bandung', 'Jakarta', 'Cirebon', 'Kuningan']}
                 />
               </div>
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
                 <CustomSelect 
-                  value={status} 
-                  onChange={setStatus} 
-                  options={['Semua Status', 'Aktif', 'Tidak Aktif']} 
+                  value={status}
+                  onChange={setStatus}
+                  options={['Semua Status', 'Aktif', 'Tidak Aktif']}
                 />
               </div>
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Supervisor</label>
                 <CustomSelect 
-                  value={supervisor} 
-                  onChange={setSupervisor} 
-                  options={['Semua Supervisor', 'Hartono', 'Budi']} 
-                />
-              </div>
-              <div className="col-span-1">
-                <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
-                <CustomSelect 
-                  value={salesName} 
-                  onChange={setSalesName} 
-                  options={['Semua Sales', 'Santoso', 'Heri']} 
+                  value={supervisor}
+                  onChange={setSupervisor}
+                  options={['Semua Supervisor', 'Andi', 'Hariono', 'Deni', 'Rahmat', 'Dudu']}
                 />
               </div>
               <div className="col-span-1">
@@ -162,30 +138,25 @@ export const SalesPage = () => {
 
           {/* Table Section */}
           <DataTable
-            title="Tabel Sales"
+            title="Tabel Supervisor"
             columns={tableColumns}
-            data={sortedSalesData}
+            data={supervisorTableData}
             renderCell={renderCell}
           />
 
         </div>
       </MainLayout>
-      
-      <SalesModal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        mode={modalMode}
-        data={selectedSales}
-        onSave={(data) => {
-          console.log('Saved data:', data);
-          setIsModalOpen(false);
-        }}
-      />
 
       <ExportModal 
         isOpen={isExportModalOpen} 
         onClose={() => setIsExportModalOpen(false)} 
-        fileName="Data_Sales.xlsx" 
+        fileName="Data_Supervisor.xlsx" 
+      />
+      
+      <SupervisorModal 
+        isOpen={isSupervisorModalOpen}
+        onClose={() => setIsSupervisorModalOpen(false)}
+        data={selectedSupervisor}
       />
     </>
   );

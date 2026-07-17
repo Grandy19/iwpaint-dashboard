@@ -43,7 +43,7 @@ export const TargetSalesPage = () => {
         className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
       >
         <Plus size={18} />
-        {isDetailView ? 'Tambah Sales' : 'Input Target'}
+        {isDetailView ? 'Sales' : 'Target'}
       </button>
     </div>
   );
