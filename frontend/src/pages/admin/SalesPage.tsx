@@ -105,7 +105,7 @@ export const SalesPage = () => {
   return (
     <>
       <MainLayout>
-        <Topbar title="Sales" subtitle="List Sales Active" actionButton={ActionButtons} />
+        <Topbar title="Sales" subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB" actionButton={ActionButtons} />
 
         <div className="px-8 pb-10">
           

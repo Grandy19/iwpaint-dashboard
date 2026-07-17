@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, User, Users, Info, Briefcase, CheckCircle2 } from 'lucide-react';
+import { X, Save, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, MapPin, User, Users, Info, Briefcase, CheckCircle2 } from 'lucide-react';
 import { CustomSelect } from './CustomSelect';
 
 interface SalesModalProps {
@@ -16,14 +16,13 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
   const [email, setEmail] = useState('');
   const [nomorHp, setNomorHp] = useState('');
   const [password, setPassword] = useState('');
-  const [konfirmasiPassword, setKonfirmasiPassword] = useState('');
+  const [alamat, setAlamat] = useState('');
   const [area, setArea] = useState('Bandung');
   const [role, setRole] = useState('Sales');
   const [supervisor, setSupervisor] = useState('Andi');
   const [status, setStatus] = useState('Aktif');
   
   const [showPassword, setShowPassword] = useState(false);
-  const [showKonfirmasiPassword, setShowKonfirmasiPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -50,7 +49,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
         setEmail(data.email || '');
         setNomorHp(data.nomorHp || '');
         setPassword('**********');
-        setKonfirmasiPassword('**********');
+        setAlamat(data.alamat || 'Jl. Jendral Sudirman No. 123');
         setArea(data.area || 'Bandung');
         setRole('Sales');
         setSupervisor(data.supervisor || 'Andi');
@@ -61,14 +60,13 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
         setEmail('');
         setNomorHp('');
         setPassword('');
-        setKonfirmasiPassword('');
+        setAlamat('');
         setArea('Bandung');
         setRole('Sales');
         setSupervisor('Andi');
         setStatus('Aktif');
       }
       setShowPassword(false);
-      setShowKonfirmasiPassword(false);
       setShowConfirm(false);
       setShowSuccess(false);
     }
@@ -186,6 +184,23 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
               </div>
             </div>
 
+            {/* Alamat */}
+            <div>
+              <label className="block text-sm text-[#475569] font-medium mb-2">Alamat</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  <MapPin size={18} />
+                </div>
+                <input 
+                  type="text" 
+                  value={alamat}
+                  onChange={(e) => setAlamat(e.target.value)}
+                  placeholder="Masukkan alamat lengkap"
+                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                />
+              </div>
+            </div>
+
             {/* Password */}
             <div>
               <label className="block text-sm text-[#475569] font-medium mb-2">Password</label>
@@ -205,29 +220,6 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
-                </div>
-              </div>
-            </div>
-
-            {/* Konfirmasi Password */}
-            <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2">Konfirmasi Password</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <Lock size={18} />
-                </div>
-                <input 
-                  type={showKonfirmasiPassword ? "text" : "password"} 
-                  value={konfirmasiPassword}
-                  onChange={(e) => setKonfirmasiPassword(e.target.value)}
-                  placeholder="Konfirmasi password"
-                  className="w-full pl-11 pr-12 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
-                />
-                <div 
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer text-gray-400 hover:text-gray-600"
-                  onClick={() => setShowKonfirmasiPassword(!showKonfirmasiPassword)}
-                >
-                  {showKonfirmasiPassword ? <Eye size={18} /> : <EyeOff size={18} />}
                 </div>
               </div>
             </div>
