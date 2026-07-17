@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { MainLayout } from '../components/layout/MainLayout';
-import { Topbar } from '../components/layout/Topbar';
-import { Download, CheckCircle, XCircle, FileText, Search, Filter, Eye, Upload } from 'lucide-react';
-import { CustomSelect } from '../components/ui/CustomSelect';
-import { ImportModal } from '../components/ui/ImportModal';
-import { ExportModal } from '../components/ui/ExportModal';
+import { MainLayout } from '../../components/layout/MainLayout';
+import { Topbar } from '../../components/layout/Topbar';
+import { Download, CheckCircle, CheckCircle2, XCircle, FileText, Search, Filter, Eye, Upload } from 'lucide-react';
+import { CustomSelect } from '../../components/ui/CustomSelect';
+import { ImportModal } from '../../components/ui/ImportModal';
+import { ExportModal } from '../../components/ui/ExportModal';
 import { Link } from 'react-router-dom';
+import { DataTable } from '../../components/common/DataTable';
+import { KpiCard } from '../../components/common/KpiCard';
+import { kpiData } from '../../mock/dashboard';
 
 export const ImportDataPage = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -35,37 +38,59 @@ export const ImportDataPage = () => {
     { id: 15, name: 'Penjualan_Mei_2025.xlsx', date: '12 Mei 2025 14:20', rows: '2.610', status: 'success' },
   ];
 
+  const ActionButtons = (
+    <button 
+      className="bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+      onClick={() => setIsImportModalOpen(true)}
+    >
+      <Download size={18} />
+      Import Data
+    </button>
+  );
+
+  const historyImportColumns = [
+    { key: 'name', label: 'Nama File' },
+    { key: 'date', label: 'Tanggal Import' },
+    { key: 'rows', label: 'Jumlah Data' },
+    { key: 'status', label: 'Status' },
+    { key: 'detail', label: 'Detail' },
+  ];
+
+  const renderHistoryCell = (item: any, columnKey: string) => {
+    switch (columnKey) {
+      case 'status':
+        return item.status === 'Berhasil' || item.status === 'success' ? (
+          <span className="flex items-center gap-1.5 text-[#10b981] font-medium">
+            <CheckCircle2 size={16} /> Berhasil
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5 text-[#ef4444] font-medium">
+            <XCircle size={16} /> Gagal
+          </span>
+        );
+      case 'detail':
+        return (
+          <button className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors">
+            <Eye size={16} /> Detail
+          </button>
+        );
+      default:
+        return item[columnKey];
+    }
+  };
+
   return (
     <MainLayout>
       <Topbar 
         title="Riwayat Import" 
-        actionButton={
-          <div className="flex items-center gap-4">
-            <button 
-              className="bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-              onClick={() => {
-                setExportFileName('Data Riwayat Import');
-                setIsExportModalOpen(true);
-              }}
-            >
-              <Upload size={18} />
-              Export Data
-            </button>
-            <button 
-              className="bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-              onClick={() => setIsImportModalOpen(true)}
-            >
-              <Download size={18} />
-              Import Data
-            </button>
-          </div>
-        }
+        subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB"
+        actionButton={ActionButtons}
       />
       
-      <div className="px-8 pb-8">
+      <div className="px-8 pb-10">
         
         {/* Filter Section */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 pt-4 mt-4">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
             <div className="col-span-1 md:col-span-2">
               <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
@@ -122,7 +147,7 @@ export const ImportDataPage = () => {
 
           <div className="flex items-center gap-4 mt-6">
             <span className="text-sm text-[#10b981] flex items-center gap-1">
-              <CheckCircle size={14} /> <span className="text-gray-500">15 hasil ditemukan</span>
+              <CheckCircle2 size={16} /> <span className="text-gray-500">15 hasil ditemukan</span>
             </span>
             <div className="flex items-center gap-2 ml-4">
               <span className="text-sm text-gray-500">Filter Aktif:</span>
@@ -135,84 +160,18 @@ export const ImportDataPage = () => {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
-            <div className="flex justify-between items-start mb-4">
-              <span className="text-gray-500 text-sm">Total File Import</span>
-              <div className="w-10 h-10 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981]">
-                <FileText size={20} />
-              </div>
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">128 File</h2>
-            <span className="text-xs text-gray-400">Seluruh file yang pernah diimport</span>
-          </div>
-          
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
-            <div className="flex justify-between items-start mb-4">
-              <span className="text-gray-500 text-sm">Import Berhasil</span>
-              <div className="w-10 h-10 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#10b981]">
-                <CheckCircle size={20} />
-              </div>
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">120 File</h2>
-            <span className="text-xs text-gray-400">Status berhasil</span>
-          </div>
-
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
-            <div className="flex justify-between items-start mb-4">
-              <span className="text-gray-500 text-sm">Import Gagal</span>
-              <div className="w-10 h-10 rounded-full bg-[#fee2e2] flex items-center justify-center text-[#ef4444]">
-                <XCircle size={20} />
-              </div>
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">8 File</h2>
-            <span className="text-xs text-gray-400">Status Gagal</span>
-          </div>
+          {kpiData.slice(0, 3).map((kpi) => (
+            <KpiCard key={kpi.id} {...kpi} />
+          ))}
         </div>
 
         {/* Table Section */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <h3 className="font-bold text-gray-900 mb-6 text-lg">Tabel Riwayat Import</h3>
-          <div className="overflow-x-auto overflow-y-auto max-h-[400px] custom-scroll pr-2">
-            <table className="w-full text-sm text-left">
-              <thead className="text-gray-400 border-b border-gray-100 sticky top-0 bg-white z-10">
-                <tr>
-                  <th className="pb-4 font-medium">Nama File</th>
-                  <th className="pb-4 font-medium">Tanggal Import</th>
-                  <th className="pb-4 font-medium">Jumlah Data</th>
-                  <th className="pb-4 font-medium">Status</th>
-                  <th className="pb-4 font-medium">Detail</th>
-                </tr>
-              </thead>
-              <tbody>
-                {historyData.map((item) => (
-                  <tr key={item.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
-                    <td className="py-4 font-medium text-gray-700">{item.name}</td>
-                    <td className="py-4 text-gray-600">{item.date}</td>
-                    <td className="py-4 text-gray-600">{item.rows}</td>
-                    <td className="py-4">
-                      {item.status === 'success' ? (
-                        <span className="flex items-center gap-1.5 text-[#10b981] font-medium">
-                          <CheckCircle size={14} /> Berhasil
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1.5 text-[#ef4444] font-medium">
-                          <XCircle size={14} /> Gagal
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-4">
-                      <Link to="/" className="flex items-center gap-1.5 text-gray-500 hover:text-[#3b0764] transition-colors w-fit">
-                        <Eye size={16} />
-                        <span>Detail</span>
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
+        <DataTable
+          title="Tabel Riwayat Import"
+          columns={historyImportColumns}
+          data={historyData}
+          renderCell={renderHistoryCell}
+        />
       </div>
 
       <ImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />

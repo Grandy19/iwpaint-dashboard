@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { MainLayout } from '../components/layout/MainLayout';
-import { Topbar } from '../components/layout/Topbar';
-import { useFilterStore } from '../store/useFilterStore';
+import { MainLayout } from '../../components/layout/MainLayout';
+import { Topbar } from '../../components/layout/Topbar';
+import { useFilterStore } from '../../store/useFilterStore';
 import { Filter, TrendingUp, Package, Activity, Banknote, Wallet, Download, Upload } from 'lucide-react';
-import { CustomSelect } from '../components/ui/CustomSelect';
-import { CustomerTable } from '../components/charts/customer/CustomerTable';
-import { CustomerDonutChart } from '../components/charts/customer/CustomerDonutChart';
-import { formatShortCurrency, formatShortNumber } from '../utils/formatters';
-import { CustomerTrendChart } from '../components/charts/customer/CustomerTrendChart';
-import { CustomerTopProductsChart } from '../components/charts/customer/CustomerTopProductsChart';
-import { ImportModal } from '../components/ui/ImportModal';
-import { ExportModal } from '../components/ui/ExportModal';
+import { CustomSelect } from '../../components/ui/CustomSelect';
+import { CustomerTable } from '../../components/charts/customer/CustomerTable';
+import { CustomerDonutChart } from '../../components/charts/customer/CustomerDonutChart';
+import { formatShortCurrency, formatShortNumber } from '../../utils/formatters';
+import { CustomerTrendChart } from '../../components/charts/customer/CustomerTrendChart';
+import { CustomerTopProductsChart } from '../../components/charts/customer/CustomerTopProductsChart';
+import { ImportModal } from '../../components/ui/ImportModal';
+import { ExportModal } from '../../components/ui/ExportModal';
 import { Link } from 'react-router-dom';
 
 export const CustomerPage = () => {

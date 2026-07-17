@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { MainLayout } from '../components/layout/MainLayout';
-import { Topbar } from '../components/layout/Topbar';
-import { useFilterStore } from '../store/useFilterStore';
+import { MainLayout } from '../../components/layout/MainLayout';
+import { Topbar } from '../../components/layout/Topbar';
+import { useFilterStore } from '../../store/useFilterStore';
 import { Filter, TrendingUp, Package, Banknote, Wallet, Download, Users, Upload } from 'lucide-react';
-import { CustomSelect } from '../components/ui/CustomSelect';
-import { SalesTable } from '../components/charts/sales/SalesTable';
-import { SalesDonutChart } from '../components/charts/sales/SalesDonutChart';
-import { formatShortCurrency, formatShortNumber } from '../utils/formatters';
-import { TrendLineChart } from '../components/charts/TrendLineChart';
-import { SalesTopProductsChart } from '../components/charts/sales/SalesTopProductsChart';
-import { SalesTransactionTable } from '../components/charts/sales/SalesTransactionTable';
-import { SalesBarChart } from '../components/charts/SalesBarChart';
-import { ImportModal } from '../components/ui/ImportModal';
-import { ExportModal } from '../components/ui/ExportModal';
+import { CustomSelect } from '../../components/ui/CustomSelect';
+import { SalesTable } from '../../components/charts/sales/SalesTable';
+import { SalesDonutChart } from '../../components/charts/sales/SalesDonutChart';
+import { formatShortCurrency, formatShortNumber } from '../../utils/formatters';
+import { TrendLineChart } from '../../components/charts/TrendLineChart';
+import { SalesTopProductsChart } from '../../components/charts/sales/SalesTopProductsChart';
+import { SalesTransactionTable } from '../../components/charts/sales/SalesTransactionTable';
+import { SalesBarChart } from '../../components/charts/SalesBarChart';
+import { ImportModal } from '../../components/ui/ImportModal';
+import { ExportModal } from '../../components/ui/ExportModal';
 import { Link } from 'react-router-dom';
 
 export const SalesPage = () => {

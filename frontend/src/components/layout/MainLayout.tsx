@@ -11,7 +11,7 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
       <Sidebar />
       <main className={clsx(
         "flex-1 p-2 relative transition-all duration-300",
-        isSidebarCollapsed ? "ml-20" : "ml-64"
+        isSidebarCollapsed ? "ml-20" : "ml-[260px]"
       )}>
         {children}
       </main>
