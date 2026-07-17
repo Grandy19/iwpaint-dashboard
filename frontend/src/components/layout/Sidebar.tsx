@@ -25,18 +25,21 @@ export const Sidebar = () => {
       isSidebarCollapsed ? "w-20" : "w-[260px]"
     )}>
       <div className={clsx(
-        "p-6 flex items-center border-b border-gray-100 h-[88px]",
-        isSidebarCollapsed ? "justify-center" : "justify-between"
+        "p-6 flex items-center border-b border-gray-100 h-[88px] relative",
+        "justify-center"
       )}>
         {!isSidebarCollapsed && (
-          <div className="flex items-center">
-            <img src="/logo.png" alt="IW Paint Logo" className="h-10 object-contain" />
+          <div className="flex items-center justify-center">
+            <img src="/logo.png" alt="IW Paint Logo" className="h-14 object-contain" />
           </div>
         )}
         
         <button 
           onClick={toggleSidebar} 
-          className="text-gray-500 hover:text-gray-900 transition-colors"
+          className={clsx(
+            "text-gray-500 hover:text-gray-900 transition-colors",
+            !isSidebarCollapsed && "absolute right-6"
+          )}
         >
           <Menu size={24} />
         </button>

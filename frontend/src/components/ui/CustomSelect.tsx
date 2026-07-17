@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, ReactNode } from 'react';
 import { ChevronDown, Check, Search } from 'lucide-react';
 
 interface CustomSelectProps {
@@ -7,6 +7,8 @@ interface CustomSelectProps {
   options: string[];
   placeholder?: string;
   showSearch?: boolean;
+  icon?: ReactNode;
+  triggerClassName?: string;
 }
 
 export const CustomSelect: React.FC<CustomSelectProps> = ({ 
@@ -14,7 +16,9 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   onChange, 
   options,
   placeholder = 'Pilih salah satu...',
-  showSearch = true
+  showSearch = true,
+  icon,
+  triggerClassName
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,13 +52,21 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
     opt.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const defaultTriggerClass = "flex items-center justify-between w-full bg-white border border-gray-200 rounded-lg px-4 py-2 text-gray-900 cursor-pointer focus-within:ring-2 focus-within:ring-[#3b0764]";
+  const combinedTriggerClass = triggerClassName || defaultTriggerClass;
+
   return (
     <div className="relative w-full" ref={dropdownRef}>
       {/* Trigger Button */}
       <div 
-        className="flex items-center justify-between w-full bg-white border border-gray-200 rounded-lg px-4 py-2 text-gray-900 cursor-pointer focus-within:ring-2 focus-within:ring-[#3b0764]"
+        className={combinedTriggerClass}
         onClick={toggleOpen}
       >
+        {icon && (
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+            {icon}
+          </div>
+        )}
         <span className="truncate">{value || placeholder}</span>
         <ChevronDown size={16} className={`text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>

@@ -40,7 +40,7 @@ export const ImportDataPage = () => {
 
   const ActionButtons = (
     <button 
-      className="bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+      className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
       onClick={() => setIsImportModalOpen(true)}
     >
       <Download size={18} />
@@ -142,18 +142,6 @@ export const ImportDataPage = () => {
                 <Filter size={18} />
                 Terapkan
               </button>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 mt-6">
-            <span className="text-sm text-[#10b981] flex items-center gap-1">
-              <CheckCircle2 size={16} /> <span className="text-gray-500">15 hasil ditemukan</span>
-            </span>
-            <div className="flex items-center gap-2 ml-4">
-              <span className="text-sm text-gray-500">Filter Aktif:</span>
-              <span className="text-sm font-medium bg-[#e0f2fe] text-[#0ea5e9] px-3 py-1 rounded-md">
-                1 Juni 2026 - 30 Juni 2026
-              </span>
             </div>
           </div>
         </div>

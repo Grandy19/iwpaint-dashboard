@@ -8,56 +8,80 @@ interface ExportModalProps {
 }
 
 export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, fileName }) => {
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
 
   useEffect(() => {
     if (isOpen) {
       setStep(1);
-      // Simulate processing
-      const timer = setTimeout(() => {
-        setStep(2);
-      }, 2000);
-      return () => clearTimeout(timer);
     }
   }, [isOpen]);
+
+  const handleExport = () => {
+    setStep(2);
+    // Simulate processing
+    setTimeout(() => {
+      setStep(3);
+      // Auto close success alert
+      setTimeout(() => {
+        onClose();
+      }, 1500);
+    }, 2000);
+  };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={step === 1 ? onClose : undefined}>
       {step === 1 && (
-        <div className="bg-white rounded-2xl w-[500px] p-8 relative shadow-lg">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold text-gray-900">Export Status</h3>
-            <span className="flex items-center gap-2 text-gray-500 text-sm">
-              <RefreshCw size={16} className="animate-spin" /> Memproses
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-[#f3e8ff] flex items-center justify-center text-[#3b0764]">
-              <FileText size={24} />
-            </div>
-            <div>
-              <p className="font-bold text-gray-900">{fileName}</p>
-              <p className="text-sm text-gray-500">Sedang mengerjakan ...</p>
-            </div>
+        <div className="bg-white rounded-2xl w-[400px] p-8 shadow-xl relative text-center" onClick={(e) => e.stopPropagation()}>
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Export</h3>
+          <p className="text-gray-600 mb-8">Apakah Anda ingin mengekspor data tersebut?</p>
+          <div className="flex justify-center gap-4">
+            <button 
+              onClick={onClose}
+              className="w-[120px] bg-[#ef4444] hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition-colors"
+            >
+              Tidak
+            </button>
+            <button 
+              onClick={handleExport}
+              className="w-[120px] bg-[#52b788] hover:bg-[#40916c] text-white py-2.5 rounded-xl font-medium transition-colors"
+            >
+              Export
+            </button>
           </div>
         </div>
       )}
 
       {step === 2 && (
-        <div className="bg-white rounded-2xl w-[400px] p-8 shadow-xl text-center">
-          <div className="flex justify-center mb-4">
-            <CheckCircle2 size={32} className="text-[#10b981]" />
+        <div className="bg-white rounded-2xl w-[500px] p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-bold text-gray-900 text-lg">Export Status</h3>
+            <div className="flex items-center gap-2 text-gray-500 text-sm">
+              <RefreshCw size={14} className="animate-spin" />
+              Memproses
+            </div>
           </div>
-          <h3 className="font-bold text-[#10b981] text-xl mb-8">File Berhasil di Export</h3>
-          <button 
-            onClick={onClose}
-            className="bg-[#52b788] hover:bg-[#40916c] text-white px-8 py-2.5 rounded-lg font-medium transition-colors"
-          >
-            Kembali
-          </button>
+          
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-[#f3e8ff] flex items-center justify-center text-[#9333ea] shrink-0">
+              <FileText size={24} />
+            </div>
+            <div>
+              <p className="font-medium text-gray-900">{fileName}</p>
+              <p className="text-sm text-gray-500 mt-1">Sedang mengerjakan ...</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {step === 3 && (
+        <div className="bg-white rounded-2xl w-[350px] p-8 shadow-xl relative text-center" onClick={(e) => e.stopPropagation()}>
+          <div className="w-16 h-16 bg-green-100 text-[#52b788] rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 size={32} />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Berhasil!</h3>
+          <p className="text-gray-600">Data berhasil diekspor.</p>
         </div>
       )}
     </div>

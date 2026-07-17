@@ -9,6 +9,7 @@ import { targetSalesKpiData, targetSalesSummary, targetSalesTableData } from '..
 import { salesDetailKpiData, salesDetailSummary, salesDetailTargetRealisasi } from '../../mock/targetSalesDetail';
 import { TargetSalesModal } from '../../components/ui/TargetSalesModal';
 import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
+import { ExportModal } from '../../components/ui/ExportModal';
 
 export const TargetSalesPage = () => {
   const [startDate, setStartDate] = useState('01 Juli 2026');
@@ -19,12 +20,17 @@ export const TargetSalesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [selectedTarget, setSelectedTarget] = useState<any>(null);
+  
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const isDetailView = salesName !== 'Semua Sales';
 
   const ActionButtons = (
     <div className="flex items-center gap-4">
-      <button className="bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+      <button 
+        onClick={() => setIsExportModalOpen(true)}
+        className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+      >
         <Upload size={18} />
         Export Data
       </button>
@@ -34,7 +40,7 @@ export const TargetSalesPage = () => {
           setModalMode('create');
           setIsModalOpen(true);
         }}
-        className="bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+        className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
       >
         <Plus size={18} />
         {isDetailView ? 'Tambah Sales' : 'Input Target'}
@@ -248,6 +254,12 @@ export const TargetSalesPage = () => {
           }}
         />
       </div>
+
+      <ExportModal 
+        isOpen={isExportModalOpen} 
+        onClose={() => setIsExportModalOpen(false)} 
+        fileName="Data_Target_Sales.xlsx" 
+      />
     </MainLayout>
   );
 };

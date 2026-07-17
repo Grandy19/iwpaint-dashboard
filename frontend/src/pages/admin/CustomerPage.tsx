@@ -49,7 +49,7 @@ export const CustomerPage = () => {
   const ActionButtons = (
     <div className="flex items-center gap-4">
       <button 
-        className="bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+        className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
         onClick={() => setIsExportModalOpen(true)}
       >
         <Upload size={18} />
@@ -57,7 +57,7 @@ export const CustomerPage = () => {
       </button>
       <button 
         onClick={() => setIsImportModalOpen(true)}
-        className="bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+        className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
       >
         <Download size={18} />
         Import Data

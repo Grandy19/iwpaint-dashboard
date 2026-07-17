@@ -23,6 +23,10 @@ export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose }) => 
     // Simulate processing
     setTimeout(() => {
       setStep(3);
+      // Auto close success alert
+      setTimeout(() => {
+        handleClose();
+      }, 1500);
     }, 2000);
   };
 
@@ -85,17 +89,12 @@ export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose }) => 
       )}
 
       {step === 3 && (
-        <div className="bg-white rounded-2xl w-[400px] p-8 shadow-xl text-center">
-          <div className="flex justify-center mb-4">
-            <CheckCircle2 size={32} className="text-[#10b981]" />
+        <div className="bg-white rounded-2xl w-[350px] p-8 shadow-xl relative text-center">
+          <div className="w-16 h-16 bg-green-100 text-[#52b788] rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 size={32} />
           </div>
-          <h3 className="font-bold text-[#10b981] text-xl mb-8">File Berhasil di Unggah</h3>
-          <button 
-            onClick={handleClose}
-            className="bg-[#52b788] hover:bg-[#40916c] text-white px-8 py-2.5 rounded-lg font-medium transition-colors"
-          >
-            Kembali
-          </button>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Berhasil!</h3>
+          <p className="text-gray-600">File berhasil diunggah.</p>
         </div>
       )}
     </div>

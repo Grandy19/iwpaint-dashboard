@@ -1,15 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { CheckCircle2, XCircle, Eye, Download } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { ProgressCard } from '../../components/common/ProgressCard';
 import { DataTable } from '../../components/common/DataTable';
+import { ImportModal } from '../../components/ui/ImportModal';
 import { kpiData, progressData, historyImportData, recentActivityData } from '../../mock/dashboard';
 
 export const DashboardPage = () => {
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+
   const ActionButtons = (
-    <button className="bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+    <button 
+      onClick={() => setIsImportModalOpen(true)}
+      className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+    >
       <Download size={18} />
       Import Data
     </button>
@@ -70,49 +76,56 @@ export const DashboardPage = () => {
   };
 
   return (
-    <MainLayout>
-      <Topbar title="Dashboard Admin" subtitle="Selamat Datang Admin" actionButton={ActionButtons} />
+    <>
+      <MainLayout>
+        <Topbar title="Dashboard Admin" subtitle="Selamat Datang Admin" actionButton={ActionButtons} />
 
-      <div className="px-8 pb-10">
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 pt-4">
-          {kpiData.map((kpi) => (
-            <KpiCard key={kpi.id} {...kpi} />
-          ))}
-        </div>
+        <div className="px-8 pb-10">
+          {/* KPI Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 pt-4">
+            {kpiData.map((kpi) => (
+              <KpiCard key={kpi.id} {...kpi} />
+            ))}
+          </div>
 
-          {/* Progress Card */}
-          <ProgressCard {...progressData} />
+            {/* Progress Card */}
+            <ProgressCard {...progressData} />
 
-          {/* History Table */}
-          <DataTable
-            title="Tabel Riwayat Import"
-            columns={[
-              { key: 'name', label: 'Nama File' },
-              { key: 'date', label: 'Tanggal Import' },
-              { key: 'rows', label: 'Jumlah Data' },
-              { key: 'status', label: 'Status' },
-              { key: 'detail', label: 'Detail' },
-            ]}
-            data={historyImportData}
-            renderCell={renderHistoryCell}
-          />
+            {/* History Table */}
+            <DataTable
+              title="Tabel Riwayat Import"
+              columns={[
+                { key: 'name', label: 'Nama File' },
+                { key: 'date', label: 'Tanggal Import' },
+                { key: 'rows', label: 'Jumlah Data' },
+                { key: 'status', label: 'Status' },
+                { key: 'detail', label: 'Detail' },
+              ]}
+              data={historyImportData}
+              renderCell={renderHistoryCell}
+            />
 
-          {/* Activity Table */}
-          <DataTable
-            title="Aktivitas Terbaru"
-            columns={[
-              { key: 'date', label: 'Tanggal' },
-              { key: 'type', label: 'Jenis Aktivitas' },
-              { key: 'description', label: 'Deskripsi' },
-              { key: 'status', label: 'Status' },
-              { key: 'role', label: 'Role' },
-              { key: 'username', label: 'Username' },
-            ]}
-            data={recentActivityData}
-            renderCell={renderActivityCell}
-          />
-        </div>
-    </MainLayout>
+            {/* Activity Table */}
+            <DataTable
+              title="Aktivitas Terbaru"
+              columns={[
+                { key: 'date', label: 'Tanggal' },
+                { key: 'type', label: 'Jenis Aktivitas' },
+                { key: 'description', label: 'Deskripsi' },
+                { key: 'status', label: 'Status' },
+                { key: 'role', label: 'Role' },
+                { key: 'username', label: 'Username' },
+              ]}
+              data={recentActivityData}
+              renderCell={renderActivityCell}
+            />
+          </div>
+      </MainLayout>
+
+      <ImportModal 
+        isOpen={isImportModalOpen} 
+        onClose={() => setIsImportModalOpen(false)} 
+      />
+    </>
   );
 };
