@@ -3,6 +3,7 @@ import React from 'react';
 interface Column {
   key: string;
   label: string;
+  align?: 'left' | 'center' | 'right';
 }
 
 interface DataTableProps {
@@ -20,8 +21,12 @@ export const DataTable: React.FC<DataTableProps> = ({ title, columns, data, rend
         <table className="w-full text-sm text-left">
           <thead className="text-gray-400 border-b border-gray-100 sticky top-0 bg-white z-10">
             <tr>
+              <th className="pb-4 font-medium whitespace-nowrap px-1 w-[50px]">No</th>
               {columns.map((col) => (
-                <th key={col.key} className="pb-4 font-medium whitespace-nowrap px-1">
+                <th 
+                  key={col.key} 
+                  className={`pb-4 font-medium whitespace-nowrap px-1 ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''}`}
+                >
                   {col.label}
                 </th>
               ))}
@@ -33,8 +38,14 @@ export const DataTable: React.FC<DataTableProps> = ({ title, columns, data, rend
                 key={item.id || rowIndex} 
                 className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors"
               >
+                <td className="py-4 px-1 text-gray-600 font-medium">
+                  {rowIndex + 1}
+                </td>
                 {columns.map((col) => (
-                  <td key={col.key} className="py-4 px-1 text-gray-600">
+                  <td 
+                    key={col.key} 
+                    className={`py-4 px-1 text-gray-600 ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''}`}
+                  >
                     {renderCell(item, col.key)}
                   </td>
                 ))}

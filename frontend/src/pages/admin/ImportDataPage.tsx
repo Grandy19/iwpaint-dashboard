@@ -89,8 +89,15 @@ export const ImportDataPage = () => {
       
       <div className="px-8 pb-10">
         
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 pt-4">
+          {kpiData.slice(0, 3).map((kpi) => (
+            <KpiCard key={kpi.id} {...kpi} />
+          ))}
+        </div>
+
         {/* Filter Section */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 pt-4 mt-4">
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
             <div className="col-span-1 md:col-span-2">
               <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
@@ -144,13 +151,6 @@ export const ImportDataPage = () => {
               </button>
             </div>
           </div>
-        </div>
-
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {kpiData.slice(0, 3).map((kpi) => (
-            <KpiCard key={kpi.id} {...kpi} />
-          ))}
         </div>
 
         {/* Table Section */}
