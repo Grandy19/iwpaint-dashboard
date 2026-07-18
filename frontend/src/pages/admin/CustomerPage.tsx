@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Upload, Filter, Eye } from 'lucide-react';
+import { Upload, Filter, Eye, Package, Download } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
 import { ExportModal } from '../../components/ui/ExportModal';
+import { ImportModal } from '../../components/ui/ImportModal';
 import { CustomerModal } from '../../components/ui/CustomerModal';
 import { customerKpiData, customerTableData, transactionTableData } from '../../mock/customer';
 
@@ -16,18 +17,28 @@ export const CustomerPage = () => {
   const [customerName, setCustomerName] = useState('Semua Customer');
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
 
   const ActionButtons = (
-    <button 
-      onClick={() => setIsExportModalOpen(true)}
-      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-    >
-      <Upload size={18} />
-      Export Data
-    </button>
+    <div className="flex gap-4">
+      <button 
+        onClick={() => setIsExportModalOpen(true)}
+        className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+      >
+        <Upload size={18} />
+        Export Data
+      </button>
+      <button 
+        onClick={() => setIsImportModalOpen(true)}
+        className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+      >
+        <Download size={18} />
+        Import Data
+      </button>
+    </div>
   );
 
   const customerColumns = [
@@ -133,9 +144,23 @@ export const CustomerPage = () => {
 
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {customerKpiData.map((kpi) => (
-              <KpiCard key={kpi.id} {...kpi} />
-            ))}
+            {customerKpiData.map((kpi) => {
+              if (kpi.id === 3 && customerName !== 'Semua Customer') {
+                return (
+                  <KpiCard 
+                    key={kpi.id} 
+                    id={kpi.id}
+                    title="Total Qty Penjualan"
+                    value="1.500 Kg"
+                    description="Total qty penjualan untuk customer terpilih"
+                    icon={Package}
+                    iconColor="text-[#10b981]"
+                    iconBg="bg-[#dcfce7]"
+                  />
+                );
+              }
+              return <KpiCard key={kpi.id} {...kpi} />;
+            })}
           </div>
 
           {/* Table Customer */}
@@ -148,9 +173,11 @@ export const CustomerPage = () => {
 
           {/* Table Transaksi */}
           <DataTable
-            title="Tabel Transaksi Seluruh Customer"
+            title={customerName === 'Semua Customer' ? "Tabel Transaksi Seluruh Customer" : "Tabel Transaksi Customer Terpilih"}
             columns={transactionColumns}
-            data={transactionTableData}
+            data={customerName === 'Semua Customer' 
+              ? transactionTableData 
+              : transactionTableData.map(item => ({ ...item, customer: customerName }))}
             renderCell={renderTransactionCell}
           />
 
@@ -161,6 +188,11 @@ export const CustomerPage = () => {
         isOpen={isExportModalOpen} 
         onClose={() => setIsExportModalOpen(false)} 
         fileName="Data_Customer.xlsx" 
+      />
+
+      <ImportModal 
+        isOpen={isImportModalOpen} 
+        onClose={() => setIsImportModalOpen(false)} 
       />
       
       <CustomerModal 

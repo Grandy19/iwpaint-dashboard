@@ -5,12 +5,13 @@ import { Download, CheckCircle, CheckCircle2, XCircle, FileText, Search, Filter,
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { ImportModal } from '../../components/ui/ImportModal';
 import { ExportModal } from '../../components/ui/ExportModal';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { DataTable } from '../../components/common/DataTable';
 import { KpiCard } from '../../components/common/KpiCard';
 import { kpiData } from '../../mock/dashboard';
 
 export const ImportDataPage = () => {
+  const navigate = useNavigate();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [exportFileName, setExportFileName] = useState('');
@@ -70,7 +71,10 @@ export const ImportDataPage = () => {
         );
       case 'detail':
         return (
-          <button className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors">
+          <button 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors"
+          >
             <Eye size={16} /> Detail
           </button>
         );

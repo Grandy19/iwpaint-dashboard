@@ -95,7 +95,9 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
     
     setTimeout(() => {
       const resultData = { ...data, area, sales: salesName, decorative, automotive, industri, totalTarget };
-      onSave(resultData);
+      if (onSave) {
+        onSave(resultData);
+      }
       setShowSuccess(false);
       onClose();
     }, 1500);

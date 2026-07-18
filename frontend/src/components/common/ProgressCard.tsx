@@ -1,5 +1,5 @@
 import React from 'react';
-import { Target } from 'lucide-react';
+import { Target, Plus } from 'lucide-react';
 
 interface ProgressCardProps {
   title: string;
@@ -8,6 +8,7 @@ interface ProgressCardProps {
   completedLabel: string;
   pendingLabel: string;
   unit: string;
+  onAction?: () => void;
 }
 
 export const ProgressCard: React.FC<ProgressCardProps> = ({
@@ -16,7 +17,8 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
   total,
   completedLabel,
   pendingLabel,
-  unit
+  unit,
+  onAction
 }) => {
   const percentage = (current / total) * 100;
 
@@ -58,8 +60,12 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
             <span className="text-gray-800 ml-1">{unit}</span>
           </div>
         </div>
-        <button className="bg-[#52b788] hover:bg-[#40916c] text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm">
-          Input Target
+        <button 
+          onClick={onAction}
+          className="bg-[#52b788] hover:bg-[#40916c] text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2"
+        >
+          <Plus size={16} />
+          Target
         </button>
       </div>
     </div>

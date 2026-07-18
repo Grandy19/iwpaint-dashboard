@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { CheckCircle2, XCircle, Eye, Download } from 'lucide-react';
+import { CheckCircle2, XCircle, Eye, Download, Plus } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { ProgressCard } from '../../components/common/ProgressCard';
 import { DataTable } from '../../components/common/DataTable';
 import { ImportModal } from '../../components/ui/ImportModal';
+import { TargetSalesModal } from '../../components/ui/TargetSalesModal';
 import { kpiData, progressData, historyImportData, recentActivityData } from '../../mock/dashboard';
 
 export const DashboardPage = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isTargetModalOpen, setIsTargetModalOpen] = useState(false);
 
   const ActionButtons = (
     <button 
@@ -89,7 +91,10 @@ export const DashboardPage = () => {
           </div>
 
             {/* Progress Card */}
-            <ProgressCard {...progressData} />
+            <ProgressCard 
+              {...progressData} 
+              onAction={() => setIsTargetModalOpen(true)}
+            />
 
             {/* History Table */}
             <DataTable
@@ -125,6 +130,14 @@ export const DashboardPage = () => {
       <ImportModal 
         isOpen={isImportModalOpen} 
         onClose={() => setIsImportModalOpen(false)} 
+      />
+
+      <TargetSalesModal
+        isOpen={isTargetModalOpen}
+        onClose={() => setIsTargetModalOpen(false)}
+        mode="create"
+        data={null}
+        onSave={() => {}}
       />
     </>
   );
