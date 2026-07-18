@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Upload, Filter, Eye, Package, Download } from 'lucide-react';
+import { Upload, Filter, Eye, Package, Download, User, Users, Receipt, Map, MapPin, Wallet, CalendarClock } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
@@ -21,6 +21,9 @@ export const CustomerPage = () => {
   
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+
+  const isAllCustomers = customerName === 'Semua Customer';
+  const selectedCustomerData = customerTableData.find(c => c.namaCustomer === customerName) || customerTableData[0];
 
   const ActionButtons = (
     <div className="flex gap-4">
@@ -145,37 +148,115 @@ export const CustomerPage = () => {
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {customerKpiData.map((kpi) => {
-              if (kpi.id === 3 && customerName !== 'Semua Customer') {
-                return (
-                  <KpiCard 
-                    key={kpi.id} 
-                    id={kpi.id}
-                    title="Total Qty Penjualan"
-                    value="1.500 Kg"
-                    description="Total qty penjualan untuk customer terpilih"
-                    icon={Package}
-                    iconColor="text-[#10b981]"
-                    iconBg="bg-[#dcfce7]"
-                  />
-                );
+              if (isAllCustomers) return <KpiCard key={kpi.id} {...kpi} />;
+              
+              if (kpi.id === 1) {
+                return <KpiCard key={kpi.id} {...kpi} value={selectedCustomerData?.totalPenjualan || 'Rp 20 Jt'} description="Total penjualan untuk customer terpilih" />;
               }
+              if (kpi.id === 2) {
+                return <KpiCard key={kpi.id} {...kpi} value={selectedCustomerData?.totalTransaksi ? `${selectedCustomerData.totalTransaksi} Transaksi` : '300 Transaksi'} description="Total transaksi untuk customer terpilih" />;
+              }
+              if (kpi.id === 3) {
+                return <KpiCard key={kpi.id} {...kpi} value={selectedCustomerData?.totalQty || '1.500 Kg'} description="Total qty penjualan untuk customer terpilih" />;
+              }
+              
               return <KpiCard key={kpi.id} {...kpi} />;
             })}
           </div>
 
-          {/* Table Customer */}
-          <DataTable
-            title="Tabel Customer"
-            columns={customerColumns}
-            data={customerTableData}
-            renderCell={renderCustomerCell}
-          />
+          {/* Customer Info or Table */}
+          {isAllCustomers ? (
+            <DataTable
+              title="Tabel Customer"
+              columns={customerColumns}
+              data={customerTableData}
+              renderCell={renderCustomerCell}
+            />
+          ) : (
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
+              <h3 className="text-gray-600 text-[18px] font-medium mb-6">Informasi Customer</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Nama Customer</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <User size={18} />
+                    </div>
+                    <input type="text" value={selectedCustomerData?.namaCustomer || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Map size={18} />
+                    </div>
+                    <input type="text" value={selectedCustomerData?.area || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Sales yang Menangani</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Users size={18} />
+                    </div>
+                    <input type="text" value={selectedCustomerData?.sales || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Alamat</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <MapPin size={18} />
+                    </div>
+                    <input type="text" value={selectedCustomerData?.alamat || 'Jl. Moh Toha No.18'} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Total Transaksi</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Receipt size={18} />
+                    </div>
+                    <input type="text" value={selectedCustomerData?.totalTransaksi ? `${selectedCustomerData.totalTransaksi} Transaksi` : ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Total Penjualan</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Wallet size={18} />
+                    </div>
+                    <input type="text" value={selectedCustomerData?.totalPenjualan || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Total QTY</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Package size={18} />
+                    </div>
+                    <input type="text" value={selectedCustomerData?.totalQty || '230 Kg'} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Transaksi Terakhir</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <CalendarClock size={18} />
+                    </div>
+                    <input type="text" value={selectedCustomerData?.transaksiTerakhir || '13 Juli 2026'} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Table Transaksi */}
           <DataTable
-            title={customerName === 'Semua Customer' ? "Tabel Transaksi Seluruh Customer" : "Tabel Transaksi Customer Terpilih"}
+            title={isAllCustomers ? "Tabel Transaksi Seluruh Customer" : "Tabel Transaksi Customer Terpilih"}
             columns={transactionColumns}
-            data={customerName === 'Semua Customer' 
+            data={isAllCustomers 
               ? transactionTableData 
               : transactionTableData.map(item => ({ ...item, customer: customerName }))}
             renderCell={renderTransactionCell}

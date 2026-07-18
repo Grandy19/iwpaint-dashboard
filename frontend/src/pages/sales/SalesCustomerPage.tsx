@@ -22,6 +22,11 @@ export const SalesCustomerPage = () => {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [appliedCustomer, setAppliedCustomer] = useState('Semua Customer');
+
+  const handleFilter = () => {
+    setAppliedCustomer(customer);
+  };
 
   const ActionButtons = (
     <button 
@@ -88,6 +93,20 @@ export const SalesCustomerPage = () => {
     { name: 'Target Penjualan', icon: Target, path: '/sales-dashboard/target' },
   ];
 
+  const isAllCustomers = appliedCustomer === 'Semua Customer';
+
+  const displayKpiData = customerKpiData.map(kpi => {
+    if (isAllCustomers) return kpi;
+    if (kpi.id === 1) return { ...kpi, value: 'Rp 20 Jt' };
+    if (kpi.id === 2) return { ...kpi, value: '300 Transaksi' };
+    if (kpi.id === 3) return { ...kpi, value: '45 Kg' };
+    return kpi;
+  });
+
+  const displayTransactions = isAllCustomers 
+    ? customerTransactionData 
+    : customerTransactionData.map(t => ({ ...t, customer: appliedCustomer }));
+
   return (
     <>
       <MainLayout sidebarItems={salesMenuItems}>
@@ -125,14 +144,20 @@ export const SalesCustomerPage = () => {
                 <label className="block text-sm text-[#475569] font-medium mb-2">Customer</label>
                 <CustomSelect 
                   value={customer} 
-                  onChange={setCustomer} 
+                  onChange={(val) => {
+                    setCustomer(val);
+                    setAppliedCustomer(val);
+                  }} 
                   options={['Semua Customer', 'TB Bangun Jaya', 'CV Sinar Mas', 'TB Toko Sejati', 'TB Sejahtera', 'CV Cirebon I']} 
                   showSearch={true}
                 />
               </div>
               
               <div className="col-span-1">
-                <button className="w-full bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px]">
+                <button 
+                  onClick={handleFilter}
+                  className="w-full bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px]"
+                >
                   <Filter size={18} />
                   Terapkan
                 </button>
@@ -142,24 +167,26 @@ export const SalesCustomerPage = () => {
 
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {customerKpiData.map((kpi) => (
+            {displayKpiData.map((kpi) => (
               <KpiCard key={kpi.id} {...kpi} />
             ))}
           </div>
 
           {/* Table Customer */}
-          <DataTable
-            title="Tabel Customer"
-            columns={customerColumns}
-            data={customerTableData}
-            renderCell={renderCustomerCell}
-          />
+          {isAllCustomers && (
+            <DataTable
+              title="Tabel Customer"
+              columns={customerColumns}
+              data={customerTableData}
+              renderCell={renderCustomerCell}
+            />
+          )}
 
           {/* Table Transaksi */}
           <DataTable
-            title="Tabel Transaksi Seluruh Customer"
+            title={isAllCustomers ? "Tabel Transaksi Seluruh Customer" : "Tabel Transaksi Customer Terpilih"}
             columns={transactionColumns}
-            data={customerTransactionData}
+            data={displayTransactions}
             renderCell={renderTransactionCell}
           />
 
