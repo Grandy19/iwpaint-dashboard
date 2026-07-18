@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, MapPin, User, Users, Info, Briefcase, CheckCircle2 } from 'lucide-react';
+import { X, Save, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, MapPin, User, Users, Info, Briefcase, CheckCircle2, Trash2 } from 'lucide-react';
 import { CustomSelect } from './CustomSelect';
 
 interface SalesModalProps {
@@ -25,6 +25,8 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
 
   // Hide native password reveal button in Edge/IE
   useEffect(() => {
@@ -69,6 +71,8 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
       setShowPassword(false);
       setShowConfirm(false);
       setShowSuccess(false);
+      setShowDeleteConfirm(false);
+      setShowDeleteSuccess(false);
     }
   }, [isOpen, mode, data]);
 
@@ -86,6 +90,19 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
         onSave({ namaSales, username, email, nomorHp, password, area, role, supervisor, status });
       }
       setShowSuccess(false);
+      onClose();
+    }, 1500);
+  };
+
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setShowDeleteConfirm(false);
+    setShowDeleteSuccess(true);
+    setTimeout(() => {
+      setShowDeleteSuccess(false);
       onClose();
     }, 1500);
   };
@@ -277,10 +294,19 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
             </div>
           </div>
 
-          <div className="flex items-center justify-center pt-2">
+          <div className="flex items-center justify-center pt-2 gap-4">
+            {data && (
+              <button 
+                onClick={handleDeleteClick}
+                className="w-[160px] bg-[#ef4444] hover:bg-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+              >
+                <Trash2 size={18} />
+                Hapus
+              </button>
+            )}
             <button 
               onClick={handleSimpanClick}
-              className="w-[200px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-[160px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
             >
               <Save size={18} />
               Simpan
@@ -322,6 +348,43 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Berhasil!</h3>
             <p className="text-gray-600">Data berhasil disimpan.</p>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirm Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="bg-white rounded-2xl w-[400px] p-8 shadow-xl relative text-center" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Hapus</h3>
+            <p className="text-gray-600 mb-8">Apakah Anda ingin menghapus user tersebut?</p>
+            <div className="flex justify-center gap-4">
+              <button 
+                onClick={() => setShowDeleteConfirm(false)}
+                className="w-[120px] bg-gray-200 hover:bg-gray-300 text-gray-800 py-2.5 rounded-xl font-medium transition-colors"
+              >
+                Tidak
+              </button>
+              <button 
+                onClick={handleConfirmDelete}
+                className="w-[120px] bg-[#ef4444] hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition-colors"
+              >
+                Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Success Alert Modal */}
+      {showDeleteSuccess && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+          <div className="bg-white rounded-2xl w-[350px] p-8 shadow-xl relative text-center">
+            <div className="w-16 h-16 bg-green-100 text-[#52b788] rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Berhasil!</h3>
+            <p className="text-gray-600">Data berhasil dihapus.</p>
           </div>
         </div>
       )}

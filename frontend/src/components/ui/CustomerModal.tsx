@@ -1,5 +1,5 @@
-import React from 'react';
-import { X, User, Users, Receipt, Package, Map, MapPin, Wallet, CalendarClock } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, User, Users, Receipt, Package, Map, MapPin, Wallet, CalendarClock, Trash2, CheckCircle2 } from 'lucide-react';
 
 interface CustomerModalProps {
   isOpen: boolean;
@@ -34,7 +34,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
             <X size={16} />
           </button>
           
-          <div className="mb-8">
+          <div className="mb-8 flex justify-between items-center">
             <h3 className="text-xl font-bold text-gray-900">
               Informasi Customer
             </h3>
