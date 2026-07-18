@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, Filter, LayoutDashboard, Users } from 'lucide-react';
+import { Download, Filter, LayoutDashboard, Users, Target } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
 import { RingkasanTargetCard } from '../../components/ui/RingkasanTargetCard';
@@ -103,6 +103,7 @@ export const SalesDashboardPage = () => {
   const salesMenuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/sales-dashboard' },
     { name: 'Customer', icon: Users, path: '/sales-dashboard/customer' },
+    { name: 'Target Penjualan', icon: Target, path: '/sales-dashboard/target' },
   ];
 
   return (
@@ -170,7 +171,7 @@ export const SalesDashboardPage = () => {
 
         {/* Target Realisasi Section */}
         <div className="mb-8">
-          <TargetRealisasiCard data={displayTargetRealisasi} onEdit={() => {}} title={targetRealisasiTitle} />
+          <TargetRealisasiCard data={displayTargetRealisasi} title={targetRealisasiTitle} />
         </div>
 
         {/* Chart Area */}

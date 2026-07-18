@@ -12,7 +12,7 @@ interface TargetItem {
 
 interface TargetRealisasiCardProps {
   data: TargetItem[];
-  onEdit: () => void;
+  onEdit?: () => void;
   title?: string;
 }
 
@@ -21,12 +21,14 @@ export const TargetRealisasiCard: React.FC<TargetRealisasiCardProps> = ({ data, 
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-gray-600 text-[18px] font-medium">{title}</h3>
-        <button 
-          onClick={onEdit}
-          className="text-gray-600 hover:text-gray-900 transition-colors"
-        >
-          <Edit3 size={18} strokeWidth={2.5} />
-        </button>
+        {onEdit && (
+          <button 
+            onClick={onEdit}
+            className="text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <Edit3 size={18} strokeWidth={2.5} />
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col gap-4">

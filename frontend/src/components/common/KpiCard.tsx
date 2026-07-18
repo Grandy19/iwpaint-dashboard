@@ -8,6 +8,7 @@ interface KpiCardProps {
   iconColor?: string;
   iconBg?: string;
   percentageLabel?: string;
+  progress?: number;
 }
 
 export const KpiCard: React.FC<KpiCardProps> = ({ 
@@ -17,7 +18,8 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   icon: Icon,
   iconColor = 'text-[#10b981]',
   iconBg = 'bg-[#dcfce7]',
-  percentageLabel
+  percentageLabel,
+  progress
 }) => {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
@@ -27,12 +29,22 @@ export const KpiCard: React.FC<KpiCardProps> = ({
           <Icon size={20} />
         </div>
       </div>
-      <div className="flex items-center gap-3 mb-6">
-        <h2 className="text-[28px] font-medium text-gray-800">{value}</h2>
-        {percentageLabel && (
-          <span className="text-sm font-semibold text-[#10b981] bg-[#dcfce7] px-2 py-0.5 rounded-full flex items-center">
-            {percentageLabel}
-          </span>
+      <div className="flex flex-col mb-6">
+        <div className={`flex items-center gap-3 ${progress !== undefined ? 'mb-4' : ''}`}>
+          <h2 className="text-[28px] font-medium text-gray-800">{value}</h2>
+          {percentageLabel && (
+            <span className="text-sm font-semibold text-[#10b981] bg-[#dcfce7] px-2 py-0.5 rounded-full flex items-center">
+              {percentageLabel}
+            </span>
+          )}
+        </div>
+        {progress !== undefined && (
+          <div className="w-full h-1.5 bg-[#e0f2fe] rounded-full">
+            <div 
+              className="h-1.5 bg-[#0ea5e9] rounded-full" 
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
         )}
       </div>
       <span className="text-xs text-gray-400">{description}</span>

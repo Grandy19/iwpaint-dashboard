@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, Filter, Eye, LayoutDashboard, Users } from 'lucide-react';
+import { Download, Filter, Eye, LayoutDashboard, Users, Target } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
@@ -85,6 +85,7 @@ export const SalesCustomerPage = () => {
   const salesMenuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/sales-dashboard' },
     { name: 'Customer', icon: Users, path: '/sales-dashboard/customer' },
+    { name: 'Target Penjualan', icon: Target, path: '/sales-dashboard/target' },
   ];
 
   return (

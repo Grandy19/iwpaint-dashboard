@@ -4,7 +4,7 @@ export const salesDashboardKpiData = [
   {
     id: 1,
     title: 'Total Penjualan (Rp)',
-    value: 'Rp 250.000.000',
+    value: '250 Jt',
     description: 'Total penjualan keseluruhan',
     icon: Banknote,
     iconColor: 'text-[#10b981]',

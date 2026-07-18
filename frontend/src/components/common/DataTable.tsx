@@ -4,6 +4,7 @@ interface Column {
   key: string;
   label: string;
   align?: 'left' | 'center' | 'right';
+  className?: string;
 }
 
 interface DataTableProps {
@@ -25,7 +26,7 @@ export const DataTable: React.FC<DataTableProps> = ({ title, columns, data, rend
               {columns.map((col) => (
                 <th 
                   key={col.key} 
-                  className={`pb-4 font-medium whitespace-nowrap px-1 ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''}`}
+                  className={`pb-4 font-medium whitespace-nowrap px-1 ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''} ${col.className || ''}`}
                 >
                   {col.label}
                 </th>
@@ -44,7 +45,7 @@ export const DataTable: React.FC<DataTableProps> = ({ title, columns, data, rend
                 {columns.map((col) => (
                   <td 
                     key={col.key} 
-                    className={`py-4 px-1 text-gray-600 ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''}`}
+                    className={`py-4 px-1 text-gray-600 ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''} ${col.className || ''}`}
                   >
                     {renderCell(item, col.key)}
                   </td>
