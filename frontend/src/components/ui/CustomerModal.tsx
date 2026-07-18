@@ -35,7 +35,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
           </button>
           
           <div className="mb-8 flex justify-between items-center">
-            <h3 className="text-xl font-bold text-gray-900">
+            <h3 className="text-gray-600 text-[18px] font-medium">
               Informasi Customer
             </h3>
           </div>

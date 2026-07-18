@@ -106,7 +106,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
           </button>
           
           <div className="mb-8">
-            <h3 className="text-xl font-bold text-gray-900">
+            <h3 className="text-gray-600 text-[18px] font-medium">
               {data ? 'Informasi Kepala Distributor' : 'Tambah Kepala Distributor'}
             </h3>
           </div>

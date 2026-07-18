@@ -13,13 +13,14 @@ interface TargetItem {
 interface TargetRealisasiCardProps {
   data: TargetItem[];
   onEdit: () => void;
+  title?: string;
 }
 
-export const TargetRealisasiCard: React.FC<TargetRealisasiCardProps> = ({ data, onEdit }) => {
+export const TargetRealisasiCard: React.FC<TargetRealisasiCardProps> = ({ data, onEdit, title = "Target vs Realisasi Bulan Ini" }) => {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="font-bold text-gray-800 text-[18px]">Target vs Realisasi</h3>
+        <h3 className="text-gray-600 text-[18px] font-medium">{title}</h3>
         <button 
           onClick={onEdit}
           className="text-gray-600 hover:text-gray-900 transition-colors"
@@ -52,7 +53,7 @@ export const TargetRealisasiCard: React.FC<TargetRealisasiCardProps> = ({ data, 
               </div>
 
               <div className="flex items-center gap-6 text-sm text-gray-500">
-                <div>
+                <div className="w-[140px]">
                   <span className="font-medium">Realisasi :</span> {item.realisasi}
                 </div>
                 <div className="w-px h-4 bg-gray-300"></div>

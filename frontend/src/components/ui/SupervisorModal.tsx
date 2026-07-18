@@ -193,7 +193,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
           </button>
           
           <div className="mb-8">
-            <h3 className="text-xl font-bold text-gray-900">
+            <h3 className="text-gray-600 text-[18px] font-medium">
               {data ? 'Informasi Supervisor' : 'Tambah Supervisor'}
             </h3>
           </div>

@@ -127,7 +127,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
             <X size={16} />
           </button>
           <div className="mb-8">
-            <h3 className="text-xl font-bold text-gray-900">
+            <h3 className="text-gray-600 text-[18px] font-medium">
               {mode === 'create' ? 'Tambah Sales' : 'Informasi Sales'}
             </h3>
           </div>

@@ -118,11 +118,11 @@ export const TargetSalesPage = () => {
       <div className="px-8 pb-10">
         
         {/* Filter Section */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 pt-4 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
             <div className="col-span-1 md:col-span-2">
               <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <CustomSelect 
                     value={startDate} 
@@ -159,7 +159,7 @@ export const TargetSalesPage = () => {
               />
             </div>
 
-            <div className="col-span-1 flex items-end">
+            <div className="col-span-1">
               <button className="w-full bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px]">
                 <Filter size={18} />
                 Terapkan
@@ -180,7 +180,7 @@ export const TargetSalesPage = () => {
 
           {/* Global Target Summary Card */}
           <div className="lg:col-span-1 bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col">
-            <h3 className="font-bold text-gray-800 mb-6">{isDetailView ? 'Ringkasan Target' : 'Ringkasan Target Global'}</h3>
+            <h3 className="text-gray-600 text-[18px] font-medium mb-6">{isDetailView ? 'Ringkasan Target' : 'Ringkasan Target Global'}</h3>
             
             <div className="flex-1 flex flex-col justify-center">
               <div className="relative w-40 h-40 mx-auto mb-8">

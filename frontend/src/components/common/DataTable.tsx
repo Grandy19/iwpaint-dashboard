@@ -16,7 +16,7 @@ interface DataTableProps {
 export const DataTable: React.FC<DataTableProps> = ({ title, columns, data, renderCell }) => {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-      <h3 className="font-bold text-gray-800 mb-6 text-[18px]">{title}</h3>
+      <h3 className="text-gray-600 text-[18px] font-medium mb-6">{title}</h3>
       <div className="overflow-y-auto overflow-x-auto max-h-[300px] pr-2 custom-scroll">
         <table className="w-full text-sm text-left">
           <thead className="text-gray-400 border-b border-gray-100 sticky top-0 bg-white z-10">

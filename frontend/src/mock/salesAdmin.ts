@@ -1,4 +1,4 @@
-import { UserCheck, CheckCircle2, XCircle } from 'lucide-react';
+import { UserCheck, CheckCircle2, XCircle, User } from 'lucide-react';
 
 export const salesAdminKpiData = [
   {
@@ -6,7 +6,7 @@ export const salesAdminKpiData = [
     title: 'Total Sales',
     value: '45 Sales',
     description: 'Total sales aktif yang terdaftar',
-    icon: UserCheck,
+    icon: User,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
   },

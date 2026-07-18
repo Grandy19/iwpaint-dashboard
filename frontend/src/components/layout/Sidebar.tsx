@@ -4,12 +4,22 @@ import clsx from 'clsx';
 import { Link, useLocation } from 'react-router-dom';
 import { useUIStore } from '../../store/useUIStore';
 
-export const Sidebar = () => {
+interface MenuItem {
+  name: string;
+  icon: React.ElementType;
+  path: string;
+}
+
+interface SidebarProps {
+  items?: MenuItem[];
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ items }) => {
   const location = useLocation();
   const currentPath = location.pathname;
   const { isSidebarCollapsed, toggleSidebar } = useUIStore();
 
-  const menuItems = [
+  const defaultMenuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
     { name: 'Riwayat Import', icon: History, path: '/import' },
     { name: 'Target Sales', icon: Target, path: '/target-sales' },
@@ -18,6 +28,8 @@ export const Sidebar = () => {
     { name: 'Supervisor', icon: UserCheck, path: '/supervisor' },
     { name: 'Kepala Distributor', icon: ShieldCheck, path: '/distributor' },
   ];
+
+  const menuItemsToRender = items || defaultMenuItems;
 
   return (
     <aside className={clsx(
@@ -46,7 +58,7 @@ export const Sidebar = () => {
       </div>
 
       <nav className="flex-1 py-6 px-4 flex flex-col gap-2">
-        {menuItems.map((item) => {
+        {menuItemsToRender.map((item) => {
           const isActive = currentPath === item.path;
           return (
             <Link

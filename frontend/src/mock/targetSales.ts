@@ -1,4 +1,4 @@
-import { Target, CheckCircle2, XCircle, UserCheck } from 'lucide-react';
+import { Target, CheckCircle2, XCircle, UserCheck, User } from 'lucide-react';
 import { CustomSalesIcon } from '../components/common/CustomSalesIcon';
 
 export const targetSalesKpiData = [
@@ -7,7 +7,7 @@ export const targetSalesKpiData = [
     title: 'Total Sales',
     value: '45 Sales',
     description: 'Total Semua Sales',
-    icon: UserCheck,
+    icon: User,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
   },

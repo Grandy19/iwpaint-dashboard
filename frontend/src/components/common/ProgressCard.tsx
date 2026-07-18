@@ -30,7 +30,7 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
           <div className="w-10 h-10 rounded-xl bg-[#dcfce7] flex items-center justify-center text-[#10b981]">
             <Target size={20} />
           </div>
-          <span className="font-bold text-gray-800 text-[18px]">{title}</span>
+          <span className="text-gray-600 text-[18px] font-medium">{title}</span>
         </div>
         <div className="font-bold text-gray-800 text-[18px]">
           {current}/{total}

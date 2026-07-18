@@ -122,7 +122,7 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
             <X size={16} />
           </button>
           <div className="mb-8">
-            <h3 className="text-xl font-bold text-gray-900">
+            <h3 className="text-gray-600 text-[18px] font-medium">
               {mode === 'create' ? 'Input Target Sales' : 'Edit Target Sales'}
             </h3>
           </div>

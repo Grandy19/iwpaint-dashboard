@@ -32,7 +32,7 @@ export const salesDetailKpiData = [
   {
     id: 4,
     title: 'Total Transaksi',
-    value: '350',
+    value: '350 Transaksi',
     description: 'Periode Juni 2026',
     icon: CreditCard,
     iconColor: 'text-[#10b981]',
@@ -53,23 +53,23 @@ export const salesDetailTargetRealisasi = [
     title: 'Decorative',
     icon: PaintRoller,
     percentage: 80,
-    realisasi: '160.000.000',
-    target: '200.000.000'
+    realisasi: 'Rp 160 Jt',
+    target: 'Rp 200 Jt'
   },
   {
     id: 'automotive',
     title: 'Automotive',
     icon: Wrench,
     percentage: 81,
-    realisasi: '65.000.000',
-    target: '80.000.000'
+    realisasi: 'Rp 65 Jt',
+    target: 'Rp 80 Jt'
   },
   {
     id: 'industri',
     title: 'Industri',
     icon: Factory,
     percentage: 90,
-    realisasi: '45.000.000',
-    target: '50.000.000'
+    realisasi: 'Rp 45 Jt',
+    target: 'Rp 50 Jt'
   }
 ];

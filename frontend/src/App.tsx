@@ -9,6 +9,9 @@ import { TargetSalesPage } from './pages/admin/TargetSalesPage';
 import { SupervisorPage } from './pages/admin/SupervisorPage';
 import { KepalaDistributorPage } from './pages/admin/KepalaDistributorPage';
 
+import { SalesDashboardPage } from './pages/sales/SalesDashboardPage';
+import { SalesCustomerPage } from './pages/sales/SalesCustomerPage';
+
 function App() {
   return (
     <BrowserRouter>
@@ -20,6 +23,11 @@ function App() {
         <Route path="/target-sales" element={<TargetSalesPage />} />
         <Route path="/supervisor" element={<SupervisorPage />} />
         <Route path="/distributor" element={<KepalaDistributorPage />} />
+        
+        {/* Role: Sales */}
+        <Route path="/sales-dashboard" element={<SalesDashboardPage />} />
+        <Route path="/sales-dashboard/customer" element={<SalesCustomerPage />} />
+
         <Route path="*" element={<DashboardPage />} />
       </Routes>
     </BrowserRouter>
