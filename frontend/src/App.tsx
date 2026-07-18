@@ -7,6 +7,7 @@ import { SalesPage } from './pages/admin/SalesPage';
 
 import { TargetSalesPage } from './pages/admin/TargetSalesPage';
 import { SupervisorPage } from './pages/admin/SupervisorPage';
+import { KepalaDistributorPage } from './pages/admin/KepalaDistributorPage';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/import" element={<ImportDataPage />} />
         <Route path="/target-sales" element={<TargetSalesPage />} />
         <Route path="/supervisor" element={<SupervisorPage />} />
+        <Route path="/distributor" element={<KepalaDistributorPage />} />
         <Route path="*" element={<DashboardPage />} />
       </Routes>
     </BrowserRouter>
