@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Upload, Filter, Eye, Package, Download, User, Users, Receipt, Map, MapPin, Wallet, CalendarClock } from 'lucide-react';
@@ -23,7 +23,7 @@ export const CustomerPage = () => {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
 
   const isAllCustomers = customerName === 'Semua Customer';
-  const selectedCustomerData = customerTableData.find(c => c.namaCustomer === customerName) || customerTableData[0];
+  const selectedCustomerData = (customerTableData.find(c => c.namaCustomer === customerName) || customerTableData[0]) as any;
 
   const ActionButtons = (
     <div className="flex gap-4">

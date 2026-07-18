@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Upload, Plus, CheckCircle2, XCircle, Eye, Filter, User, UserCircle, Mail, Phone, Lock, Map, MapPin, Briefcase, Users, Info, EyeOff, Save, Trash2 } from 'lucide-react';
@@ -134,7 +134,7 @@ export const SalesPage = () => {
   });
 
   const isAllSales = salesName === 'Semua Sales';
-  const selectedSalesData = sortedSalesData.find(s => s.namaSales === salesName) || sortedSalesData[0];
+  const selectedSalesData = (sortedSalesData.find(s => s.namaSales === salesName) || sortedSalesData[0]) as any;
 
   useEffect(() => {
     if (!isAllSales && selectedSalesData) {
