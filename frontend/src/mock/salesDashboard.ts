@@ -1,4 +1,4 @@
-import { Wallet, Package, Receipt, Users, PaintRoller, Wrench, Factory, Banknote } from 'lucide-react';
+import { Wallet, Package, Receipt, Users, PaintRoller, Wrench, Factory, Banknote, WalletCards } from 'lucide-react';
 
 export const salesDashboardKpiData = [
   {
