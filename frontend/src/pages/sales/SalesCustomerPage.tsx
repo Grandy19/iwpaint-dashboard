@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Download, Filter, Eye, LayoutDashboard, Users, Target, User, Map, MapPin, Receipt, Wallet, Package, CalendarClock } from 'lucide-react';
@@ -7,6 +7,9 @@ import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
 import { ExportModal } from '../../components/ui/ExportModal';
 import { CustomerModal } from '../../components/ui/CustomerModal';
+import { ChartCard } from '../../components/ui/ChartCard';
+import { TopProductsCard } from '../../components/ui/TopProductsCard';
+import { salesChartData, salesTopProductsData } from '../../mock/salesDashboard';
 
 import { 
   customerKpiData, 
@@ -23,6 +26,9 @@ export const SalesCustomerPage = () => {
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [appliedCustomer, setAppliedCustomer] = useState('Semua Customer');
+
+  const [chartJenisData, setChartJenisData] = useState('Total Penjualan');
+  const [chartPeriode, setChartPeriode] = useState('Hari');
 
   const handleFilter = () => {
     setAppliedCustomer(customer);
@@ -108,6 +114,47 @@ export const SalesCustomerPage = () => {
     ? customerTransactionData 
     : customerTransactionData.map(t => ({ ...t, customer: appliedCustomer }));
 
+  const displayTopProducts = isAllCustomers 
+    ? salesTopProductsData 
+    : salesTopProductsData.map(item => ({
+        ...item,
+        value: item.value * 0.6,
+        max: 80000000,
+        label: `Rp ${(item.value * 0.6 / 1000000).toFixed(0)} Jt`
+      }));
+
+  const dynamicChartData = useMemo(() => {
+    if (chartPeriode === 'Hari') {
+      const baseData = Array.from({ length: 30 }, (_, i) => {
+        const day = (i + 1).toString().padStart(2, '0');
+        return {
+          date: `${day}/07/2026`,
+          value: Math.floor(40000000 + Math.random() * 60000000)
+        };
+      });
+      for (let i = 0; i < salesChartData.length; i++) {
+        baseData[i] = salesChartData[i];
+      }
+      if (chartJenisData === 'Total Qty') {
+        return baseData.map(item => ({ ...item, value: item.value / 10000 }));
+      }
+      return baseData;
+    } else if (chartPeriode === 'Bulan') {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+      return months.map(m => ({
+        date: m,
+        value: Math.floor(400000000 + Math.random() * 600000000) / (chartJenisData === 'Total Qty' ? 10000 : 1)
+      }));
+    } else if (chartPeriode === 'Tahun') {
+      const years = ['2023', '2024', '2025', '2026'];
+      return years.map(y => ({
+        date: y,
+        value: Math.floor(400000000 + Math.random() * 600000000) / (chartJenisData === 'Total Qty' ? 10000 : 1)
+      }));
+    }
+    return salesChartData;
+  }, [chartPeriode, chartJenisData]);
+
   return (
     <>
       <MainLayout sidebarItems={salesMenuItems}>
@@ -176,7 +223,7 @@ export const SalesCustomerPage = () => {
           {/* Table Customer */}
           {isAllCustomers ? (
             <DataTable
-              title="Tabel Customer"
+              title="Tabel Keseluruhan Customer Berdasarkan Total Penjualan"
               columns={customerColumns}
               data={customerTableData}
               renderCell={renderCustomerCell}
@@ -261,9 +308,28 @@ export const SalesCustomerPage = () => {
             </div>
           )}
 
+          {/* Tren Pembelian Customer */}
+          <div className="mb-8">
+            <ChartCard 
+              data={dynamicChartData} 
+              title={isAllCustomers ? "Tren Pembelian Keseluruhan Customer" : `Tren Pembelian Customer ${appliedCustomer}`}
+              jenisData={chartJenisData}
+              setJenisData={setChartJenisData}
+              periode={chartPeriode}
+              setPeriode={setChartPeriode}
+              filterAktifLabel={`${periodeAwal} - ${periodeAkhir}`}
+            />
+          </div>
+
+          {/* Top 10 Produk */}
+          <TopProductsCard 
+            data={displayTopProducts} 
+            title={isAllCustomers ? "Top 10 Produk Terlaris Penjualan Keseluruhan Customer" : `Top 10 Produk Terlaris Penjualan Customer ${appliedCustomer}`} 
+          />
+
           {/* Table Transaksi */}
           <DataTable
-            title={isAllCustomers ? "Tabel Transaksi Seluruh Customer" : "Tabel Transaksi Customer Terpilih"}
+            title={isAllCustomers ? "Tabel Transaksi Seluruh Customer" : `Tabel Transaksi Customer ${appliedCustomer}`}
             columns={transactionColumns}
             data={displayTransactions}
             renderCell={renderTransactionCell}
