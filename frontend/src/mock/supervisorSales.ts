@@ -1,4 +1,4 @@
-import { User, Building2, Receipt } from 'lucide-react';
+import { User, Users, Wallet } from 'lucide-react';
 
 export const supervisorSalesKpiData = [
   {
@@ -15,7 +15,7 @@ export const supervisorSalesKpiData = [
     title: 'Total Customer Ditangani',
     value: '185 Customer',
     description: 'Total customer yang dikelola seluruh tim sales',
-    icon: Building2,
+    icon: Users,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
   },
@@ -24,7 +24,7 @@ export const supervisorSalesKpiData = [
     title: 'Total Transaksi',
     value: '1.245 Transaksi',
     description: 'Total transaksi dari seluruh sales pada periode aktif',
-    icon: Receipt,
+    icon: Wallet,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
   }

@@ -10,27 +10,26 @@ import { CustomerModal } from '../../components/ui/CustomerModal';
 import { ChartCard } from '../../components/ui/ChartCard';
 import { TopProductsCard } from '../../components/ui/TopProductsCard';
 import { salesChartData, salesTopProductsData } from '../../mock/salesDashboard';
+import { supervisorCustomerKpiData, supervisorCustomerTableData, supervisorTransactionTableData } from '../../mock/supervisorCustomer';
 
-import { 
-  customerKpiData, 
-  customerTableData, 
-  customerTransactionData 
-} from '../../mock/salesCustomer';
-
-export const SalesCustomerPage = () => {
+export const SupervisorCustomerPage = () => {
   const [periodeAwal, setPeriodeAwal] = useState('01 Juli 2026');
   const [periodeAkhir, setPeriodeAkhir] = useState('01 Juli 2026');
+  const [sales, setSales] = useState('Semua Sales');
   const [customer, setCustomer] = useState('Semua Customer');
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  
+  const [appliedSales, setAppliedSales] = useState('Semua Sales');
   const [appliedCustomer, setAppliedCustomer] = useState('Semua Customer');
 
   const [chartJenisData, setChartJenisData] = useState('Total Penjualan');
   const [chartPeriode, setChartPeriode] = useState('Hari');
 
   const handleFilter = () => {
+    setAppliedSales(sales);
     setAppliedCustomer(customer);
   };
 
@@ -47,7 +46,7 @@ export const SalesCustomerPage = () => {
   const customerColumns = [
     { key: 'namaCustomer', label: 'Nama Customer' },
     { key: 'kodeCustomer', label: 'Kode Customer' },
-    { key: 'alamat', label: 'Alamat' }, // HMR trigger
+    { key: 'alamat', label: 'Alamat' },
     { key: 'totalTransaksi', label: 'Total Transaksi' },
     { key: 'totalPenjualan', label: 'Total Penjualan' },
     { key: 'detail', label: 'Detail' },
@@ -93,35 +92,74 @@ export const SalesCustomerPage = () => {
     }
   };
 
-  const salesMenuItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, path: '/sales-dashboard' },
-    { name: 'Customer', icon: Users, path: '/sales-dashboard/customer' },
-    { name: 'Target Penjualan', icon: Target, path: '/sales-dashboard/target' },
+  const supervisorMenuItems = [
+    { name: 'Dashboard', icon: LayoutDashboard, path: '/supervisor-dashboard' },
+    { name: 'Sales', icon: User, path: '/supervisor-dashboard/sales' },
+    { name: 'Customer', icon: Users, path: '/supervisor-dashboard/customer' },
+    { name: 'Target Sales', icon: Target, path: '/supervisor-dashboard/target-sales' },
   ];
 
   const isAllCustomers = appliedCustomer === 'Semua Customer';
-  const selectedCustomerData = (customerTableData.find(c => c.namaCustomer === appliedCustomer) || customerTableData[0]) as any;
+  const isAllSales = appliedSales === 'Semua Sales';
 
-  const displayKpiData = customerKpiData.map(kpi => {
-    if (isAllCustomers) return kpi;
-    if (kpi.id === 1) return { ...kpi, value: 'Rp 20 Jt' };
-    if (kpi.id === 2) return { ...kpi, value: '300 Transaksi' };
-    if (kpi.id === 3) return { ...kpi, value: '45 Kg' };
-    return kpi;
-  });
+  const isSpecificCustomer = !isAllCustomers;
+  const isSpecificSalesOnly = !isAllSales && isAllCustomers;
 
-  const displayTransactions = isAllCustomers 
-    ? customerTransactionData 
-    : customerTransactionData.map(t => ({ ...t, customer: appliedCustomer }));
+  const displayKpiData = useMemo(() => {
+    if (isSpecificSalesOnly) {
+      return supervisorCustomerKpiData.map(kpi => {
+        if (kpi.id === 1) return { ...kpi, title: 'Total Penjualan' };
+        if (kpi.id === 3) return { ...kpi, title: 'Total QTY Penjualan', description: 'Total qty pembelian customer yang ditangani sales terpilih', value: '4.800 Kg' };
+        return kpi;
+      });
+    }
+    if (isSpecificCustomer) {
+      return supervisorCustomerKpiData.map(kpi => {
+        if (kpi.id === 1) return { ...kpi, value: 'Rp 20 Jt' };
+        if (kpi.id === 2) return { ...kpi, value: '300 Transaksi' };
+        if (kpi.id === 3) return { ...kpi, title: 'Total Qty Penjualan', description: 'Total qty pembelian customer terpilih', value: '45 Kg' };
+        return kpi;
+      });
+    }
+    return supervisorCustomerKpiData; // Default: Total Penjualan, Total Transaksi, Total Customer
+  }, [isSpecificSalesOnly, isSpecificCustomer]);
 
-  const displayTopProducts = isAllCustomers 
-    ? salesTopProductsData 
-    : salesTopProductsData.map(item => ({
+  const displayCustomersTable = useMemo(() => {
+    if (isSpecificSalesOnly) {
+      return supervisorCustomerTableData.filter(c => c.sales === appliedSales);
+    }
+    return supervisorCustomerTableData;
+  }, [isSpecificSalesOnly, appliedSales]);
+
+  const displayTransactions = useMemo(() => {
+    if (isSpecificCustomer) {
+      return supervisorTransactionTableData.map(t => ({ ...t, customer: appliedCustomer }));
+    }
+    if (isSpecificSalesOnly) {
+      const allowedCustomers = supervisorCustomerTableData.filter(c => c.sales === appliedSales).map(c => c.namaCustomer);
+      return supervisorTransactionTableData.filter(t => allowedCustomers.includes(t.customer));
+    }
+    return supervisorTransactionTableData;
+  }, [isSpecificCustomer, isSpecificSalesOnly, appliedCustomer, appliedSales]);
+
+  const displayTopProducts = useMemo(() => {
+    if (isSpecificSalesOnly) {
+      return salesTopProductsData.map(item => ({
+        ...item,
+        value: item.value * 0.8,
+        label: `Rp ${(item.value * 0.8 / 1000000).toFixed(0)} Jt`
+      }));
+    }
+    if (isSpecificCustomer) {
+      return salesTopProductsData.map(item => ({
         ...item,
         value: item.value * 0.6,
         max: 80000000,
         label: `Rp ${(item.value * 0.6 / 1000000).toFixed(0)} Jt`
       }));
+    }
+    return salesTopProductsData;
+  }, [isSpecificSalesOnly, isSpecificCustomer]);
 
   const dynamicChartData = useMemo(() => {
     if (chartPeriode === 'Hari') {
@@ -155,16 +193,18 @@ export const SalesCustomerPage = () => {
     return salesChartData;
   }, [chartPeriode, chartJenisData]);
 
+  const selectedCustomerData = (supervisorCustomerTableData.find(c => c.namaCustomer === appliedCustomer) || supervisorCustomerTableData[0]) as any;
+
   return (
     <>
-      <MainLayout sidebarItems={salesMenuItems}>
-        <Topbar title="Customer" subtitle="Daftar customer yang telah melakukan pembelian" actionButton={ActionButtons} />
+      <MainLayout sidebarItems={supervisorMenuItems}>
+        <Topbar title="Customer" subtitle="Pantau customer yang dikelola oleh tim sales." actionButton={ActionButtons} />
 
         <div className="px-8 pb-10">
           
           {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-7 gap-6 items-end">
               <div className="col-span-2">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
                 <div className="flex items-center gap-3">
@@ -188,6 +228,23 @@ export const SalesCustomerPage = () => {
                 </div>
               </div>
               
+              <div className="col-span-2">
+                <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
+                <CustomSelect 
+                  value={sales} 
+                  onChange={(val) => {
+                    setSales(val);
+                    setAppliedSales(val);
+                    if (val !== 'Semua Sales') {
+                      setCustomer('Semua Customer');
+                      setAppliedCustomer('Semua Customer');
+                    }
+                  }} 
+                  options={['Semua Sales', 'Budi', 'Fransiskus']} 
+                  showSearch={true}
+                />
+              </div>
+
               <div className="col-span-2">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Customer</label>
                 <CustomSelect 
@@ -221,14 +278,7 @@ export const SalesCustomerPage = () => {
           </div>
 
           {/* Table Customer */}
-          {isAllCustomers ? (
-            <DataTable
-              title="Tabel Keseluruhan Customer Berdasarkan Total Penjualan"
-              columns={customerColumns}
-              data={customerTableData}
-              renderCell={renderCustomerCell}
-            />
-          ) : (
+          {isSpecificCustomer ? (
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
               <h3 className="text-gray-600 text-[18px] font-medium mb-6">Informasi Customer</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
@@ -247,7 +297,7 @@ export const SalesCustomerPage = () => {
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <Map size={18} />
                     </div>
-                    <input type="text" value={selectedCustomerData?.area || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                    <input type="text" value={selectedCustomerData?.area || 'Bandung'} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                   </div>
                 </div>
                 <div>
@@ -256,7 +306,7 @@ export const SalesCustomerPage = () => {
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <Users size={18} />
                     </div>
-                    <input type="text" value={selectedCustomerData?.sales || 'Budi (Anda)'} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                    <input type="text" value={selectedCustomerData?.sales || 'Budi'} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                   </div>
                 </div>
                 <div>
@@ -306,13 +356,26 @@ export const SalesCustomerPage = () => {
                 </div>
               </div>
             </div>
+          ) : (
+            <DataTable
+              title="Tabel Keseluruhan Customer Berdasarkan Total Penjualan"
+              columns={customerColumns}
+              data={displayCustomersTable}
+              renderCell={renderCustomerCell}
+            />
           )}
 
           {/* Tren Pembelian Customer */}
           <div className="mb-8">
             <ChartCard 
               data={dynamicChartData} 
-              title={isAllCustomers ? "Tren Pembelian Keseluruhan Customer" : `Tren Pembelian Customer ${appliedCustomer}`}
+              title={
+                isSpecificCustomer 
+                  ? `Tren Pembelian Customer ${appliedCustomer}` 
+                  : isSpecificSalesOnly
+                    ? `Tren Pembelian Keseluruhan Customer yang ditangani ${appliedSales}`
+                    : "Tren Pembelian Keseluruhan Customer"
+              }
               jenisData={chartJenisData}
               setJenisData={setChartJenisData}
               periode={chartPeriode}
@@ -324,12 +387,24 @@ export const SalesCustomerPage = () => {
           {/* Top 10 Produk */}
           <TopProductsCard 
             data={displayTopProducts} 
-            title={isAllCustomers ? "Top 10 Produk Terlaris Penjualan Keseluruhan Customer" : `Top 10 Produk Terlaris Penjualan Customer ${appliedCustomer}`} 
+            title={
+              isSpecificCustomer 
+                ? `Top 10 Produk Terlaris Penjualan Customer ${appliedCustomer}`
+                : isSpecificSalesOnly
+                  ? `Top 10 Produk Terlaris Penjualan Keseluruhan Customer yang ditangani ${appliedSales}`
+                  : "Top 10 Produk Terlaris Penjualan Keseluruhan Customer"
+            } 
           />
 
           {/* Table Transaksi */}
           <DataTable
-            title={isAllCustomers ? "Tabel Transaksi Seluruh Customer" : `Tabel Transaksi Customer ${appliedCustomer}`}
+            title={
+              isSpecificCustomer 
+                ? `Tabel Transaksi Customer ${appliedCustomer}`
+                : isSpecificSalesOnly
+                  ? `Tabel Transaksi Seluruh Customer yang ditangani ${appliedSales}`
+                  : "Tabel Transaksi Seluruh Customer"
+            }
             columns={transactionColumns}
             data={displayTransactions}
             renderCell={renderTransactionCell}

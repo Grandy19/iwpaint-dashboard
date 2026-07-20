@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, Filter, LayoutDashboard, Users, Target, User, Eye, CheckCircle2, XCircle, Banknote, Building2, Receipt, UserCircle, Mail, Phone, Lock, EyeOff, Map, Briefcase, Info, MapPin } from 'lucide-react';
+import { Download, Filter, LayoutDashboard, Users, Target, User, Eye, CheckCircle2, XCircle, Banknote, Wallet, UserCircle, Mail, Phone, Lock, EyeOff, Map, Briefcase, Info, MapPin } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
 import { CustomSelect } from '../../components/ui/CustomSelect';
@@ -35,7 +35,7 @@ export const SupervisorSalesPage = () => {
       title: 'Total Customer Ditangani',
       value: `${selectedSalesData.customer} Customer`,
       description: `Total customer yang dikelola oleh ${sales}`,
-      icon: Building2,
+      icon: Users,
       iconColor: 'text-[#10b981]',
       iconBg: 'bg-[#dcfce7]',
     },
@@ -44,7 +44,7 @@ export const SupervisorSalesPage = () => {
       title: 'Total Transaksi',
       value: `${selectedSalesData.transaksi} Transaksi`,
       description: `Total transaksi oleh ${sales}`,
-      icon: Receipt,
+      icon: Wallet,
       iconColor: 'text-[#10b981]',
       iconBg: 'bg-[#dcfce7]',
     }
@@ -63,7 +63,7 @@ export const SupervisorSalesPage = () => {
     { name: 'Dashboard', icon: LayoutDashboard, path: '/supervisor-dashboard' },
     { name: 'Sales', icon: User, path: '/supervisor-dashboard/sales' },
     { name: 'Customer', icon: Users, path: '/supervisor-dashboard/customer' },
-    { name: 'Target Sales', icon: Target, path: '/supervisor-dashboard/target' },
+    { name: 'Target Sales', icon: Target, path: '/supervisor-dashboard/target-sales' },
   ];
 
   const tableColumns = [

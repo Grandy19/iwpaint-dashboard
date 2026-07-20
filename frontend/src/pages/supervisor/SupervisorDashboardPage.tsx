@@ -85,7 +85,7 @@ export const SupervisorDashboardPage = () => {
     { name: 'Dashboard', icon: LayoutDashboard, path: '/supervisor-dashboard' },
     { name: 'Sales', icon: User, path: '/supervisor-dashboard/sales' },
     { name: 'Customer', icon: Users, path: '/supervisor-dashboard/customer' },
-    { name: 'Target Sales', icon: Target, path: '/supervisor-dashboard/target' },
+    { name: 'Target Sales', icon: Target, path: '/supervisor-dashboard/target-sales' },
   ];
 
   const tableColumns = [

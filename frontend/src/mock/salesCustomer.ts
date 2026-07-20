@@ -14,7 +14,7 @@ export const customerKpiData = [
     id: 2,
     title: 'Total Transaksi',
     value: '350 Transaksi',
-    description: 'Total qty penjualan filter terpilih', // Match the mockup typo or specific text
+    description: 'Total transaksi filter terpilih', // Match the mockup typo or specific text
     icon: Wallet,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
@@ -23,7 +23,7 @@ export const customerKpiData = [
     id: 3,
     title: 'Total Qty Penjualan',
     value: '589 Kg',
-    description: 'Total transaksi filter terpilih', // Match the mockup typo or specific text
+    description: 'Total qty penjualan filter terpilih', // Match the mockup typo or specific text
     icon: Package,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
@@ -31,16 +31,16 @@ export const customerKpiData = [
 ];
 
 export const customerTableData = [
-  { id: 1, namaCustomer: 'TB Bangun Jaya', kodeCustomer: 'F.454', area: 'Bandung', totalTransaksi: 300, totalPenjualan: 'Rp 20 Jt' },
-  { id: 2, namaCustomer: 'CV Sinar Mas', kodeCustomer: 'F.749', area: 'Bandung', totalTransaksi: 280, totalPenjualan: 'Rp 18,5 Jt' },
-  { id: 3, namaCustomer: 'TB Toko Sejati', kodeCustomer: 'F.739', area: 'Bandung', totalTransaksi: 260, totalPenjualan: 'Rp 14,6 Jt' },
-  { id: 4, namaCustomer: 'TB Sejahtera', kodeCustomer: 'F.730', area: 'Bandung', totalTransaksi: 230, totalPenjualan: 'Rp 13 Jt' },
-  { id: 5, namaCustomer: 'CV Cirebon I', kodeCustomer: 'F.578', area: 'Cirebon', totalTransaksi: 210, totalPenjualan: 'Rp 10,6 Jt' },
-  { id: 6, namaCustomer: 'TB Maju Terus', kodeCustomer: 'F.802', area: 'Jakarta', totalTransaksi: 190, totalPenjualan: 'Rp 9,2 Jt' },
-  { id: 7, namaCustomer: 'PT Warna Indah', kodeCustomer: 'F.911', area: 'Bandung', totalTransaksi: 175, totalPenjualan: 'Rp 8,5 Jt' },
-  { id: 8, namaCustomer: 'Toko Besi Karya', kodeCustomer: 'F.333', area: 'Cirebon', totalTransaksi: 160, totalPenjualan: 'Rp 7,8 Jt' },
-  { id: 9, namaCustomer: 'UD Setia Abadi', kodeCustomer: 'F.651', area: 'Jakarta', totalTransaksi: 145, totalPenjualan: 'Rp 6,5 Jt' },
-  { id: 10, namaCustomer: 'CV Multi Warna', kodeCustomer: 'F.420', area: 'Bandung', totalTransaksi: 130, totalPenjualan: 'Rp 5,4 Jt' }
+  { id: 1, namaCustomer: 'TB Bangun Jaya', kodeCustomer: 'F.454', alamat: 'Jl. Ahmad Yani No. 15, Bandung', totalTransaksi: 300, totalPenjualan: 'Rp 20 Jt' },
+  { id: 2, namaCustomer: 'CV Sinar Mas', kodeCustomer: 'F.749', alamat: 'Jl. Sudirman No. 8, Bandung', totalTransaksi: 280, totalPenjualan: 'Rp 18,5 Jt' },
+  { id: 3, namaCustomer: 'TB Toko Sejati', kodeCustomer: 'F.739', alamat: 'Jl. Asia Afrika No. 45, Bandung', totalTransaksi: 260, totalPenjualan: 'Rp 14,6 Jt' },
+  { id: 4, namaCustomer: 'TB Sejahtera', kodeCustomer: 'F.730', alamat: 'Jl. Soekarno Hatta No. 120, Bandung', totalTransaksi: 230, totalPenjualan: 'Rp 13 Jt' },
+  { id: 5, namaCustomer: 'CV Cirebon I', kodeCustomer: 'F.578', alamat: 'Jl. Tuparev No. 11, Cirebon', totalTransaksi: 210, totalPenjualan: 'Rp 10,6 Jt' },
+  { id: 6, namaCustomer: 'TB Maju Terus', kodeCustomer: 'F.802', alamat: 'Jl. Thamrin No. 9, Jakarta', totalTransaksi: 190, totalPenjualan: 'Rp 9,2 Jt' },
+  { id: 7, namaCustomer: 'PT Warna Indah', kodeCustomer: 'F.911', alamat: 'Jl. Buah Batu No. 67, Bandung', totalTransaksi: 175, totalPenjualan: 'Rp 8,5 Jt' },
+  { id: 8, namaCustomer: 'Toko Besi Karya', kodeCustomer: 'F.333', alamat: 'Jl. Siliwangi No. 22, Cirebon', totalTransaksi: 160, totalPenjualan: 'Rp 7,8 Jt' },
+  { id: 9, namaCustomer: 'UD Setia Abadi', kodeCustomer: 'F.651', alamat: 'Jl. Gajah Mada No. 101, Jakarta', totalTransaksi: 145, totalPenjualan: 'Rp 6,5 Jt' },
+  { id: 10, namaCustomer: 'CV Multi Warna', kodeCustomer: 'F.420', alamat: 'Jl. Cihampelas No. 34, Bandung', totalTransaksi: 130, totalPenjualan: 'Rp 5,4 Jt' }
 ];
 
 export const customerTransactionData = [

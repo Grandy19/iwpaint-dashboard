@@ -15,6 +15,8 @@ import { SalesTargetPage } from './pages/sales/SalesTargetPage';
 
 import { SupervisorDashboardPage } from './pages/supervisor/SupervisorDashboardPage';
 import { SupervisorSalesPage } from './pages/supervisor/SupervisorSalesPage';
+import { SupervisorCustomerPage } from './pages/supervisor/SupervisorCustomerPage';
+import { SupervisorTargetPage } from './pages/supervisor/SupervisorTargetPage';
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function App() {
         {/* Supervisor Dashboard Routes */}
         <Route path="/supervisor-dashboard" element={<SupervisorDashboardPage />} />
         <Route path="/supervisor-dashboard/sales" element={<SupervisorSalesPage />} />
+        <Route path="/supervisor-dashboard/customer" element={<SupervisorCustomerPage />} />
+        <Route path="/supervisor-dashboard/target-sales" element={<SupervisorTargetPage />} />
 
         <Route path="*" element={<DashboardPage />} />
       </Routes>
