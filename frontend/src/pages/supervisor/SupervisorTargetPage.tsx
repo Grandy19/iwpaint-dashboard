@@ -28,7 +28,7 @@ export const SupervisorTargetPage = () => {
 
   const displayPerformanceData = React.useMemo(() => {
     if (appliedSales !== 'Semua Sales') {
-      return supervisorTargetPerformanceData.filter(item => item.namaSales === appliedSales);
+      return supervisorTargetPerformanceData.filter(item => item.sales === appliedSales);
     }
     return supervisorTargetPerformanceData;
   }, [appliedSales]);
@@ -175,7 +175,7 @@ export const SupervisorTargetPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
             <div className="col-span-2">
               <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
               <div className="flex items-center gap-3">
@@ -199,7 +199,7 @@ export const SupervisorTargetPage = () => {
               </div>
             </div>
             
-            <div className="col-span-2">
+            <div className="col-span-1">
               <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
               <CustomSelect 
                 value={sales} 

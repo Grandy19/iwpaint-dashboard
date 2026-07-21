@@ -1,8 +1,9 @@
 import React from 'react';
-import { LayoutDashboard, History, Target, User, Users, UserCheck, ShieldCheck, Menu } from 'lucide-react';
+import { LayoutDashboard, History, Target, User, Users, UserCheck, ShieldCheck, Menu, LogOut } from 'lucide-react';
 import clsx from 'clsx';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useUIStore } from '../../store/useUIStore';
+import { useAuth } from '../../context/AuthContext';
 
 interface MenuItem {
   name: string;
@@ -16,8 +17,10 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ items }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
   const { isSidebarCollapsed, toggleSidebar } = useUIStore();
+  const { logout } = useAuth();
 
   const defaultMenuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
@@ -57,7 +60,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ items }) => {
         </button>
       </div>
 
-      <nav className="flex-1 py-6 px-4 flex flex-col gap-2">
+      <nav className="flex-1 py-6 px-4 flex flex-col gap-2 overflow-y-auto">
         {menuItemsToRender.map((item) => {
           const isActive = currentPath === item.path;
           return (
@@ -79,6 +82,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ items }) => {
           );
         })}
       </nav>
+
+      {/* Logout Button at Bottom */}
+      <div className="p-4 border-t border-gray-100">
+        <button
+          onClick={() => {
+            logout();
+            navigate('/login');
+          }}
+          className={clsx(
+            'flex items-center w-full rounded-xl transition-colors font-medium text-red-500 hover:bg-red-50',
+            isSidebarCollapsed ? 'justify-center p-3' : 'gap-4 px-4 py-3.5 text-sm'
+          )}
+          title={isSidebarCollapsed ? 'Logout' : undefined}
+        >
+          <LogOut size={20} />
+          {!isSidebarCollapsed && <span>Logout</span>}
+        </button>
+      </div>
     </aside>
   );
 };

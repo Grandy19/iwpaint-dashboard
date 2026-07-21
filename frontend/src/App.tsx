@@ -22,39 +22,52 @@ import { DistributorDashboardPage } from './pages/distributor/DistributorDashboa
 import { DistributorSupervisorPage } from './pages/distributor/DistributorSupervisorPage';
 import { DistributorSalesPage } from './pages/distributor/DistributorSalesPage';
 import { DistributorCustomerPage } from './pages/distributor/DistributorCustomerPage';
+import { DistributorTargetSalesPage } from './pages/distributor/DistributorTargetSalesPage';
 
+import { AuthProvider } from './context/AuthContext';
+import { ProtectedRoute } from './components/layout/ProtectedRoute';
+import { LoginPage } from './pages/auth/LoginPage';
+import { AuthenticatorPage } from './pages/auth/AuthenticatorPage';
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/customer" element={<CustomerPage />} />
-        <Route path="/sales" element={<SalesPage />} />
-        <Route path="/import" element={<ImportDataPage />} />
-        <Route path="/target-sales" element={<TargetSalesPage />} />
-        <Route path="/supervisor" element={<SupervisorPage />} />
-        <Route path="/distributor" element={<KepalaDistributorPage />} />
-        
-        {/* Sales Dashboard Routes */}
-        <Route path="/sales-dashboard" element={<SalesDashboardPage />} />
-        <Route path="/sales-dashboard/customer" element={<SalesCustomerPage />} />
-        <Route path="/sales-dashboard/target" element={<SalesTargetPage />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Auth Routes */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/authenticator" element={<AuthenticatorPage />} />
 
-        {/* Supervisor Dashboard Routes */}
-        <Route path="/supervisor-dashboard" element={<SupervisorDashboardPage />} />
-        <Route path="/supervisor-dashboard/sales" element={<SupervisorSalesPage />} />
-        <Route path="/supervisor-dashboard/customer" element={<SupervisorCustomerPage />} />
-        <Route path="/supervisor-dashboard/target-sales" element={<SupervisorTargetPage />} />
+          {/* Admin Routes */}
+          <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/customer" element={<ProtectedRoute><CustomerPage /></ProtectedRoute>} />
+          <Route path="/sales" element={<ProtectedRoute><SalesPage /></ProtectedRoute>} />
+          <Route path="/import" element={<ProtectedRoute><ImportDataPage /></ProtectedRoute>} />
+          <Route path="/target-sales" element={<ProtectedRoute><TargetSalesPage /></ProtectedRoute>} />
+          <Route path="/supervisor" element={<ProtectedRoute><SupervisorPage /></ProtectedRoute>} />
+          <Route path="/distributor" element={<ProtectedRoute><KepalaDistributorPage /></ProtectedRoute>} />
+          
+          {/* Sales Dashboard Routes */}
+          <Route path="/sales-dashboard" element={<ProtectedRoute><SalesDashboardPage /></ProtectedRoute>} />
+          <Route path="/sales-dashboard/customer" element={<ProtectedRoute><SalesCustomerPage /></ProtectedRoute>} />
+          <Route path="/sales-dashboard/target" element={<ProtectedRoute><SalesTargetPage /></ProtectedRoute>} />
 
-        {/* Distributor Dashboard Routes */}
-        <Route path="/distributor-dashboard" element={<DistributorDashboardPage />} />
-        <Route path="/distributor-dashboard/supervisor" element={<DistributorSupervisorPage />} />
-        <Route path="/distributor-dashboard/sales" element={<DistributorSalesPage />} />
-        <Route path="/distributor-dashboard/customer" element={<DistributorCustomerPage />} />
+          {/* Supervisor Dashboard Routes */}
+          <Route path="/supervisor-dashboard" element={<ProtectedRoute><SupervisorDashboardPage /></ProtectedRoute>} />
+          <Route path="/supervisor-dashboard/sales" element={<ProtectedRoute><SupervisorSalesPage /></ProtectedRoute>} />
+          <Route path="/supervisor-dashboard/customer" element={<ProtectedRoute><SupervisorCustomerPage /></ProtectedRoute>} />
+          <Route path="/supervisor-dashboard/target-sales" element={<ProtectedRoute><SupervisorTargetPage /></ProtectedRoute>} />
 
-        <Route path="*" element={<DashboardPage />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Distributor Dashboard Routes */}
+          <Route path="/distributor-dashboard" element={<ProtectedRoute><DistributorDashboardPage /></ProtectedRoute>} />
+          <Route path="/distributor-dashboard/supervisor" element={<ProtectedRoute><DistributorSupervisorPage /></ProtectedRoute>} />
+          <Route path="/distributor-dashboard/sales" element={<ProtectedRoute><DistributorSalesPage /></ProtectedRoute>} />
+          <Route path="/distributor-dashboard/customer" element={<ProtectedRoute><DistributorCustomerPage /></ProtectedRoute>} />
+          <Route path="/distributor-dashboard/target-sales" element={<ProtectedRoute><DistributorTargetSalesPage /></ProtectedRoute>} />
+
+          <Route path="*" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
