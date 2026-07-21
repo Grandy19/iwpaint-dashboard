@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Eye, EyeOff, ShieldCheck, Lock, Activity, Zap } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import clsx from 'clsx';
 
 export const LoginPage = () => {
@@ -13,8 +13,6 @@ export const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [delayedMousePos, setDelayedMousePos] = useState({ x: 0, y: 0 });
   
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -27,39 +25,14 @@ export const LoginPage = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Smooth delayed mouse following effect for background orbs
   useEffect(() => {
-    let animationFrameId: number;
-    
-    const updateDelayedMouse = () => {
-      setDelayedMousePos(prev => {
-        // LERP (Linear Interpolation) for extremely smooth delay
-        const dx = mousePos.x - prev.x;
-        const dy = mousePos.y - prev.y;
-        return {
-          x: prev.x + dx * 0.05,
-          y: prev.y + dy * 0.05
-        };
-      });
-      animationFrameId = requestAnimationFrame(updateDelayedMouse);
-    };
-    
-    animationFrameId = requestAnimationFrame(updateDelayedMouse);
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [mousePos]);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!containerRef.current) return;
-    
-    const { clientX, clientY } = e;
-    const { innerWidth, innerHeight } = window;
-    
-    // Normalized coordinates between -1 and 1
-    const x = (clientX - innerWidth / 2) / (innerWidth / 2);
-    const y = (clientY - innerHeight / 2) / (innerHeight / 2);
-    
-    setMousePos({ x, y });
-  };
+    if (error) {
+      const timer = setTimeout(() => {
+        setError('');
+      }, 2500); // 2.5 seconds before it disappears automatically
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,40 +82,16 @@ export const LoginPage = () => {
   return (
     <>
       <style>{`
-        /* Ambient Background Animations */
-        @keyframes drift {
-          0% { transform: translate(0, 0) rotate(-15deg); }
-          50% { transform: translate(-2%, 2%) rotate(-14deg); }
-          100% { transform: translate(0, 0) rotate(-15deg); }
-        }
-        @keyframes drift2 {
-          0% { transform: translate(0, 0) rotate(-25deg); }
-          50% { transform: translate(2%, -2%) rotate(-26deg); }
-          100% { transform: translate(0, 0) rotate(-25deg); }
-        }
-        @keyframes floatOrb1 {
-          0%, 100% { transform: translate(0, 0); }
-          33% { transform: translate(3%, -5%); }
-          66% { transform: translate(-2%, 4%); }
-        }
-        @keyframes floatOrb2 {
-          0%, 100% { transform: translate(0, 0); }
-          33% { transform: translate(-4%, 3%); }
-          66% { transform: translate(2%, -5%); }
+        /* Hide default browser password eye icon (Edge) */
+        input::-ms-reveal,
+        input::-ms-clear {
+          display: none;
         }
         
-        /* Floating Badges Animation (different timings) */
-        @keyframes badgeFloat1 {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-8px); }
-        }
-        @keyframes badgeFloat2 {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(12px); }
-        }
-        @keyframes badgeFloat3 {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
+        /* Ambient Background Animations */
+        @keyframes aura-spin {
+          0% { transform: translate(-50%, -50%) rotate(0deg); }
+          100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
         /* Staggered Load Animations */
@@ -201,6 +150,13 @@ export const LoginPage = () => {
             transform: translateY(0);
           }
         }
+        @keyframes toastSlideDown {
+          0% { transform: translateY(-10px) scale(0.95); opacity: 0; }
+          100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .toast-enter {
+          animation: toastSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
 
         /* Exit Animation */
         .page-exit {
@@ -213,21 +169,10 @@ export const LoginPage = () => {
             filter: blur(5px);
           }
         }
-
-        /* Utility Classes */
-        .animate-ribbon-1 { animation: drift 35s ease-in-out infinite; }
-        .animate-ribbon-2 { animation: drift2 40s ease-in-out infinite; }
-        .animate-orb-1 { animation: floatOrb1 25s ease-in-out infinite; }
-        .animate-orb-2 { animation: floatOrb2 30s ease-in-out infinite; }
-        
-        .animate-badge-1 { animation: badgeFloat1 7s ease-in-out infinite; }
-        .animate-badge-2 { animation: badgeFloat2 9s ease-in-out infinite; }
-        .animate-badge-3 { animation: badgeFloat3 8s ease-in-out infinite; }
       `}</style>
 
       <div 
         ref={containerRef}
-        onMouseMove={handleMouseMove}
         className={clsx(
           "min-h-screen relative flex items-center justify-center bg-[#FAFAFC] font-sans overflow-hidden selection:bg-[#3b0764]/20 selection:text-[#3b0764]",
           isExiting && "page-exit"
@@ -235,130 +180,86 @@ export const LoginPage = () => {
       >
         
         {/* =========================================
-            BACKGROUND - STRIPE-STYLE DIAGONAL MESH & ORBS
+            BACKGROUND - EXACT IMAGE REPLICA
         ========================================= */}
         <div className={clsx("absolute inset-0 start-hidden", isMounted && "bg-reveal")}>
           
-          {/* Very Subtle Grid Pattern */}
-          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
+          {/* Base Background Color (Matches Dashboard) */}
+          <div className="absolute inset-0 bg-[#FAFAFC]"></div>
           
-          {/* Diagonal Ribbon Aurora 1 - Purple/Pink */}
+          {/* Static Wrapper */}
           <div 
-            className="absolute top-[-20%] left-[10%] w-[120vw] h-[40vh] bg-gradient-to-r from-purple-400/25 via-fuchsia-400/15 to-transparent blur-[120px] animate-ribbon-1 pointer-events-none origin-left"
-            style={{ 
-              transform: `rotate(-15deg) translate(${delayedMousePos.x * -15}px, ${delayedMousePos.y * -15}px)` 
-            }}
-          ></div>
-          
-          {/* Diagonal Ribbon Aurora 2 - Cyan/Emerald */}
-          <div 
-            className="absolute top-[20%] right-[-20%] w-[120vw] h-[50vh] bg-gradient-to-l from-cyan-400/20 via-emerald-400/10 to-transparent blur-[140px] animate-ribbon-2 pointer-events-none origin-right"
-            style={{ 
-              transform: `rotate(-25deg) translate(${delayedMousePos.x * 20}px, ${delayedMousePos.y * 20}px)` 
-            }}
-          ></div>
-
-          {/* GLOWING ORBS (Massive Blur, Slow Movement) */}
-          
-          {/* Purple Orb */}
-          <div 
-            className="absolute top-[10%] left-[20%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] bg-purple-500/10 rounded-full blur-[200px] animate-orb-1 pointer-events-none mix-blend-multiply"
-            style={{ transform: `translate(${delayedMousePos.x * -30}px, ${delayedMousePos.y * -30}px)` }}
-          ></div>
-
-          {/* Cyan Orb */}
-          <div 
-            className="absolute bottom-[-10%] right-[15%] w-[45vw] h-[45vw] max-w-[650px] max-h-[650px] bg-cyan-400/15 rounded-full blur-[200px] animate-orb-2 pointer-events-none mix-blend-multiply"
-            style={{ transform: `translate(${delayedMousePos.x * 35}px, ${delayedMousePos.y * 35}px)` }}
-          ></div>
-
-          {/* Soft Blue Center Glow */}
-          <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-blue-100/40 rounded-full blur-[150px] pointer-events-none"
-            style={{ transform: `translate(calc(-50% + ${delayedMousePos.x * 10}px), calc(-50% + ${delayedMousePos.y * 10}px))` }}
-          ></div>
-
-          {/* Extremely Subtle Noise Texture placed ABOVE orbs to texturize the light */}
-          <div className="absolute inset-0 opacity-[0.015] mix-blend-overlay pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
+            className="absolute inset-0 z-0 pointer-events-none"
+          >
+            {/* Diagonal Mask Container - This creates the exact "swath" shape from the image */}
+            <div 
+              className="absolute top-1/2 left-1/2 w-[140vw] max-w-[1200px] h-[200vh] -translate-x-1/2 -translate-y-1/2 rotate-[-35deg]"
+              style={{
+                // This mask ensures the gradient doesn't fill the screen, leaving corners clean #FAFAFC
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 30%, black 70%, transparent 100%)',
+                maskImage: 'linear-gradient(to right, transparent 0%, black 30%, black 70%, transparent 100%)'
+              }}
+            >
+              {/* Spinning Colors - This provides the "bergerak memutar" effect INSIDE the diagonal swath */}
+              <div 
+                className="absolute top-1/2 left-1/2 w-[250vh] h-[250vh]"
+                style={{
+                  // Precise colors extracted from the image reference
+                  background: 'conic-gradient(from 180deg, #93c5fd 0%, #fde047 15%, #fb923c 30%, #f43f5e 50%, #a855f7 75%, #93c5fd 100%)',
+                  filter: 'blur(100px)',
+                  opacity: 0.9,
+                  animation: 'aura-spin 10s linear infinite'
+                }}
+              ></div>
+            </div>
+          </div>
 
         </div>
+
 
         {/* =========================================
-            FLOATING BADGES (MAX 3, SMALL, TASTEFUL)
+            TOP LEFT LOGO
         ========================================= */}
-        <div className={clsx("hidden lg:block absolute inset-0 pointer-events-none z-10 transition-opacity duration-1000", isMounted ? "opacity-100" : "opacity-0")}>
-          
-          {/* Enterprise Badge */}
-          <div 
-            className="absolute top-[25%] left-[18%] xl:left-[28%] bg-white/70 backdrop-blur-md border border-white/50 px-3 py-1.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.03)] animate-badge-1 flex items-center gap-1.5 transition-transform duration-300"
-            style={{ transform: `translate(${mousePos.x * 10}px, ${mousePos.y * 10}px)` }}
-          >
-            <ShieldCheck size={13} className="text-[#3b0764]" />
-            <span className="text-[11px] font-bold text-gray-700 tracking-wide">Enterprise</span>
-          </div>
-
-          {/* Encrypted Badge */}
-          <div 
-            className="absolute bottom-[28%] left-[22%] xl:left-[30%] bg-white/70 backdrop-blur-md border border-white/50 px-3 py-1.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.03)] animate-badge-2 flex items-center gap-1.5 transition-transform duration-300"
-            style={{ transform: `translate(${mousePos.x * -12}px, ${mousePos.y * -12}px)` }}
-          >
-            <Lock size={13} className="text-emerald-600" />
-            <span className="text-[11px] font-bold text-gray-700 tracking-wide">Encrypted</span>
-          </div>
-
-          {/* Live Monitoring Badge */}
-          <div 
-            className="absolute top-[42%] right-[15%] xl:right-[26%] bg-white/70 backdrop-blur-md border border-white/50 px-3 py-1.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.03)] animate-badge-3 flex items-center gap-1.5 transition-transform duration-300"
-            style={{ transform: `translate(${mousePos.x * 15}px, ${mousePos.y * -8}px)` }}
-          >
-            <Activity size={13} className="text-cyan-600" />
-            <span className="text-[11px] font-bold text-gray-700 tracking-wide">Live Monitoring</span>
-          </div>
-          
+        <div className={clsx("absolute top-6 left-6 sm:top-8 sm:left-8 z-30 start-hidden w-20 h-20 flex items-center justify-center bg-white/50 backdrop-blur-xl border border-white/40 rounded-[20px] shadow-sm transition-transform hover:scale-105 cursor-default", isMounted && "bg-reveal")}>
+          <img src="/logo.png" alt="IW Paint" className="h-11 object-contain" />
         </div>
-
 
         {/* =========================================
             MAIN LOGIN CARD (CENTERED)
         ========================================= */}
         <div 
           className={clsx(
-            "relative z-20 w-full max-w-[460px] px-6 sm:px-0 start-card-hidden",
+            "relative z-20 w-full max-w-[500px] px-6 sm:px-0 start-card-hidden",
             isMounted && "card-reveal"
           )}
         >
           <div 
-            className="bg-white/95 backdrop-blur-2xl rounded-[32px] p-8 sm:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04),_0_0_1px_rgba(0,0,0,0.05)] border border-white/60 relative overflow-hidden transition-shadow duration-300 hover:shadow-[0_20px_40px_rgb(0,0,0,0.06),_0_0_1px_rgba(0,0,0,0.05)]"
-            style={{
-              transform: `translate(${mousePos.x * -4}px, ${mousePos.y * -4}px)` // Extremely subtle card parallax
-            }}
+            className="bg-white/95 backdrop-blur-2xl rounded-[15px] p-8 sm:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04),_0_0_1px_rgba(0,0,0,0.05)] border border-white/60 relative overflow-hidden transition-shadow duration-300 hover:shadow-[0_20px_40px_rgb(0,0,0,0.06),_0_0_1px_rgba(0,0,0,0.05)]"
           >
+            {/* IN-CARD ERROR OVERLAY */}
+            {error && (
+              <div className="absolute inset-0 z-[100] flex items-center justify-center p-6 bg-white/40 backdrop-blur-[2px] rounded-[15px] toast-enter pointer-events-none">
+                <div className="w-full max-w-[90%] bg-red-50/95 backdrop-blur-md text-red-600 px-5 py-4 rounded-2xl text-[14px] font-bold border border-red-200 shadow-[0_15px_40px_rgba(239,68,68,0.2)] flex items-center gap-3">
+                  <div className="flex-shrink-0 w-7 h-7 bg-red-200/80 text-red-700 rounded-full flex items-center justify-center text-[14px] font-black shadow-sm">!</div>
+                  <p className="whitespace-normal leading-tight">{error}</p>
+                </div>
+              </div>
+            )}
             
             {/* Very faint glass reflection on top edge */}
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-100 pointer-events-none"></div>
-            <div className="absolute top-0 inset-x-0 h-[200px] bg-gradient-to-b from-white/40 to-transparent pointer-events-none rounded-t-[32px]"></div>
+            <div className="absolute top-0 inset-x-0 h-[200px] bg-gradient-to-b from-white/40 to-transparent pointer-events-none rounded-t-[15px]"></div>
 
             <div className="relative z-10 flex flex-col items-center">
               
-              {/* Branding Header */}
-              <div className={clsx("flex flex-col items-center text-center mb-10 start-item-hidden w-full", isMounted && "item-reveal-1")}>
-                {/* Logo and Badges in a single column */}
-                <div className="w-14 h-14 bg-[#3b0764] rounded-2xl flex items-center justify-center shadow-[0_4px_12px_rgba(59,7,100,0.2)] mb-6 border border-white/10">
-                  <img src="/logo.png" alt="IW Paint" className="h-7 brightness-0 invert object-contain" />
-                </div>
-                
-                <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">
-                  IW Paint Enterprise
+              {/* Form Header */}
+              <div className={clsx("flex flex-col items-start w-full mb-8 start-item-hidden", isMounted && "item-reveal-1")}>
+                <h1 className="text-2xl sm:text-[28px] font-semibold tracking-tight mb-2" style={{ color: '#464255' }}>
+                  Masuk
                 </h1>
-                
-                <p className="text-[14px] text-gray-500 font-medium mb-6">
-                  Sales Monitoring Dashboard
+                <p className="text-[14px] text-gray-500 font-medium">
+                  untuk melanjutkan ke Enterprise Dashboard
                 </p>
-
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-200/60 text-[11px] font-bold text-gray-600 uppercase tracking-widest shadow-sm">
-                  <Zap size={12} className="text-[#3b0764]" />
-                  Internal Access Only
-                </div>
               </div>
 
               {/* Form */}
@@ -366,15 +267,20 @@ export const LoginPage = () => {
                 
                 {/* Email Input */}
                 <div className={clsx("space-y-1.5 start-item-hidden w-full", isMounted && "item-reveal-2")}>
-                  <label className="text-[13px] font-bold text-gray-700 ml-1">Email address</label>
+                  <label className="text-[13px] font-semibold ml-1" style={{ color: '#464255' }}>
+                    Email
+                  </label>
                   <div className="relative group/input">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-colors group-focus-within/input:text-[#3b0764]">
+                      <Mail size={18} strokeWidth={2.5} />
+                    </div>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="admin@iwpaint.com"
                       className={clsx(
-                        "w-full px-4 py-3.5 bg-white border rounded-2xl outline-none transition-all duration-300 font-medium text-[14px]",
+                        "w-full pl-11 pr-4 py-3.5 bg-white border rounded-2xl outline-none transition-all duration-300 font-medium text-[14px]",
                         error && !email 
                           ? "border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10 text-red-900 placeholder-red-300" 
                           : "border-gray-200 focus:border-[#3b0764] focus:ring-[3px] focus:ring-[#3b0764]/15 text-gray-900 placeholder-gray-400 hover:border-gray-300 hover:shadow-[0_2px_12px_rgb(0,0,0,0.03)]"
@@ -386,19 +292,24 @@ export const LoginPage = () => {
                 {/* Password Input */}
                 <div className={clsx("space-y-1.5 start-item-hidden w-full", isMounted && "item-reveal-3")}>
                   <div className="flex items-center justify-between ml-1">
-                    <label className="text-[13px] font-bold text-gray-700">Password</label>
+                    <label className="text-[13px] font-semibold" style={{ color: '#464255' }}>
+                      Kata Sandi
+                    </label>
                     <a href="#" className="text-[12px] text-[#3b0764] hover:text-purple-700 font-bold transition-colors">
-                      Forgot password?
+                      Lupa kata sandi?
                     </a>
                   </div>
                   <div className="relative group/input">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-colors group-focus-within/input:text-[#3b0764]">
+                      <Lock size={18} strokeWidth={2.5} />
+                    </div>
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
                       className={clsx(
-                        "w-full pl-4 pr-11 py-3.5 bg-white border rounded-2xl outline-none transition-all duration-300 font-medium text-[14px]",
+                        "w-full pl-11 pr-11 py-3.5 bg-white border rounded-2xl outline-none transition-all duration-300 font-medium text-[14px]",
                         error && !password 
                           ? "border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10 text-red-900 placeholder-red-300" 
                           : "border-gray-200 focus:border-[#3b0764] focus:ring-[3px] focus:ring-[#3b0764]/15 text-gray-900 placeholder-gray-400 hover:border-gray-300 hover:shadow-[0_2px_12px_rgb(0,0,0,0.03)]"
@@ -426,16 +337,9 @@ export const LoginPage = () => {
                       className="w-4 h-4 text-[#3b0764] bg-white border-gray-300 rounded focus:ring-[#3b0764] focus:ring-2 cursor-pointer transition-all"
                     />
                     <label htmlFor="remember-me" className="ml-2.5 text-[13.5px] font-semibold text-gray-600 cursor-pointer select-none">
-                      Remember this device
+                      Ingat perangkat ini
                     </label>
                   </div>
-
-                  {error && (
-                    <div className="bg-red-50/80 text-red-600 px-4 py-3 rounded-xl text-[13px] font-bold border border-red-100/50 flex items-start gap-2 mt-3 shadow-sm">
-                      <div className="min-w-[14px] mt-0.5">!</div>
-                      <p>{error}</p>
-                    </div>
-                  )}
 
                   {/* Submit Button */}
                   <button
@@ -449,11 +353,11 @@ export const LoginPage = () => {
                     {isLoading ? (
                       <div className="flex items-center gap-2.5 relative z-10">
                         <div className="w-4.5 h-4.5 border-[2.5px] border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Signing in...</span>
+                        <span>Memverifikasi...</span>
                       </div>
                     ) : (
                       <div className="relative z-10">
-                        Sign In to Dashboard
+                        Masuk ke Dashboard
                       </div>
                     )}
                   </button>
@@ -461,8 +365,16 @@ export const LoginPage = () => {
               </form>
             </div>
           </div>
-          
         </div>
+        {/* =========================================
+            ABSOLUTE BOTTOM FOOTER
+        ========================================= */}
+        <div className={clsx("absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 w-full text-center z-30 start-item-hidden", isMounted && "item-reveal-4")}>
+          <p className="text-[13px] font-semibold tracking-wide" style={{ color: '#464255' }}>
+            &copy; 2026 IW Paint Indonesia
+          </p>
+        </div>
+
       </div>
     </>
   );
