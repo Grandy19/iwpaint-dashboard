@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, Briefcase, Info, Users, Save, CheckCircle2, MapPin, ChevronDown, Search, Trash2 } from 'lucide-react';
+import { X, User, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, Briefcase, Info, Users, Save, CheckCircle2, MapPin, ChevronDown, Search, Trash2, Target } from 'lucide-react';
 import { CustomSelect } from './CustomSelect';
+import { DataTable } from '../common/DataTable';
+import { mockSupervisorSalesData } from '../../mock/distributorSupervisor';
 import clsx from 'clsx';
 
 interface SupervisorModalProps {
@@ -8,6 +10,7 @@ interface SupervisorModalProps {
   onClose: () => void;
   data?: any;
   onSave?: (data: any) => void;
+  mode?: 'edit' | 'detail' | 'view_only';
 }
 
 interface SalesOption {
@@ -26,7 +29,7 @@ const salesOptions: SalesOption[] = [
   { value: 'agus', label: 'Agus', subLabel: 'Jakarta' },
 ];
 
-export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClose, data, onSave }) => {
+export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClose, data, onSave, mode = 'edit' }) => {
   // Kiri
   const [namaSupervisor, setNamaSupervisor] = useState('');
   const [email, setEmail] = useState('');
@@ -49,6 +52,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
 
   // Sales Sub-Modal State
   const [showSalesModal, setShowSalesModal] = useState(false);
+  const [showViewSalesModal, setShowViewSalesModal] = useState(false);
   const [tempSelectedSales, setTempSelectedSales] = useState<string[]>([]);
   const [salesSearchQuery, setSalesSearchQuery] = useState('');
 
@@ -100,6 +104,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
       setShowDeleteConfirm(false);
       setShowDeleteSuccess(false);
       setShowSalesModal(false);
+      setShowViewSalesModal(false);
     }
   }, [isOpen, data]);
 
@@ -163,6 +168,18 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
     (opt.subLabel && opt.subLabel.toLowerCase().includes(salesSearchQuery.toLowerCase()))
   );
 
+  const salesTableColumns = [
+    { key: 'namaSales', label: 'Nama Sales' },
+    { key: 'area', label: 'Area' },
+    { key: 'customer', label: 'Customer' },
+    { key: 'target', label: 'Target' },
+    { key: 'realisasi', label: 'Realisasi' },
+  ];
+
+  const renderSalesTableCell = (item: any, columnKey: string) => {
+    return item[columnKey];
+  };
+
   if (!isOpen) return null;
 
   // Render teks untuk field Sales
@@ -214,7 +231,8 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
                   value={namaSupervisor}
                   onChange={(e) => setNamaSupervisor(e.target.value)}
                   placeholder="Masukkan nama"
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                  readOnly={mode === 'view_only'}
+                  className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                 />
               </div>
             </div>
@@ -231,7 +249,8 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Masukkan username"
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                  readOnly={mode === 'view_only'}
+                  className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                 />
               </div>
             </div>
@@ -248,7 +267,8 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Masukkan email"
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                  readOnly={mode === 'view_only'}
+                  className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                 />
               </div>
             </div>
@@ -265,7 +285,8 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
                   value={nomorHp}
                   onChange={(e) => setNomorHp(e.target.value)}
                   placeholder="Masukkan nomor HP"
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                  readOnly={mode === 'view_only'}
+                  className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                 />
               </div>
             </div>
@@ -282,110 +303,209 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
                   value={alamat}
                   onChange={(e) => setAlamat(e.target.value)}
                   placeholder="Masukkan alamat"
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                  readOnly={mode === 'view_only'}
+                  className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                 />
               </div>
             </div>
 
-            {/* Password (Kolom Kanan) */}
-            <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2">Password</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <Lock size={18} />
-                </div>
-                <input 
-                  type={showPassword ? "text" : "password"} 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Masukkan password"
-                  className="w-full pl-11 pr-12 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
-                />
-                <div 
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer text-gray-400 hover:text-gray-600"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
-                </div>
-              </div>
-            </div>
-
-            {/* Area (Kolom Kiri) */}
+            {/* Area (Kolom Kanan if Password is hidden) */}
             <div>
               <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
-              <CustomSelect 
-                value={area}
-                onChange={setArea}
-                options={['Bandung', 'Jakarta', 'Cirebon', 'Kuningan']}
-                icon={<Map size={18} />}
-                triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
-                showSearch={false}
-              />
+              {mode === 'view_only' ? (
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <Map size={18} />
+                  </div>
+                  <input type="text" value={area} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                </div>
+              ) : (
+                <CustomSelect 
+                  value={area}
+                  onChange={setArea}
+                  options={['Bandung', 'Jakarta', 'Cirebon', 'Kuningan']}
+                  icon={<Map size={18} />}
+                  triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
+                  showSearch={false}
+                />
+              )}
             </div>
 
-            {/* Role (Kolom Kanan) */}
+            {/* Role */}
             <div>
               <label className="block text-sm text-[#475569] font-medium mb-2">Role</label>
-              <CustomSelect 
-                value={role}
-                onChange={setRole}
-                options={['Sales', 'Supervisor', 'Admin']}
-                icon={<Briefcase size={18} />}
-                triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
-                showSearch={false}
-              />
-            </div>
-
-            {/* Sales (Kolom Kiri) - Pemicu Sub-Modal */}
-            <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
-              <div 
-                onClick={handleOpenSalesModal}
-                className="relative flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer hover:border-[#3b0764] hover:ring-1 hover:ring-[#3b0764] transition-colors"
-              >
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <Users size={18} />
+              {mode === 'view_only' ? (
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <Briefcase size={18} />
+                  </div>
+                  <input type="text" value={role} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
-                <span className="truncate">{salesDisplayText}</span>
-                <ChevronDown size={16} className="text-gray-500" />
-              </div>
+              ) : (
+                <CustomSelect 
+                  value={role}
+                  onChange={setRole}
+                  options={['Sales', 'Supervisor', 'Admin']}
+                  icon={<Briefcase size={18} />}
+                  triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
+                  showSearch={false}
+                />
+              )}
             </div>
 
-            {/* Status (Kolom Kanan) */}
+            {/* Sales (or Jumlah Sales in view_only) */}
             <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
-              <CustomSelect 
-                value={status}
-                onChange={setStatus}
-                options={['Aktif', 'Tidak Aktif']}
-                icon={<Info size={18} />}
-                triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
-                showSearch={false}
-              />
+              <label className="block text-sm text-[#475569] font-medium mb-2">{mode === 'view_only' ? 'Jumlah Sales' : 'Sales'}</label>
+              {mode === 'view_only' ? (
+                <div 
+                  onClick={() => setShowViewSalesModal(true)}
+                  className="relative flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer hover:border-[#3b0764] hover:ring-1 hover:ring-[#3b0764] transition-colors"
+                >
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <Users size={18} />
+                  </div>
+                  <span className="truncate">{data?.jumlahSales || '12 Sales'}</span>
+                  <ChevronDown size={16} className="text-gray-500" />
+                </div>
+              ) : (
+                <div 
+                  onClick={handleOpenSalesModal}
+                  className="relative flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer hover:border-[#3b0764] hover:ring-1 hover:ring-[#3b0764] transition-colors"
+                >
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <Users size={18} />
+                  </div>
+                  <span className="truncate">{salesDisplayText}</span>
+                  <ChevronDown size={16} className="text-gray-500" />
+                </div>
+              )}
             </div>
 
+            {/* Conditional Fields for view_only: Target and Realisasi */}
+            {mode === 'view_only' ? (
+              <>
+                {/* Target */}
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Target</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Target size={18} />
+                    </div>
+                    <input type="text" value={data?.target || 'Rp 0'} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  </div>
+                </div>
+
+                {/* Realisasi */}
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Realisasi</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <CheckCircle2 size={18} />
+                    </div>
+                    <input type="text" value={data?.realisasi || 'Rp 0'} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Password */}
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Password</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Lock size={18} />
+                    </div>
+                    <input 
+                      type={showPassword ? "text" : "password"} 
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Masukkan password"
+                      className="w-full pl-11 pr-12 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    />
+                    <div 
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer text-gray-400 hover:text-gray-600"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status */}
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
+                  <CustomSelect 
+                    value={status}
+                    onChange={setStatus}
+                    options={['Aktif', 'Tidak Aktif']}
+                    icon={<Info size={18} />}
+                    triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
+                    showSearch={false}
+                  />
+                </div>
+              </>
+            )}
+
           </div>
 
-          <div className="flex items-center justify-center pt-2 gap-4">
-            {data && (
+          {mode !== 'view_only' && (
+            <div className="flex items-center justify-center pt-2 gap-4">
+              {data && (
+                <button 
+                  onClick={handleDeleteClick}
+                  className="w-[160px] bg-[#ef4444] hover:bg-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                >
+                  <Trash2 size={18} />
+                  Hapus
+                </button>
+              )}
               <button 
-                onClick={handleDeleteClick}
-                className="w-[160px] bg-[#ef4444] hover:bg-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                onClick={handleSimpanClick}
+                className="w-[160px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
               >
-                <Trash2 size={18} />
-                Hapus
+                <Save size={18} />
+                Simpan
               </button>
-            )}
-            <button 
-              onClick={handleSimpanClick}
-              className="w-[160px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
-            >
-              <Save size={18} />
-              Simpan
-            </button>
-          </div>
+            </div>
+          )}
+
+          {mode === 'view_only' && (
+            <div className="mt-8 pt-4">
+              {/* Optional: Tambahan informasi lain yang read-only jika perlu */}
+            </div>
+          )}
         </div>
       </div>
+
+      {/* ============================================================ */}
+      {/* Sub-Modal View Sales (Read-Only) */}
+      {/* ============================================================ */}
+      {showViewSalesModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-[2px]" onClick={() => setShowViewSalesModal(false)}>
+          <div className="bg-white rounded-2xl w-[800px] shadow-2xl relative flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
+            <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100">
+              <h3 className="text-gray-600 text-[18px] font-medium">Daftar Sales Bawahan</h3>
+              <button 
+                onClick={() => setShowViewSalesModal(false)}
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            {/* Body */}
+            <div className="p-6 overflow-y-auto">
+              <DataTable 
+                title=""
+                columns={salesTableColumns}
+                data={mockSupervisorSalesData}
+                renderCell={renderSalesTableCell}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ============================================================ */}
       {/* Sub-Modal Pemilihan Sales */}

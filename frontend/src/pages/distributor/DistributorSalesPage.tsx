@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, Filter, LayoutDashboard, Users, Target, User, Eye, CheckCircle2, XCircle, Banknote, Wallet, UserCircle, Mail, Phone, Lock, EyeOff, Map, Briefcase, Info, MapPin } from 'lucide-react';
+import { Download, Filter, Users, Target, User, Eye, CheckCircle2, XCircle, Banknote, Wallet, UserCircle, Mail, Phone, Lock, EyeOff, Map, Briefcase, Info, MapPin } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { SalesModal } from '../../components/ui/SalesModal';
 import { supervisorSalesKpiData, supervisorSalesTableData } from '../../mock/supervisorSales';
+import { distributorMenuItems } from '../../mock/distributorDashboard';
 
-export const SupervisorSalesPage = () => {
+export const DistributorSalesPage = () => {
   const [periodeAwal, setPeriodeAwal] = useState('30 Juni 2026');
   const [periodeAkhir, setPeriodeAkhir] = useState('30 Juni 2026');
+  const [supervisor, setSupervisor] = useState('Semua Supervisor');
   const [sales, setSales] = useState('Semua Sales');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -59,13 +61,6 @@ export const SupervisorSalesPage = () => {
     </button>
   );
 
-  const supervisorMenuItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, path: '/supervisor-dashboard' },
-    { name: 'Sales', icon: User, path: '/supervisor-dashboard/sales' },
-    { name: 'Customer', icon: Users, path: '/supervisor-dashboard/customer' },
-    { name: 'Target Sales', icon: Target, path: '/supervisor-dashboard/target-sales' },
-  ];
-
   const tableColumns = [
     { key: 'namaSales', label: 'Nama Sales' },
     { key: 'email', label: 'Email' },
@@ -109,8 +104,8 @@ export const SupervisorSalesPage = () => {
 
   return (
     <>
-      <MainLayout sidebarItems={supervisorMenuItems}>
-        <Topbar title="Sales" subtitle="Pantau performa anggota tim sales" actionButton={ActionButtons} />
+      <MainLayout sidebarItems={distributorMenuItems}>
+        <Topbar title="Sales" subtitle="Pantau performa anggota tim sales di bawah naungan distributor" actionButton={ActionButtons} />
 
         <div className="px-8 pb-10">
           
@@ -140,7 +135,17 @@ export const SupervisorSalesPage = () => {
                 </div>
               </div>
 
-              <div className="col-span-2">
+              <div className="col-span-1">
+                <label className="block text-sm text-[#475569] font-medium mb-2">Supervisor</label>
+                <CustomSelect 
+                  value={supervisor} 
+                  onChange={setSupervisor} 
+                  options={['Semua Supervisor', 'Didi', 'Rafael', 'Julio', 'Asep', 'Rahmat']} 
+                  showSearch={true}
+                />
+              </div>
+
+              <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
                 <CustomSelect 
                   value={sales} 
@@ -160,7 +165,7 @@ export const SupervisorSalesPage = () => {
           </div>
 
           {/* KPI Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {currentKpiData.map((kpi) => (
               <KpiCard key={kpi.id} {...kpi} />
             ))}

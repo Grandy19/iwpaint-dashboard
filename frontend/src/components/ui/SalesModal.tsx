@@ -5,7 +5,7 @@ import { CustomSelect } from './CustomSelect';
 interface SalesModalProps {
   isOpen: boolean;
   onClose: () => void;
-  mode: 'create' | 'detail' | 'view_target';
+  mode: 'create' | 'detail' | 'view_target' | 'view_only';
   data?: any;
   onSave?: (data: any) => void;
 }
@@ -45,11 +45,11 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
 
   useEffect(() => {
     if (isOpen) {
-      if (mode === 'detail' && data) {
-        setNamaSales(data.namaSales || '');
-        setUsername(data.username || '');
-        setEmail(data.email || '');
-        setNomorHp(data.nomorHp || '');
+      if ((mode === 'detail' || mode === 'view_only') && data) {
+        setNamaSales(data.namaSales || data.name || '');
+        setUsername(data.username || (data.namaSales || data.name || '').toLowerCase().replace(/\s/g, '') + '123' || '');
+        setEmail(data.email || (data.namaSales || data.name || '').toLowerCase().replace(/\s/g, '') + '@gmail.com' || '');
+        setNomorHp(data.nomorHp || '081290922809');
         setPassword('**********');
         setAlamat(data.alamat || 'Jl. Jendral Sudirman No. 123');
         setArea(data.area || 'Bandung');
@@ -248,7 +248,8 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
                     value={namaSales}
                     onChange={(e) => setNamaSales(e.target.value)}
                     placeholder="Masukkan nama sales"
-                    className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    readOnly={mode === 'view_only'}
+                    className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                   />
                 </div>
               </div>
@@ -265,7 +266,8 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Masukkan username"
-                    className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    readOnly={mode === 'view_only'}
+                    className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                   />
                 </div>
               </div>
@@ -282,7 +284,8 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Masukkan email"
-                    className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    readOnly={mode === 'view_only'}
+                    className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                   />
                 </div>
               </div>
@@ -299,7 +302,8 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
                     value={nomorHp}
                     onChange={(e) => setNomorHp(e.target.value)}
                     placeholder="Masukkan nomor HP"
-                    className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    readOnly={mode === 'view_only'}
+                    className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                   />
                 </div>
               </div>
@@ -316,89 +320,122 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, d
                     value={alamat}
                     onChange={(e) => setAlamat(e.target.value)}
                     placeholder="Masukkan alamat lengkap"
-                    className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    readOnly={mode === 'view_only'}
+                    className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                   />
                 </div>
               </div>
 
               {/* Password */}
-              <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Password</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Lock size={18} />
-                  </div>
-                  <input 
-                    type={showPassword ? "text" : "password"} 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Masukkan password"
-                    className="w-full pl-11 pr-12 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
-                  />
-                  <div 
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer text-gray-400 hover:text-gray-600"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+              {mode !== 'view_only' && (
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Password</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Lock size={18} />
+                    </div>
+                    <input 
+                      type={showPassword ? "text" : "password"} 
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Masukkan password"
+                      readOnly={mode === 'view_only'}
+                      className={`w-full pl-11 pr-12 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
+                    />
+                    <div 
+                      className={`absolute inset-y-0 right-0 pr-4 flex items-center ${mode === 'view_only' ? 'pointer-events-none' : 'cursor-pointer'} text-gray-400 hover:text-gray-600`}
+                      onClick={() => { if(mode !== 'view_only') setShowPassword(!showPassword); }}
+                    >
+                      {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Area */}
               <div>
                 <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
-                <CustomSelect 
-                  value={area}
-                  onChange={setArea}
-                  options={['Bandung', 'Jakarta', 'Cirebon', 'Kuningan']}
-                  icon={<Map size={18} />}
-                  triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
-                  showSearch={false}
-                />
+                {mode === 'view_only' ? (
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Map size={18} />
+                    </div>
+                    <input type="text" value={area} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  </div>
+                ) : (
+                  <CustomSelect 
+                    value={area}
+                    onChange={setArea}
+                    options={['Bandung', 'Jakarta', 'Cirebon', 'Kuningan']}
+                    icon={<Map size={18} />}
+                    triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
+                    showSearch={false}
+                  />
+                )}
               </div>
 
               {/* Role */}
               <div>
                 <label className="block text-sm text-[#475569] font-medium mb-2">Role</label>
-                <CustomSelect 
-                  value={role}
-                  onChange={setRole}
-                  options={['Sales', 'Supervisor', 'Admin']}
-                  icon={<Briefcase size={18} />}
-                  triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
-                  showSearch={false}
-                />
+                {mode === 'view_only' ? (
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Briefcase size={18} />
+                    </div>
+                    <input type="text" value={role} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  </div>
+                ) : (
+                  <CustomSelect 
+                    value={role}
+                    onChange={setRole}
+                    options={['Sales', 'Supervisor', 'Admin']}
+                    icon={<Briefcase size={18} />}
+                    triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
+                    showSearch={false}
+                  />
+                )}
               </div>
 
               {/* Supervisor */}
-              <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Supervisor</label>
-                <CustomSelect 
-                  value={supervisor}
-                  onChange={setSupervisor}
-                  options={['Andi', 'Hartono', 'Budi']}
-                  icon={<Users size={18} />}
-                  triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
-                  showSearch={false}
-                />
-              </div>
+              {mode !== 'view_only' && (
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Supervisor</label>
+                  <CustomSelect 
+                    value={supervisor}
+                    onChange={setSupervisor}
+                    options={['Andi', 'Hartono', 'Budi']}
+                    icon={<Users size={18} />}
+                    triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
+                    showSearch={false}
+                  />
+                </div>
+              )}
 
               {/* Status */}
               <div>
                 <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
-                <CustomSelect 
-                  value={status}
-                  onChange={setStatus}
-                  options={['Aktif', 'Tidak Aktif']}
-                  icon={<Info size={18} />}
-                  triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
-                  showSearch={false}
-                />
+                {mode === 'view_only' ? (
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Info size={18} />
+                    </div>
+                    <input type="text" value={status} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  </div>
+                ) : (
+                  <CustomSelect 
+                    value={status}
+                    onChange={setStatus}
+                    options={['Aktif', 'Tidak Aktif']}
+                    icon={<Info size={18} />}
+                    triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
+                    showSearch={false}
+                  />
+                )}
               </div>
             </div>
           )}
 
-          {mode !== 'view_target' && (
+          {mode !== 'view_target' && mode !== 'view_only' && (
             <div className="flex items-center justify-center pt-2 gap-4">
               {data && (
                 <button 

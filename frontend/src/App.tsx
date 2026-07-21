@@ -18,6 +18,11 @@ import { SupervisorSalesPage } from './pages/supervisor/SupervisorSalesPage';
 import { SupervisorCustomerPage } from './pages/supervisor/SupervisorCustomerPage';
 import { SupervisorTargetPage } from './pages/supervisor/SupervisorTargetPage';
 
+import { DistributorDashboardPage } from './pages/distributor/DistributorDashboardPage';
+import { DistributorSupervisorPage } from './pages/distributor/DistributorSupervisorPage';
+import { DistributorSalesPage } from './pages/distributor/DistributorSalesPage';
+import { DistributorCustomerPage } from './pages/distributor/DistributorCustomerPage';
+
 function App() {
   return (
     <BrowserRouter>
@@ -40,6 +45,12 @@ function App() {
         <Route path="/supervisor-dashboard/sales" element={<SupervisorSalesPage />} />
         <Route path="/supervisor-dashboard/customer" element={<SupervisorCustomerPage />} />
         <Route path="/supervisor-dashboard/target-sales" element={<SupervisorTargetPage />} />
+
+        {/* Distributor Dashboard Routes */}
+        <Route path="/distributor-dashboard" element={<DistributorDashboardPage />} />
+        <Route path="/distributor-dashboard/supervisor" element={<DistributorSupervisorPage />} />
+        <Route path="/distributor-dashboard/sales" element={<DistributorSalesPage />} />
+        <Route path="/distributor-dashboard/customer" element={<DistributorCustomerPage />} />
 
         <Route path="*" element={<DashboardPage />} />
       </Routes>

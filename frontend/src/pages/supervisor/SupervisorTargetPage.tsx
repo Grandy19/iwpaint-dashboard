@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, LayoutDashboard, Users, Target, CheckCircle2, XCircle, Filter, Eye, Banknote, Package, Wallet } from 'lucide-react';
+import { Download, LayoutDashboard, Users, Target, CheckCircle2, XCircle, Filter, Eye, Banknote, Package, Wallet, User } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { RingkasanTargetCard } from '../../components/ui/RingkasanTargetCard';
 import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
@@ -158,7 +158,7 @@ export const SupervisorTargetPage = () => {
 
   const supervisorMenuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/supervisor-dashboard' },
-    { name: 'Sales', icon: Users, path: '/supervisor-dashboard/sales' },
+    { name: 'Sales', icon: User, path: '/supervisor-dashboard/sales' },
     { name: 'Customer', icon: Users, path: '/supervisor-dashboard/customer' },
     { name: 'Target Sales', icon: Target, path: '/supervisor-dashboard/target-sales' },
   ];
