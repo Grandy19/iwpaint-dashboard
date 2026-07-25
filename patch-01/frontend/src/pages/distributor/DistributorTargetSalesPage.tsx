@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, Filter, CheckCircle2, XCircle, Eye, Wallet, Scale, PaintRoller, Wrench, Factory, Target, LayoutDashboard, User, Users } from 'lucide-react';
+import { Download, Filter, CheckCircle2, XCircle, Eye, Wallet, Scale, PaintRoller, Wrench, Factory, Target, LayoutDashboard, User, Users, Banknote, TrendingUp, Flag } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
@@ -137,15 +137,15 @@ export const DistributorTargetSalesPage = () => {
           value: totalTargetVal >= 1e6 ? `Rp ${(totalTargetVal / 1e6).toFixed(1)} Jt` : `Rp ${totalTargetVal.toLocaleString('id-ID')}`,
           description: 'Total Target Penjualan Area',
           icon: Target,
-          iconColor: 'text-[#3b82f6]',
-          iconBg: 'bg-[#dbeafe]',
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
         },
         {
           id: 2,
           title: 'Realisasi Penjualan Area',
           value: totalRealisasiVal >= 1e6 ? `Rp ${(totalRealisasiVal / 1e6).toFixed(1)} Jt` : `Rp ${totalRealisasiVal.toLocaleString('id-ID')}`,
           description: 'Total Realisasi Penjualan Area',
-          icon: Wallet,
+          icon: Banknote,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
         },
@@ -154,9 +154,9 @@ export const DistributorTargetSalesPage = () => {
           title: 'Pencapaian Target Area',
           value: `${globalPercentage}%`,
           description: 'Persentase Pencapaian Area',
-          icon: Target,
-          iconColor: 'text-[#f59e0b]',
-          iconBg: 'bg-[#fef3c7]',
+          icon: TrendingUp,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
           progress: globalPercentage > 100 ? 100 : globalPercentage
         },
         {
@@ -164,7 +164,7 @@ export const DistributorTargetSalesPage = () => {
           title: 'Area Mencapai Target',
           value: `${achievedAreas} Area`,
           description: 'Jumlah Area yang Mencapai Target',
-          icon: CheckCircle2,
+          icon: Flag,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
         }

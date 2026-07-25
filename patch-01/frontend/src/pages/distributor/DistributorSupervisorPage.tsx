@@ -96,9 +96,9 @@ export const DistributorSupervisorPage = () => {
           title: 'Total Supervisor',
           value: `${filtered.length} Supervisor`,
           description: 'Total supervisor di regional Anda',
-          icon: UserCheck,
-          iconColor: 'text-[#f59e0b]',
-          iconBg: 'bg-[#fef3c7]',
+          icon: Users,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
         }
       ]);
     } catch (err) {

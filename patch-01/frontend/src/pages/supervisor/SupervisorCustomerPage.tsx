@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, Filter, Eye, LayoutDashboard, Users, Target, User, Map, MapPin, Receipt, Wallet, Package, CalendarClock } from 'lucide-react';
+import { Download, Filter, Eye, LayoutDashboard, Users, Target, User, Map, MapPin, Receipt, Wallet, Package, CalendarClock, Banknote } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
@@ -67,7 +67,7 @@ export const SupervisorCustomerPage = () => {
           title: 'Total Penjualan (Rp)',
           value: totalSalesVal >= 1e9 ? `Rp ${(totalSalesVal / 1e9).toFixed(1)} M` : `Rp ${(totalSalesVal / 1e6).toFixed(1)} Jt`,
           description: 'Total penjualan customer supervisi Anda',
-          icon: Wallet,
+          icon: Banknote,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
         },
@@ -76,9 +76,9 @@ export const SupervisorCustomerPage = () => {
           title: 'Total Transaksi',
           value: `${totalTxVal.toLocaleString('id-ID')} Transaksi`,
           description: 'Total transaksi customer supervisi Anda',
-          icon: Receipt,
-          iconColor: 'text-[#3b82f6]',
-          iconBg: 'bg-[#dbeafe]',
+          icon: Wallet,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
         },
         {
           id: 3,
@@ -86,8 +86,8 @@ export const SupervisorCustomerPage = () => {
           value: `${totalCustomersVal.toLocaleString('id-ID')} Customer`,
           description: 'Total customer di bawah supervisi Anda',
           icon: Users,
-          iconColor: 'text-[#f59e0b]',
-          iconBg: 'bg-[#fef3c7]',
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
         }
       ]);
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Upload, Plus, CheckCircle2, XCircle, Edit3, ArrowDown, Filter, Wallet, Target, CreditCard, Users, PaintRoller, Wrench, Factory } from 'lucide-react';
+import { Upload, Plus, CheckCircle2, XCircle, Edit3, ArrowDown, Filter, Wallet, Target, CreditCard, Users, PaintRoller, Wrench, Factory, User } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { DataTable } from '../../components/common/DataTable';
 import { KpiCard } from '../../components/common/KpiCard';
@@ -115,8 +115,8 @@ export const TargetSalesPage = () => {
               value: selectedRow.totalTarget,
               description: 'Target untuk bulan Juli 2026',
               icon: Target,
-              iconColor: 'text-[#3b82f6]',
-              iconBg: 'bg-[#dbeafe]',
+              iconColor: 'text-[#10b981]',
+              iconBg: 'bg-[#dcfce7]',
             },
             {
               id: 3,
@@ -124,8 +124,8 @@ export const TargetSalesPage = () => {
               value: `${selectedRow.status === 'Sudah Input' ? 12 : 0} Customer`, // placeholder/derived
               description: 'Customer yang dilayani',
               icon: Users,
-              iconColor: 'text-[#f59e0b]',
-              iconBg: 'bg-[#fef3c7]',
+              iconColor: 'text-[#10b981]',
+              iconBg: 'bg-[#dcfce7]',
             },
             {
               id: 4,
@@ -153,7 +153,7 @@ export const TargetSalesPage = () => {
             title: 'Total Sales',
             value: `${totalSalesmenCount} Sales`,
             description: 'Total Semua Sales',
-            icon: Users,
+            icon: User,
             iconColor: 'text-[#10b981]',
             iconBg: 'bg-[#dcfce7]',
           },
@@ -163,8 +163,8 @@ export const TargetSalesPage = () => {
             value: perfRes.data.targetGlobal,
             description: `Total Target ${targetMonthName} ${targetYear}`,
             icon: Target,
-            iconColor: 'text-[#3b82f6]',
-            iconBg: 'bg-[#dbeafe]',
+            iconColor: 'text-[#10b981]',
+            iconBg: 'bg-[#dcfce7]',
           },
           {
             id: 3,

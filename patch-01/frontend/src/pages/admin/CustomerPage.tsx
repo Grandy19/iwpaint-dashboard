@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Upload, Filter, Eye, Package, Download, User, Users, Receipt, Map, MapPin, Wallet, CalendarClock } from 'lucide-react';
+import { Upload, Filter, Eye, Package, Download, User, Users, Receipt, Map, MapPin, Wallet, CalendarClock, CreditCard } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
@@ -63,9 +63,9 @@ export const CustomerPage = () => {
           title: 'Total Transaksi',
           value: `${totalTxVal.toLocaleString('id-ID')} Transaksi`,
           description: 'Total transaksi keseluruhan',
-          icon: Receipt,
-          iconColor: 'text-[#3b82f6]',
-          iconBg: 'bg-[#dbeafe]',
+          icon: CreditCard,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
         },
         {
           id: 3,
@@ -73,8 +73,8 @@ export const CustomerPage = () => {
           value: `${totalCustomersVal.toLocaleString('id-ID')} Customer`,
           description: 'Total customer aktif yang terdaftar',
           icon: Users,
-          iconColor: 'text-[#f59e0b]',
-          iconBg: 'bg-[#fef3c7]',
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
         }
       ]);
     } catch (err) {

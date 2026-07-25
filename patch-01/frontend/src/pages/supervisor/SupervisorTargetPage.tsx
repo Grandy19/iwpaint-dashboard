@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, LayoutDashboard, Users, Target, CheckCircle2, XCircle, Filter, Eye, Wallet, Scale, CreditCard, PaintRoller, Wrench, Factory, User } from 'lucide-react';
+import { Download, LayoutDashboard, Users, Target, CheckCircle2, XCircle, Filter, Eye, Wallet, Scale, CreditCard, PaintRoller, Wrench, Factory, User, TrendingUp, UserCheck } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { RingkasanTargetCard } from '../../components/ui/RingkasanTargetCard';
 import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
@@ -77,8 +77,8 @@ export const SupervisorTargetPage = () => {
               value: selectedRow.totalTarget,
               description: `Target bulanan ${appliedSales}`,
               icon: Target,
-              iconColor: 'text-[#3b82f6]',
-              iconBg: 'bg-[#dbeafe]',
+              iconColor: 'text-[#10b981]',
+              iconBg: 'bg-[#dcfce7]',
             },
             {
               id: 3,
@@ -86,8 +86,8 @@ export const SupervisorTargetPage = () => {
               value: `${selectedRow.totalQty || 0} Kg`,
               description: `Total QTY terjual oleh ${appliedSales}`,
               icon: Scale,
-              iconColor: 'text-[#f59e0b]',
-              iconBg: 'bg-[#fef3c7]',
+              iconColor: 'text-[#10b981]',
+              iconBg: 'bg-[#dcfce7]',
             },
             {
               id: 4,
@@ -140,8 +140,8 @@ export const SupervisorTargetPage = () => {
             value: targetTim,
             description: 'Total target penjualan tim Anda',
             icon: Target,
-            iconColor: 'text-[#3b82f6]',
-            iconBg: 'bg-[#dbeafe]',
+            iconColor: 'text-[#10b981]',
+            iconBg: 'bg-[#dcfce7]',
           },
           {
             id: 2,
@@ -157,7 +157,7 @@ export const SupervisorTargetPage = () => {
             title: 'Pencapaian Target Tim',
             value: `${pencapaianTim}%`,
             description: 'Persentase pencapaian target tim',
-            icon: CheckCircle2,
+            icon: TrendingUp,
             iconColor: 'text-[#10b981]',
             iconBg: 'bg-[#dcfce7]',
             progress: pencapaianTim > 100 ? 100 : pencapaianTim,
@@ -167,9 +167,9 @@ export const SupervisorTargetPage = () => {
             title: 'Sales Mencapai Target',
             value: `${salesMencapaiTarget} Sales`,
             description: 'Jumlah sales yang telah mencapai target',
-            icon: Users,
-            iconColor: 'text-[#f59e0b]',
-            iconBg: 'bg-[#fef3c7]',
+            icon: UserCheck,
+            iconColor: 'text-[#10b981]',
+            iconBg: 'bg-[#dcfce7]',
           }
         ]);
 

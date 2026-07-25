@@ -68,7 +68,7 @@ export const DistributorSalesPage = () => {
           title: sales === 'Semua Sales' ? 'Total Sales' : 'Total Penjualan',
           value: sales === 'Semua Sales' ? `${filteredSales.length} Sales` : (kpisVal.total_sales >= 1e9 ? `Rp ${(kpisVal.total_sales / 1e9).toFixed(1)} M` : `Rp ${(kpisVal.total_sales / 1e6).toFixed(1)} Jt`),
           description: sales === 'Semua Sales' ? 'Total sales di regional Anda' : `Total penjualan oleh ${sales}`,
-          icon: sales === 'Semua Sales' ? Users : Banknote,
+          icon: sales === 'Semua Sales' ? User : Banknote,
           iconColor: sales === 'Semua Sales' ? 'text-[#3b82f6]' : 'text-[#10b981]',
           iconBg: sales === 'Semua Sales' ? 'bg-[#dbeafe]' : 'bg-[#dcfce7]',
         },
@@ -78,8 +78,8 @@ export const DistributorSalesPage = () => {
           value: `${kpisVal.total_customers} Customer`,
           description: sales === 'Semua Sales' ? 'Total customer yang ditangani' : `Total customer yang dikelola oleh ${sales}`,
           icon: Users,
-          iconColor: 'text-[#3b82f6]',
-          iconBg: 'bg-[#dbeafe]',
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
         },
         {
           id: 3,
@@ -87,8 +87,8 @@ export const DistributorSalesPage = () => {
           value: `${kpisVal.total_transactions || 0} Transaksi`,
           description: sales === 'Semua Sales' ? 'Total transaksi dari semua sales' : `Total transaksi oleh ${sales}`,
           icon: Wallet,
-          iconColor: 'text-[#f59e0b]',
-          iconBg: 'bg-[#fef3c7]',
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
         }
       ]);
 

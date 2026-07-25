@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, Filter, Eye, LayoutDashboard, Users, Target, User, Map, MapPin, Receipt, Wallet, Package, CalendarClock } from 'lucide-react';
+import { Download, Filter, Eye, LayoutDashboard, Users, Target, User, Map, MapPin, Receipt, Wallet, Package, CalendarClock, Banknote } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
@@ -55,7 +55,7 @@ export const SalesCustomerPage = () => {
           title: 'Total Penjualan (Rp)',
           value: totalSalesVal >= 1e9 ? `Rp ${(totalSalesVal / 1e9).toFixed(1)} M` : `Rp ${(totalSalesVal / 1e6).toFixed(1)} Jt`,
           description: 'Total penjualan keseluruhan',
-          icon: Wallet,
+          icon: Banknote,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
         },
@@ -64,9 +64,9 @@ export const SalesCustomerPage = () => {
           title: 'Total Transaksi',
           value: `${totalTxVal.toLocaleString('id-ID')} Transaksi`,
           description: 'Total transaksi periode terpilih',
-          icon: Receipt,
-          iconColor: 'text-[#3b82f6]',
-          iconBg: 'bg-[#dbeafe]',
+          icon: Wallet,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
         },
         {
           id: 3,

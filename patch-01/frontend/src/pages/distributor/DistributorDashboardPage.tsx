@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, Filter, LayoutDashboard, Users, Target, User, Eye, Briefcase, UserCheck, Wallet, Scale, CreditCard, PaintRoller, Wrench, Factory } from 'lucide-react';
+import { Download, Filter, LayoutDashboard, Users, Target, User, Eye, Briefcase, UserCheck, Wallet, Scale, CreditCard, PaintRoller, Wrench, Factory, Banknote, Package, Flag } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
 import { RingkasanTargetCard } from '../../components/ui/RingkasanTargetCard';
@@ -78,7 +78,7 @@ export const DistributorDashboardPage = () => {
           title: 'Total Penjualan Tim',
           value: kpisVal.total_sales >= 1e9 ? `Rp ${(kpisVal.total_sales / 1e9).toFixed(1)} M` : `Rp ${(kpisVal.total_sales / 1e6).toFixed(1)} Jt`,
           description: 'Total penjualan wilayah Anda',
-          icon: Wallet,
+          icon: Banknote,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
         },
@@ -87,9 +87,9 @@ export const DistributorDashboardPage = () => {
           title: 'Total Qty Penjualan',
           value: `${Number(kpisVal.total_weight).toLocaleString('id-ID')} Kg`,
           description: 'Berat total produk terjual wilayah Anda',
-          icon: Scale,
-          iconColor: 'text-[#3b82f6]',
-          iconBg: 'bg-[#dbeafe]',
+          icon: Package,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
         },
         {
           id: 3,
@@ -97,15 +97,15 @@ export const DistributorDashboardPage = () => {
           value: `${areaSupervisors.length} Supervisor`,
           description: 'Supervisor di wilayah Anda',
           icon: UserCheck,
-          iconColor: 'text-[#f59e0b]',
-          iconBg: 'bg-[#fef3c7]',
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
         },
         {
           id: 4,
           title: 'Pencapaian Target Area',
           value: `${targetPerfRes.data.percentage || 0}%`,
           description: 'Persentase pencapaian target area',
-          icon: Target,
+          icon: Flag,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
           progress: targetPerfRes.data.percentage > 100 ? 100 : (targetPerfRes.data.percentage || 0),
