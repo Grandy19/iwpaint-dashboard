@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Dashboard Monitoring Sales - IW Paint</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6;
+      }
+      /* Custom scrollbar for table */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+      }
+
+      /* Sidebar Transitions */
+      .sidebar-transition {
+        transition: width 0.3s ease-in-out;
+      }
+      
+      .hide {
+        display: none !important;
+      }
+      .skeleton {
+        background: #eee;
+        background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+        border-radius: 5px;
+        background-size: 200% 100%;
+        animation: 1.5s shine linear infinite;
+      }
+      @keyframes shine {
+        to {
+          background-position-x: -200%;
+        }
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#431853",
+              secondary: "#E8E1EF",
+              textMain: "#1F2937",
+              textMuted: "#6B7280",
+              accentGreen: "#10B981",
+              accentRed: "#EF4444",
+              accentBlue: "#3B82F6",
+              chartPink: "#D946EF",
+              bgGray: "#F3F4F6",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="flex h-screen overflow-hidden text-textMain">
+    <!-- BEGIN: Sidebar -->
+    <aside class="bg-white w-64 border-r border-gray-200 flex flex-col sidebar-transition relative z-20 hidden md:flex shrink-0" id="sidebar">
+      <!-- Logo Area -->
+      <div class="h-20 flex items-center justify-center border-b border-gray-100 cursor-pointer" onclick="toggleSidebar()">
+        <div class="flex flex-col items-center" id="logo-full">
+          <div class="text-2xl font-bold italic flex items-center"><span class="text-primary">i</span><span class="text-chartPink">w</span></div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-primary">paint</div>
+        </div>
+        <div class="hidden text-2xl font-bold italic text-primary" id="logo-icon">i<span class="text-chartPink">w</span></div>
+      </div>
+      <!-- Navigation -->
+      <nav class="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+        <a class="flex items-center space-x-3 text-textMuted hover:bg-gray-50 px-4 py-3 rounded-lg font-medium transition-colors" href="/dashboard">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+          <span class="sidebar-text">Dashboard</span>
+        </a>
+        <a class="flex items-center space-x-3 text-textMuted hover:bg-gray-50 px-4 py-3 rounded-lg font-medium transition-colors" href="#">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+          <span class="sidebar-text">Customer</span>
+        </a>
+        <a class="flex items-center space-x-3 bg-secondary text-primary px-4 py-3 rounded-lg font-medium transition-colors" href="/sales">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+          <span class="sidebar-text">Sales</span>
+        </a>
+        <a class="flex items-center space-x-3 text-textMuted hover:bg-gray-50 px-4 py-3 rounded-lg font-medium transition-colors" href="/import">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+          <span class="sidebar-text">Import Data</span>
+        </a>
+      </nav>
+    </aside>
+    <!-- END: Sidebar -->
+
+    <!-- Mobile Header -->
+    <div class="md:hidden fixed top-0 w-full bg-white border-b border-gray-200 z-30 flex items-center justify-between px-4 h-16">
+      <div class="text-xl font-bold italic flex items-center"><span class="text-primary">i</span><span class="text-chartPink">w</span><span class="text-xs uppercase text-primary ml-1">paint</span></div>
+      <button class="text-gray-500 hover:text-gray-700" onclick="toggleMobileMenu()">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="hidden fixed inset-0 z-40 bg-gray-900/50" id="mobile-menu">
+      <div class="bg-white w-64 h-full flex flex-col pt-16 animate-slide-in">
+        <nav class="flex-1 py-4 px-4 space-y-2">
+          <a class="flex items-center space-x-3 text-textMuted hover:bg-gray-50 px-4 py-3 rounded-lg font-medium" href="/dashboard">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            <span>Dashboard</span>
+          </a>
+          <a class="flex items-center space-x-3 text-textMuted hover:bg-gray-50 px-4 py-3 rounded-lg font-medium font-semibold" href="/sales">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            <span>Sales</span>
+          </a>
+          <a class="flex items-center space-x-3 text-textMuted hover:bg-gray-50 px-4 py-3 rounded-lg font-medium" href="/import">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            <span>Import Data</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- BEGIN: Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden pt-16 md:pt-0">
+      <!-- BEGIN: Header -->
+      <header class="h-20 bg-bgGray px-4 md:px-8 flex items-center justify-between flex-shrink-0 border-b border-gray-200">
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold text-gray-800">Dashboard Monitoring Sales</h1>
+          <p class="text-xs text-textMuted mt-1" id="last-updated">Loading...</p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a class="bg-primary hover:bg-[#321240] text-white px-4 py-2 rounded-lg flex items-center space-x-2 text-xs md:text-sm font-medium transition-colors shadow-sm" href="/import">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+              <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+            <span class="hidden sm:inline">Import Data</span>
+          </a>
+          <button class="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 text-textMuted transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          </button>
+          <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold border-2 border-white shadow-sm overflow-hidden text-sm uppercase">
+            U
+          </div>
+        </div>
+      </header>
+      <!-- END: Header -->
+
+      <!-- BEGIN: Content Area -->
+      <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
+        <!-- Filter Card -->
+        <div class="bg-white rounded-xl shadow-sm p-4 md:p-6 flex flex-wrap gap-4 items-end max-w-7xl mx-auto">
+          <div class="flex-1 min-w-[200px]">
+            <label class="block text-xs font-medium text-textMuted mb-1.5">Rentang Tanggal</label>
+            <select class="w-full border-gray-200 rounded-lg text-sm focus:ring-primary focus:border-primary">
+              <option>Juni 1 - Juni 30, 2028</option>
+            </select>
+          </div>
+          <div class="flex-1 min-w-[200px]">
+            <label class="block text-xs font-medium text-textMuted mb-1.5">Lokasi</label>
+            <select class="w-full border-gray-200 rounded-lg text-sm focus:ring-primary focus:border-primary">
+              <option>Kabupaten Bandung ...</option>
+            </select>
+          </div>
+          <div class="flex-1 min-w-[200px]">
+            <label class="block text-xs font-medium text-textMuted mb-1.5">Sales</label>
+            <select id="filter-sales" class="w-full border-gray-200 rounded-lg text-sm focus:ring-primary focus:border-primary">
+              <option value="Semua Sales">Semua Sales</option>
+            </select>
+          </div>
+          <div class="flex-1 min-w-[200px]">
+            <label class="block text-xs font-medium text-textMuted mb-1.5">Kategori Produk</label>
+            <select class="w-full border-gray-200 rounded-lg text-sm focus:ring-primary focus:border-primary">
+              <option>Semua Kategori</option>
+            </select>
+          </div>
+          <div class="w-full md:w-auto">
+            <button class="w-full md:w-auto bg-primary hover:bg-[#321240] text-white px-6 py-2.5 rounded-lg flex items-center justify-center space-x-2 text-sm font-medium transition-colors shadow-sm" id="btn-terapkan">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+              </svg>
+              <span>Terapkan</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ================= CONTAINER A: SEMUA SALES MODE ================= -->
+        <div id="layout-semua-sales" class="space-y-6 max-w-7xl mx-auto">
+          <!-- KPI Cards (3 Cards) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Total Penjualan -->
+            <div class="bg-white rounded-xl shadow-sm p-5 data-container relative">
+              <div class="flex justify-between items-start mb-4">
+                <h3 class="text-sm font-medium text-textMuted">Total Penjualan (Rp)</h3>
+                <div class="p-1.5 bg-green-50 rounded text-accentGreen">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                </div>
+              </div>
+              <div class="data-content">
+                <div class="text-2xl lg:text-3xl font-bold text-gray-800 mb-2" id="kpi-total-sales-semua">Rp 0</div>
+                <div class="flex items-center text-xs text-textMuted">
+                  <span class="flex items-center text-accentGreen bg-green-50 px-1 rounded mr-1">
+                    <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 10l7-7m0 0l7 7m-7-7v18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                    8.4%
+                  </span>
+                  dibanding bulan lalu
+                </div>
+              </div>
+              <div class="skeleton w-full h-16 mt-2 hidden skeleton-loader"></div>
+            </div>
+            <!-- Total Qty Terjual -->
+            <div class="bg-white rounded-xl shadow-sm p-5 data-container relative">
+              <div class="flex justify-between items-start mb-4">
+                <h3 class="text-sm font-medium text-textMuted">Total Qty Terjual</h3>
+                <div class="p-1.5 bg-green-50 rounded text-accentGreen">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                </div>
+              </div>
+              <div class="data-content">
+                <div class="text-2xl lg:text-3xl font-bold text-gray-800 mb-2" id="kpi-total-qty-semua">0 Kg</div>
+                <div class="flex items-center text-xs text-textMuted">
+                  <span>Berat total penjualan terakumulasi</span>
+                </div>
+              </div>
+              <div class="skeleton w-full h-16 mt-2 hidden skeleton-loader"></div>
+            </div>
+            <!-- Total Transaksi -->
+            <div class="bg-white rounded-xl shadow-sm p-5 data-container relative">
+              <div class="flex justify-between items-start mb-4">
+                <h3 class="text-sm font-medium text-textMuted">Total Transaksi</h3>
+                <div class="p-1.5 bg-green-50 rounded text-accentGreen">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                </div>
+              </div>
+              <div class="data-content">
+                <div class="text-2xl lg:text-3xl font-bold text-gray-800 mb-2" id="kpi-total-transactions-semua">0</div>
+                <div class="flex items-center text-xs text-textMuted">
+                  <span>Jumlah invoice unik (NOFAKTUR)</span>
+                </div>
+              </div>
+              <div class="skeleton w-full h-16 mt-2 hidden skeleton-loader"></div>
+            </div>
+          </div>
+
+          <!-- Row 2: Top 10 Salesman Table & Contribution chart -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Top 10 Salesman -->
+            <div class="bg-white rounded-xl shadow-sm p-5 lg:col-span-5 flex flex-col data-container">
+              <h3 class="text-sm font-bold text-gray-800 mb-4">Top 10 Sales Berdasarkan Penjualan</h3>
+              <div class="overflow-x-auto flex-1">
+                <table class="w-full text-sm text-left">
+                  <thead class="text-xs text-textMuted border-b border-gray-100">
+                    <tr>
+                      <th class="pb-2 font-medium" scope="col">No.</th>
+                      <th class="pb-2 font-medium" scope="col">Kode Sales</th>
+                      <th class="pb-2 font-medium" scope="col">Sales</th>
+                      <th class="pb-2 font-medium text-right" scope="col">Penjualan</th>
+                    </tr>
+                  </thead>
+                  <tbody class="data-content" id="top-salesmen-body">
+                    <!-- Dynamic Rows -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="skeleton w-full h-40 hidden skeleton-loader"></div>
+            </div>
+            <!-- Piechart Distribusi -->
+            <div class="bg-white rounded-xl shadow-sm p-5 lg:col-span-7 flex flex-col data-container">
+              <h3 class="text-sm font-bold text-gray-800 mb-2">Kontribusi Penjualan per Sales</h3>
+              <div class="flex-1 relative min-h-[400px] data-content">
+                <div class="h-[360px] w-full relative">
+                  <canvas id="donutChartSemua"></canvas>
+                </div>
+                <div class="absolute bottom-0 w-full flex justify-center gap-6 px-8 text-xs text-textMuted mt-2" id="donut-legend-semua"></div>
+              </div>
+              <div class="skeleton w-full h-[400px] hidden skeleton-loader"></div>
+            </div>
+          </div>
+
+          <!-- Area Chart -->
+          <div class="bg-white rounded-xl shadow-sm p-5 data-container">
+            <div class="mb-4">
+              <h3 class="text-sm font-bold text-gray-800">Tren Penjualan Sales</h3>
+            </div>
+            <div class="h-[250px] w-full data-content relative">
+              <canvas id="areaChartSemua"></canvas>
+            </div>
+            <div class="skeleton w-full h-[250px] hidden skeleton-loader"></div>
+          </div>
+
+          <!-- Bar Horizontal list for Top 10 Terlaris -->
+          <div class="bg-white rounded-xl shadow-sm p-5 data-container">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-sm font-bold text-gray-800">Top 10 Produk Terlaris</h3>
+              <div class="text-sm font-bold text-gray-800">Total: <span id="top-products-semua-total">Rp 0</span></div>
+            </div>
+            <div class="space-y-4 data-content" id="top-products-semua-body">
+              <!-- Dynamic bars -->
+            </div>
+            <div class="skeleton w-full h-[300px] hidden skeleton-loader"></div>
+          </div>
+        </div>
+
+        <!-- ================= CONTAINER B: SALES DETAIL MODE ================= -->
+        <div id="layout-sales-detail" class="space-y-6 max-w-7xl mx-auto hidden">
+          <!-- Row 1: KPI Cards (2x2 grid) & Donut Chart (side-by-side) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- KPIs (2/3 width) -->
+            <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <!-- Total Penjualan -->
+              <div class="bg-white rounded-xl shadow-sm p-5 data-container relative flex flex-col justify-between">
+                <div class="flex justify-between items-start mb-4">
+                  <h3 class="text-sm font-medium text-textMuted">Total Penjualan (Rp)</h3>
+                  <div class="p-1.5 bg-green-50 rounded text-accentGreen">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  </div>
+                </div>
+                <div class="data-content">
+                  <div class="text-2xl lg:text-3xl font-bold text-gray-800" id="kpi-total-sales-detail">Rp 0</div>
+                </div>
+                <div class="skeleton w-full h-12 hidden skeleton-loader"></div>
+              </div>
+              <!-- Total Qty Penjualan -->
+              <div class="bg-white rounded-xl shadow-sm p-5 data-container relative flex flex-col justify-between">
+                <div class="flex justify-between items-start mb-4">
+                  <h3 class="text-sm font-medium text-textMuted">Total Qty Penjualan</h3>
+                  <div class="p-1.5 bg-green-50 rounded text-accentGreen">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  </div>
+                </div>
+                <div class="data-content">
+                  <div class="text-2xl lg:text-3xl font-bold text-gray-800" id="kpi-total-qty-detail">0 Kg</div>
+                </div>
+                <div class="skeleton w-full h-12 hidden skeleton-loader"></div>
+              </div>
+              <!-- Total Transaksi -->
+              <div class="bg-white rounded-xl shadow-sm p-5 data-container relative flex flex-col justify-between">
+                <div class="flex justify-between items-start mb-4">
+                  <h3 class="text-sm font-medium text-textMuted">Total Transaksi</h3>
+                  <div class="p-1.5 bg-green-50 rounded text-accentGreen">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  </div>
+                </div>
+                <div class="data-content">
+                  <div class="text-2xl lg:text-3xl font-bold text-gray-800" id="kpi-total-transactions-detail">0</div>
+                </div>
+                <div class="skeleton w-full h-12 hidden skeleton-loader"></div>
+              </div>
+              <!-- Customer yang Dilayani -->
+              <div class="bg-white rounded-xl shadow-sm p-5 data-container relative flex flex-col justify-between">
+                <div class="flex justify-between items-start mb-4">
+                  <h3 class="text-sm font-medium text-textMuted">Customer yang Dilayani</h3>
+                  <div class="p-1.5 bg-green-50 rounded text-accentGreen">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                      <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="data-content">
+                  <div class="text-2xl lg:text-3xl font-bold text-gray-800" id="kpi-total-customers-detail">0 Customer</div>
+                </div>
+                <div class="skeleton w-full h-12 hidden skeleton-loader"></div>
+              </div>
+            </div>
+            <!-- Donut (1/3 width) -->
+            <div class="lg:col-span-4 bg-white rounded-xl shadow-sm p-5 flex flex-col data-container justify-between min-h-[300px]">
+              <h3 class="text-sm font-bold text-gray-800 mb-2">Kontribusi Penjualan per Customer</h3>
+              <div class="flex-1 relative data-content flex flex-col justify-center">
+                <div class="h-[180px] w-full relative">
+                  <canvas id="donutChartDetail"></canvas>
+                </div>
+                <div class="flex justify-center flex-wrap gap-4 text-[10px] text-textMuted mt-2" id="donut-legend-detail"></div>
+              </div>
+              <div class="skeleton w-full h-full hidden skeleton-loader"></div>
+            </div>
+          </div>
+
+          <!-- Area Chart (Trend) -->
+          <div class="bg-white rounded-xl shadow-sm p-5 data-container">
+            <div class="mb-4">
+              <h3 class="text-sm font-bold text-gray-800">Tren Pembelian Sales</h3>
+            </div>
+            <div class="h-[250px] w-full data-content relative">
+              <canvas id="areaChartDetail"></canvas>
+            </div>
+            <div class="skeleton w-full h-[250px] hidden skeleton-loader"></div>
+          </div>
+
+          <!-- Horizontal Bar List (Top Products) -->
+          <div class="bg-white rounded-xl shadow-sm p-5 data-container">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-sm font-bold text-gray-800">Top 10 Produk Terlaris Sales</h3>
+              <div class="text-sm font-bold text-gray-800">Total: <span id="top-products-detail-total">Rp 0</span></div>
+            </div>
+            <div class="space-y-4 data-content" id="top-products-detail-body">
+              <!-- Dynamic bars -->
+            </div>
+            <div class="skeleton w-full h-[300px] hidden skeleton-loader"></div>
+          </div>
+
+          <!-- Transactions Table (New!) -->
+          <div class="bg-white rounded-xl shadow-sm p-5 data-container">
+            <h3 class="text-sm font-bold text-gray-800 mb-4">Tabel Transaksi Sales</h3>
+            <div class="overflow-x-auto max-h-[400px] custom-scrollbar">
+              <table class="w-full text-sm text-left border-collapse">
+                <thead class="text-xs text-textMuted border-b border-gray-100 sticky top-0 bg-white">
+                  <tr>
+                    <th class="pb-3 font-medium">Tanggal</th>
+                    <th class="pb-3 font-medium">No. Faktur</th>
+                    <th class="pb-3 font-medium">Customer</th>
+                    <th class="pb-3 font-medium">Produk</th>
+                    <th class="pb-3 font-medium text-center">QTY</th>
+                    <th class="pb-3 font-medium text-center">Satuan</th>
+                    <th class="pb-3 font-medium text-right">Total Penjualan</th>
+                  </tr>
+                </thead>
+                <tbody class="data-content" id="transactions-body">
+                  <!-- Dynamic rows -->
+                </tbody>
+              </table>
+            </div>
+            <div class="skeleton w-full h-48 hidden skeleton-loader"></div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="hidden bg-white rounded-xl shadow-sm p-12 text-center flex-col items-center justify-center max-w-7xl mx-auto" id="empty-state">
+          <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+            <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+          </svg>
+          <h3 class="text-lg font-medium text-gray-800 mb-1">Tidak ada data ditemukan</h3>
+          <p class="text-sm text-textMuted max-w-sm mx-auto">Silakan ubah filter pencarian Anda untuk melihat hasil yang berbeda.</p>
+        </div>
+      </div>
+    </main>
+    <!-- END: Main Content -->
+
+    <script>
+      // Sidebar Toggle Logic
+      let sidebarExpanded = true;
+      const sidebar = document.getElementById("sidebar");
+      const logoFull = document.getElementById("logo-full");
+      const logoIcon = document.getElementById("logo-icon");
+      const sidebarTexts = document.querySelectorAll(".sidebar-text");
+
+      function toggleSidebar() {
+        sidebarExpanded = !sidebarExpanded;
+        if (sidebarExpanded) {
+          sidebar.classList.remove("w-20");
+          sidebar.classList.add("w-64");
+          logoFull.classList.remove("hidden");
+          logoFull.classList.add("flex");
+          logoIcon.classList.add("hidden");
+          sidebarTexts.forEach((el) => (el.style.display = "block"));
+        } else {
+          sidebar.classList.remove("w-64");
+          sidebar.classList.add("w-20");
+          logoFull.classList.remove("flex");
+          logoFull.classList.add("hidden");
+          logoIcon.classList.remove("hidden");
+          sidebarTexts.forEach((el) => (el.style.display = "none"));
+        }
+        setTimeout(() => {
+          window.dispatchEvent(new Event("resize"));
+        }, 300);
+      }
+
+      const mobileMenu = document.getElementById("mobile-menu");
+      function toggleMobileMenu() {
+        mobileMenu.classList.toggle("hidden");
+      }
+      mobileMenu.addEventListener("click", (e) => {
+        if (e.target === mobileMenu) toggleMobileMenu();
+      });
+
+      // Global chart instances
+      let chartDonutSemua, chartAreaSemua;
+      let chartDonutDetail, chartAreaDetail;
+      const CHART_COLORS = ["#8B5CF6", "#F43F5E", "#3B82F6", "#10B981", "#F59E0B", "#14B8A6"];
+
+      function formatRupiah(value) {
+        return new Intl.NumberFormat("id-ID", {
+          style: "currency",
+          currency: "IDR",
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }).format(value);
+      }
+
+      function setLastUpdated() {
+        const text = new Date().toLocaleString("id-ID", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        });
+        document.getElementById("last-updated").textContent = `Terakhir Diperbarui: Hari Ini, ${text} WIB`;
+      }
+
+      async function apiGet(endpoint, params = {}) {
+        const urlParams = new URLSearchParams(params).toString();
+        const response = await fetch(`/api/sales${endpoint}${urlParams ? '?' + urlParams : ''}`);
+        if (!response.ok) throw new Error(`Gagal mengambil data ${endpoint}`);
+        return response.json();
+      }
+
+      // Dynamic Chart managers to prevent infinite resize loops on hidden canvases
+      const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+      };
+
+      function destroyChartsSemua() {
+        if (chartDonutSemua) {
+          chartDonutSemua.destroy();
+          chartDonutSemua = null;
+        }
+        if (chartAreaSemua) {
+          chartAreaSemua.destroy();
+          chartAreaSemua = null;
+        }
+      }
+
+      function destroyChartsDetail() {
+        if (chartDonutDetail) {
+          chartDonutDetail.destroy();
+          chartDonutDetail = null;
+        }
+        if (chartAreaDetail) {
+          chartAreaDetail.destroy();
+          chartAreaDetail = null;
+        }
+      }
+
+      function initChartsSemua() {
+        if (!chartDonutSemua) {
+          const ctxDonut = document.getElementById("donutChartSemua").getContext("2d");
+          chartDonutSemua = new Chart(ctxDonut, {
+            type: "doughnut",
+            data: { labels: [], datasets: [{ data: [], backgroundColor: CHART_COLORS, borderWidth: 0, cutout: "70%" }] },
+            options: { ...commonOptions, layout: { padding: 0 } }
+          });
+        }
+        if (!chartAreaSemua) {
+          const ctxArea = document.getElementById("areaChartSemua").getContext("2d");
+          let grad = ctxArea.createLinearGradient(0, 0, 0, 250);
+          grad.addColorStop(0, "rgba(121, 40, 202, 0.4)");
+          grad.addColorStop(1, "rgba(121, 40, 202, 0.0)");
+          chartAreaSemua = new Chart(ctxArea, {
+            type: "line",
+            data: {
+              labels: [],
+              datasets: [{ label: "Sales", data: [], borderColor: "#7928CA", backgroundColor: grad, borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 6 }]
+            },
+            options: {
+              ...commonOptions,
+              scales: {
+                x: { grid: { display: false }, ticks: { color: "#9CA3AF", font: { size: 11 } } },
+                y: { display: false }
+              }
+            }
+          });
+        }
+      }
+
+      function initChartsDetail() {
+        if (!chartDonutDetail) {
+          const ctxDonut = document.getElementById("donutChartDetail").getContext("2d");
+          chartDonutDetail = new Chart(ctxDonut, {
+            type: "doughnut",
+            data: { labels: [], datasets: [{ data: [], backgroundColor: CHART_COLORS, borderWidth: 0, cutout: "70%" }] },
+            options: { ...commonOptions, layout: { padding: 20 } }
+          });
+        }
+        if (!chartAreaDetail) {
+          const ctxArea = document.getElementById("areaChartDetail").getContext("2d");
+          let grad = ctxArea.createLinearGradient(0, 0, 0, 250);
+          grad.addColorStop(0, "rgba(59, 130, 246, 0.4)");
+          grad.addColorStop(1, "rgba(59, 130, 246, 0.0)");
+          chartAreaDetail = new Chart(ctxArea, {
+            type: "line",
+            data: {
+              labels: [],
+              datasets: [{ label: "Sales", data: [], borderColor: "#3B82F6", backgroundColor: grad, borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 6 }]
+            },
+            options: {
+              ...commonOptions,
+              scales: {
+                x: { grid: { display: false }, ticks: { color: "#9CA3AF", font: { size: 11 } } },
+                y: { display: false }
+              }
+            }
+          });
+        }
+      }
+
+      // Populate Sales dropdown filter list
+      async function loadSalesmenFilter() {
+        try {
+          const res = await fetch("/api/sales/list");
+          const json = await res.json();
+          const select = document.getElementById("filter-sales");
+          select.innerHTML = '<option value="Semua Sales">Semua Sales</option>';
+          if (json.data) {
+            json.data.forEach(name => {
+              const opt = document.createElement("option");
+              opt.value = name;
+              opt.textContent = name;
+              select.appendChild(opt);
+            });
+          }
+        } catch (err) {
+          console.error("Gagal memuat filter list sales:", err);
+        }
+      }
+
+      // Render Horizontal Progress Bars list
+      function renderHorizontalTopProducts(data, containerId, totalSpanId) {
+        const body = document.getElementById(containerId);
+        body.innerHTML = "";
+        
+        let sumTotal = data.reduce((acc, r) => acc + r.total_sales, 0);
+        document.getElementById(totalSpanId).textContent = formatRupiah(sumTotal);
+
+        if (data.length === 0) {
+          body.innerHTML = '<div class="text-xs text-textMuted py-2 text-center">Tidak ada produk terlaris</div>';
+          return;
+        }
+
+        const maxVal = Math.max(...data.map(item => item.total_sales));
+
+        data.forEach(item => {
+          const percentage = maxVal > 0 ? (item.total_sales / maxVal) * 100 : 0;
+          const rowDiv = document.createElement("div");
+          rowDiv.className = "flex items-center space-x-4";
+          rowDiv.innerHTML = `
+            <div class="w-1/4 text-xs font-semibold text-gray-700 truncate">${item.nama_produk}</div>
+            <div class="flex-1 bg-gray-100 rounded-full h-3.5 relative overflow-hidden">
+              <div class="bg-accentBlue h-3.5 rounded-full" style="width: ${percentage}%"></div>
+            </div>
+            <div class="w-1/4 text-right text-xs font-bold text-gray-800">${formatRupiah(item.total_sales)}</div>
+          `;
+          body.appendChild(rowDiv);
+        });
+      }
+
+      // Render legends for Donut Chart
+      function renderLegend(labels, colors, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
+        labels.forEach((label, i) => {
+          const item = document.createElement("div");
+          item.className = "flex items-center";
+          item.innerHTML = `<span class="w-2.5 h-2.5 rounded-full mr-2" style="background-color: ${colors[i % colors.length]}"></span>${label}`;
+          container.appendChild(item);
+        });
+      }
+
+      // Main Load Function
+      async function loadDashboardData() {
+        const salesman = document.getElementById("filter-sales").value;
+        const containers = document.querySelectorAll(".data-container");
+        const emptyState = document.getElementById("empty-state");
+
+        // Toggle layouts
+        const layoutSemua = document.getElementById("layout-semua-sales");
+        const layoutDetail = document.getElementById("layout-sales-detail");
+
+        containers.forEach((c) => {
+          c.querySelector(".data-content")?.classList.add("hide");
+          c.querySelector(".skeleton-loader")?.classList.remove("hidden");
+        });
+        emptyState.classList.add("hidden");
+
+        const isSemua = (salesman === "Semua Sales");
+
+        try {
+          if (isSemua) {
+            destroyChartsDetail();
+            layoutDetail.classList.add("hidden");
+            layoutSemua.classList.remove("hidden");
+            initChartsSemua();
+
+            // Fetch Semua Sales Mode APIs
+            const [kpi, contribution, trend, topProducts, topSalesmen] = await Promise.all([
+              apiGet("/kpis", { salesman }),
+              apiGet("/contribution", { salesman }),
+              apiGet("/trend", { salesman }),
+              apiGet("/top-products", { salesman }),
+              apiGet("/top-salesmen")
+            ]);
+
+            // Bind KPIs
+            document.getElementById("kpi-total-sales-semua").textContent = formatRupiah(kpi.total_sales);
+            document.getElementById("kpi-total-qty-semua").textContent = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(kpi.total_weight) + " Kg";
+            document.getElementById("kpi-total-transactions-semua").textContent = new Intl.NumberFormat("id-ID").format(kpi.total_transactions);
+
+            // Bind Top 10 Salesmen Table
+            const topSalesBody = document.getElementById("top-salesmen-body");
+            topSalesBody.innerHTML = "";
+            (topSalesmen.data || []).forEach((row, i) => {
+              const tr = document.createElement("tr");
+              tr.className = "border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors";
+              tr.innerHTML = `
+                <td class="py-3 font-semibold text-gray-700">${String(i + 1).padStart(2, "0")}</td>
+                <td class="py-3"><span class="bg-gray-100 px-2 py-1 rounded text-xs font-semibold text-gray-600">${row.kode_salesman}</span></td>
+                <td class="py-3 font-medium text-gray-800">${row.nama_salesman}</td>
+                <td class="py-3 text-right font-bold text-gray-800">${formatRupiah(row.total_sales)}</td>
+              `;
+              topSalesBody.appendChild(tr);
+            });
+
+            // Bind Donut Chart
+            const donutLabels = (contribution.data || []).map(r => r.kategori);
+            const donutValues = (contribution.data || []).map(r => r.total_sales);
+            chartDonutSemua.data.labels = donutLabels;
+            chartDonutSemua.data.datasets[0].data = donutValues;
+            chartDonutSemua.update();
+            renderLegend(donutLabels, CHART_COLORS, "donut-legend-semua");
+
+            // Bind Area Chart
+            chartAreaSemua.data.labels = trend.labels || [];
+            chartAreaSemua.data.datasets[0].data = trend.values || [];
+            chartAreaSemua.update();
+
+            // Bind Horizontal Top Products
+            renderHorizontalTopProducts(topProducts.data || [], "top-products-semua-body", "top-products-semua-total");
+
+          } else {
+            destroyChartsSemua();
+            layoutSemua.classList.add("hidden");
+            layoutDetail.classList.remove("hidden");
+            initChartsDetail();
+
+            // Fetch Salesman Detail Mode APIs
+            const [kpi, contribution, trend, topProducts, txs] = await Promise.all([
+              apiGet("/kpis", { salesman }),
+              apiGet("/contribution", { salesman }),
+              apiGet("/trend", { salesman }),
+              apiGet("/top-products", { salesman }),
+              apiGet("/transactions", { salesman })
+            ]);
+
+            // Bind KPIs
+            document.getElementById("kpi-total-sales-detail").textContent = formatRupiah(kpi.total_sales);
+            document.getElementById("kpi-total-qty-detail").textContent = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(kpi.total_weight) + " Kg";
+            document.getElementById("kpi-total-transactions-detail").textContent = new Intl.NumberFormat("id-ID").format(kpi.total_transactions);
+            document.getElementById("kpi-total-customers-detail").textContent = new Intl.NumberFormat("id-ID").format(kpi.total_customers) + " Customer";
+
+            // Bind Donut Chart
+            const donutLabels = (contribution.data || []).map(r => r.kategori);
+            const donutValues = (contribution.data || []).map(r => r.total_sales);
+            chartDonutDetail.data.labels = donutLabels;
+            chartDonutDetail.data.datasets[0].data = donutValues;
+            chartDonutDetail.update();
+            renderLegend(donutLabels, CHART_COLORS, "donut-legend-detail");
+
+            // Bind Area Chart
+            chartAreaDetail.data.labels = trend.labels || [];
+            chartAreaDetail.data.datasets[0].data = trend.values || [];
+            chartAreaDetail.update();
+
+            // Bind Horizontal Top Products
+            renderHorizontalTopProducts(topProducts.data || [], "top-products-detail-body", "top-products-detail-total");
+
+            // Bind Transactions Table
+            const txBody = document.getElementById("transactions-body");
+            txBody.innerHTML = "";
+            if ((txs.data || []).length === 0) {
+              txBody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-xs text-textMuted">Tidak ada transaksi</td></tr>';
+            } else {
+              (txs.data || []).forEach(row => {
+                const tr = document.createElement("tr");
+                tr.className = "border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors";
+                tr.innerHTML = `
+                  <td class="py-3 text-xs text-gray-600">${row.tanggal_formatted}</td>
+                  <td class="py-3 text-xs font-semibold text-gray-700">${row.nofaktur}</td>
+                  <td class="py-3 text-xs font-medium text-gray-800 truncate max-w-[120px]">${row.customer}</td>
+                  <td class="py-3 text-xs text-gray-700 truncate max-w-[180px]">${row.produk}</td>
+                  <td class="py-3 text-xs text-center text-gray-800">${row.qty}</td>
+                  <td class="py-3 text-xs text-center text-gray-600">${row.satuan}</td>
+                  <td class="py-3 text-xs text-right font-bold text-gray-800">${formatRupiah(row.total_penjualan)}</td>
+                `;
+                txBody.appendChild(tr);
+              });
+            }
+          }
+
+          containers.forEach((c) => {
+            c.querySelector(".skeleton-loader")?.classList.add("hidden");
+            c.querySelector(".data-content")?.classList.remove("hide");
+          });
+          emptyState.classList.add("hidden");
+          setLastUpdated();
+
+        } catch (error) {
+          console.error(error);
+          containers.forEach((c) => {
+            c.querySelector(".skeleton-loader")?.classList.add("hidden");
+            c.querySelector(".data-content")?.classList.add("hide");
+          });
+          emptyState.classList.remove("hidden");
+          emptyState.classList.add("flex");
+        }
+      }
+
+      document.getElementById("btn-terapkan").addEventListener("click", loadDashboardData);
+
+      window.addEventListener("DOMContentLoaded", async () => {
+                await loadSalesmenFilter();
+        loadDashboardData();
+      });
+    </script>
+  </body>
+</html>

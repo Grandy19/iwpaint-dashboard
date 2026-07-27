@@ -14,9 +14,9 @@ import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
 import { ExportModal } from '../../components/ui/ExportModal';
 
 export const TargetSalesPage = () => {
-  const [startDate, setStartDate] = useState('01 Juli 2026');
+  const [startDate, setStartDate] = useState('2026-07-01');
   const [isLoading, setIsLoading] = useState(false);
-  const [endDate, setEndDate] = useState('30 Juni 2026');
+  const [endDate, setEndDate] = useState('2026-06-30');
   const [area, setArea] = useState('Semua Area');
   const [salesName, setSalesName] = useState('Semua Sales');
 
@@ -128,26 +128,28 @@ export const TargetSalesPage = () => {
               <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
-                  <CustomSelect 
+                  <input 
+                    type="date" 
                     value={startDate} 
-                    onChange={(val) => {
-                  setStartDate(val);
-                  setIsLoading(true);
-                  setTimeout(() => setIsLoading(false), 500);
-                }} 
-                    options={['01 Juli 2026', '01 Juni 2026']} 
+                    onChange={(e) => {
+                      setStartDate(e.target.value);
+                      setIsLoading(true);
+                      setTimeout(() => setIsLoading(false), 500);
+                    }} 
+                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b0764] focus:border-transparent h-[42px] text-gray-700" 
                   />
                 </div>
                 <span className="text-gray-500 font-bold">-</span>
                 <div className="flex-1">
-                  <CustomSelect 
+                  <input 
+                    type="date" 
                     value={endDate} 
-                    onChange={(val) => {
-                  setEndDate(val);
-                  setIsLoading(true);
-                  setTimeout(() => setIsLoading(false), 500);
-                }} 
-                    options={['30 Juni 2026', '31 Juli 2026']} 
+                    onChange={(e) => {
+                      setEndDate(e.target.value);
+                      setIsLoading(true);
+                      setTimeout(() => setIsLoading(false), 500);
+                    }} 
+                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b0764] focus:border-transparent h-[42px] text-gray-700" 
                   />
                 </div>
               </div>

@@ -1,0 +1,105 @@
+import React from 'react';
+import { LayoutDashboard, History, Target, User, Users, UserCheck, ShieldCheck, Menu, LogOut } from 'lucide-react';
+import clsx from 'clsx';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useUIStore } from '../../store/useUIStore';
+import { useAuth } from '../../context/AuthContext';
+
+interface MenuItem {
+  name: string;
+  icon: React.ElementType;
+  path: string;
+}
+
+interface SidebarProps {
+  items?: MenuItem[];
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ items }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const currentPath = location.pathname;
+  const { isSidebarCollapsed, toggleSidebar } = useUIStore();
+  const { logout } = useAuth();
+
+  const defaultMenuItems = [
+    { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
+    { name: 'Riwayat Import', icon: History, path: '/import' },
+    { name: 'Target Sales', icon: Target, path: '/target-sales' },
+    { name: 'Sales', icon: User, path: '/sales' },
+    { name: 'Customer', icon: Users, path: '/customer' },
+    { name: 'Supervisor', icon: UserCheck, path: '/supervisor' },
+    { name: 'Kepala Distributor', icon: ShieldCheck, path: '/distributor' },
+  ];
+
+  const menuItemsToRender = items || defaultMenuItems;
+
+  return (
+    <aside className={clsx(
+      "bg-white h-screen border-r border-gray-100 flex flex-col fixed left-0 top-0 transition-all duration-300 z-50",
+      isSidebarCollapsed ? "w-20" : "w-[260px]"
+    )}>
+      <div className={clsx(
+        "p-6 flex items-center border-b border-gray-100 h-[88px] relative",
+        "justify-center"
+      )}>
+        {!isSidebarCollapsed && (
+          <div className="flex items-center justify-center">
+            <img src="/logo.png" alt="IW Paint Logo" className="h-14 object-contain" />
+          </div>
+        )}
+        
+        <button 
+          onClick={toggleSidebar} 
+          className={clsx(
+            "text-gray-500 hover:text-gray-900 transition-colors",
+            !isSidebarCollapsed && "absolute right-6"
+          )}
+        >
+          <Menu size={24} />
+        </button>
+      </div>
+
+      <nav className="flex-1 py-6 px-4 flex flex-col gap-2 overflow-y-auto">
+        {menuItemsToRender.map((item) => {
+          const isActive = currentPath === item.path;
+          return (
+            <Link
+              key={item.name}
+              to={item.path}
+              className={clsx(
+                'flex items-center rounded-xl transition-colors font-medium',
+                isSidebarCollapsed ? 'justify-center p-3' : 'gap-4 px-4 py-3.5 text-sm',
+                isActive
+                  ? 'bg-[#3b0764] text-white shadow-sm'
+                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+              )}
+              title={isSidebarCollapsed ? item.name : undefined}
+            >
+              <item.icon size={20} className={isActive ? 'text-white' : 'text-gray-400'} />
+              {!isSidebarCollapsed && <span>{item.name}</span>}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Logout Button at Bottom */}
+      <div className="p-4 border-t border-gray-100">
+        <button
+          onClick={() => {
+            logout();
+            navigate('/login');
+          }}
+          className={clsx(
+            'flex items-center w-full rounded-xl transition-colors font-medium text-red-500 hover:bg-red-50',
+            isSidebarCollapsed ? 'justify-center p-3' : 'gap-4 px-4 py-3.5 text-sm'
+          )}
+          title={isSidebarCollapsed ? 'Logout' : undefined}
+        >
+          <LogOut size={20} />
+          {!isSidebarCollapsed && <span>Logout</span>}
+        </button>
+      </div>
+    </aside>
+  );
+};

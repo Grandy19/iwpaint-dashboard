@@ -23,13 +23,13 @@ import {
 } from '../../mock/supervisorDashboard';
 
 export const SupervisorDashboardPage = () => {
-  const [periodeAwal, setPeriodeAwal] = useState('30 Juni 2026');
+  const [periodeAwal, setPeriodeAwal] = useState('2026-07-01');
   const [isLoading, setIsLoading] = useState(false);
-  const [periodeAkhir, setPeriodeAkhir] = useState('30 Juni 2026');
+  const [periodeAkhir, setPeriodeAkhir] = useState('2026-06-30');
   const [kategoriProduk, setKategoriProduk] = useState('Semua Kategori');
 
   const [chartJenisData, setChartJenisData] = useState('Total Penjualan');
-  const [chartPeriode, setChartPeriode] = useState('Hari');
+  const [chartPeriode, setChartPeriode] = useState('2026-07-01');
 
   const isAllKategori = kategoriProduk === 'Semua Kategori';
 
@@ -130,28 +130,28 @@ export const SupervisorDashboardPage = () => {
               <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
-                  <CustomSelect 
+                  <input 
+                    type="date" 
                     value={periodeAwal} 
-                    onChange={(val) => {
-                  setPeriodeAwal(val);
-                  setIsLoading(true);
-                  setTimeout(() => setIsLoading(false), 500);
-                }} 
-                    options={['30 Juni 2026', '01 Juli 2026', '02 Juli 2026']} 
-                    showSearch={true}
+                    onChange={(e) => {
+                      setPeriodeAwal(e.target.value);
+                      setIsLoading(true);
+                      setTimeout(() => setIsLoading(false), 500);
+                    }} 
+                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b0764] focus:border-transparent h-[42px] text-gray-700" 
                   />
                 </div>
                 <span className="text-gray-400 font-bold">-</span>
                 <div className="flex-1">
-                  <CustomSelect 
+                  <input 
+                    type="date" 
                     value={periodeAkhir} 
-                    onChange={(val) => {
-                  setPeriodeAkhir(val);
-                  setIsLoading(true);
-                  setTimeout(() => setIsLoading(false), 500);
-                }} 
-                    options={['30 Juni 2026', '01 Juli 2026', '02 Juli 2026']} 
-                    showSearch={true}
+                    onChange={(e) => {
+                      setPeriodeAkhir(e.target.value);
+                      setIsLoading(true);
+                      setTimeout(() => setIsLoading(false), 500);
+                    }} 
+                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b0764] focus:border-transparent h-[42px] text-gray-700" 
                   />
                 </div>
               </div>
