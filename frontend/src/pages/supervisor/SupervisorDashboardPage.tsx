@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from 'react';
+import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
+
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Download, Filter, LayoutDashboard, Users, Target, User, Eye } from 'lucide-react';
@@ -22,6 +24,7 @@ import {
 
 export const SupervisorDashboardPage = () => {
   const [periodeAwal, setPeriodeAwal] = useState('30 Juni 2026');
+  const [isLoading, setIsLoading] = useState(false);
   const [periodeAkhir, setPeriodeAkhir] = useState('30 Juni 2026');
   const [kategoriProduk, setKategoriProduk] = useState('Semua Kategori');
 
@@ -115,20 +118,25 @@ export const SupervisorDashboardPage = () => {
 
   return (
     <MainLayout sidebarItems={supervisorMenuItems}>
+      <LoadingOverlay isLoading={isLoading} />
       <Topbar title="Dashboard Supervisor" subtitle="Selamat Datang, Gunawan!" actionButton={ActionButtons} />
 
       <div className="px-8 pb-10">
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
             <div className="col-span-2">
               <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <CustomSelect 
                     value={periodeAwal} 
-                    onChange={setPeriodeAwal} 
+                    onChange={(val) => {
+                  setPeriodeAwal(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                     options={['30 Juni 2026', '01 Juli 2026', '02 Juli 2026']} 
                     showSearch={true}
                   />
@@ -137,7 +145,11 @@ export const SupervisorDashboardPage = () => {
                 <div className="flex-1">
                   <CustomSelect 
                     value={periodeAkhir} 
-                    onChange={setPeriodeAkhir} 
+                    onChange={(val) => {
+                  setPeriodeAkhir(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                     options={['30 Juni 2026', '01 Juli 2026', '02 Juli 2026']} 
                     showSearch={true}
                   />
@@ -149,18 +161,17 @@ export const SupervisorDashboardPage = () => {
               <label className="block text-sm text-[#475569] font-medium mb-2">Kategori Produk</label>
               <CustomSelect 
                 value={kategoriProduk} 
-                onChange={setKategoriProduk} 
+                onChange={(val) => {
+                  setKategoriProduk(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                 options={['Semua Kategori', 'Decorative', 'Automotive', 'Industri']} 
                 showSearch={true}
               />
             </div>
             
-            <div className="col-span-1">
-              <button className="w-full bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px]">
-                <Filter size={18} />
-                Terapkan
-              </button>
-            </div>
+            
           </div>
         </div>
 

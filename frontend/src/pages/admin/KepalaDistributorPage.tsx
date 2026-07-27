@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
+
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Upload, Filter, Eye, CheckCircle2, XCircle, Plus, User, UserCircle, Mail, Phone, Lock, EyeOff, Map, Info, Save, MapPin, Trash2 } from 'lucide-react';
@@ -11,6 +13,7 @@ import { kepalaDistributorKpiData, kepalaDistributorTableData } from '../../mock
 
 export const KepalaDistributorPage = () => {
   const [area, setArea] = useState('Semua Area');
+  const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState('Semua Status');
   const [kepalaDistributor, setKepalaDistributor] = useState('Semua Kepala Distributor');
 
@@ -130,6 +133,7 @@ export const KepalaDistributorPage = () => {
   return (
     <>
       <MainLayout>
+      <LoadingOverlay isLoading={isLoading} />
         <Topbar 
           title="Kepala Distributor" 
           subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB"
@@ -147,12 +151,16 @@ export const KepalaDistributorPage = () => {
 
           {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                 <CustomSelect 
                   value={area}
-                  onChange={setArea}
+                  onChange={(val) => {
+                  setArea(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }}
                   options={['Semua Area', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera', 'DKI Jakarta']}
                 />
               </div>
@@ -160,7 +168,11 @@ export const KepalaDistributorPage = () => {
                 <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
                 <CustomSelect 
                   value={status}
-                  onChange={setStatus}
+                  onChange={(val) => {
+                  setStatus(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }}
                   options={['Semua Status', 'Aktif', 'Tidak Aktif']}
                 />
               </div>
@@ -168,16 +180,15 @@ export const KepalaDistributorPage = () => {
                 <label className="block text-sm text-[#475569] font-medium mb-2">Kepala Distributor</label>
                 <CustomSelect 
                   value={kepalaDistributor}
-                  onChange={setKepalaDistributor}
+                  onChange={(val) => {
+                  setKepalaDistributor(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }}
                   options={['Semua Kepala Distributor', 'Bambang', 'Hendra', 'Dedi', 'Anton', 'Gery']}
                 />
               </div>
-              <div className="col-span-1">
-                <button className="w-full bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px]">
-                  <Filter size={18} />
-                  Terapkan
-                </button>
-              </div>
+              
             </div>
           </div>
 
@@ -253,14 +264,22 @@ export const KepalaDistributorPage = () => {
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                   <CustomSelect 
-                    value={editArea} onChange={setEditArea} options={['Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera', 'DKI Jakarta']} 
+                    value={editArea} onChange={(val) => {
+                  setEditArea(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} options={['Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera', 'DKI Jakarta']} 
                     icon={<Map size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
                   <CustomSelect 
-                    value={editStatus} onChange={setEditStatus} options={['Aktif', 'Tidak Aktif']} 
+                    value={editStatus} onChange={(val) => {
+                  setEditStatus(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} options={['Aktif', 'Tidak Aktif']} 
                     icon={<Info size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>

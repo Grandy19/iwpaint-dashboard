@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
+
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Upload, Filter, Eye, CheckCircle2, XCircle, Plus, User, UserCircle, Mail, Phone, Lock, EyeOff, Map, Briefcase, Info, Users, Save, MapPin, ChevronDown, Search, Trash2, X } from 'lucide-react';
@@ -27,6 +29,7 @@ const salesOptions: SalesOption[] = [
 
 export const SupervisorPage = () => {
   const [area, setArea] = useState('Semua Area');
+  const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState('Semua Status');
   const [supervisor, setSupervisor] = useState('Semua Supervisor');
 
@@ -186,6 +189,7 @@ export const SupervisorPage = () => {
   return (
     <>
       <MainLayout>
+      <LoadingOverlay isLoading={isLoading} />
         <Topbar 
           title="Supervisor" 
           subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB"
@@ -203,12 +207,16 @@ export const SupervisorPage = () => {
 
           {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                 <CustomSelect 
                   value={area}
-                  onChange={setArea}
+                  onChange={(val) => {
+                  setArea(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }}
                   options={['Semua Area', 'Bandung', 'Jakarta', 'Cirebon', 'Kuningan']}
                 />
               </div>
@@ -216,7 +224,11 @@ export const SupervisorPage = () => {
                 <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
                 <CustomSelect 
                   value={status}
-                  onChange={setStatus}
+                  onChange={(val) => {
+                  setStatus(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }}
                   options={['Semua Status', 'Aktif', 'Tidak Aktif']}
                 />
               </div>
@@ -224,16 +236,15 @@ export const SupervisorPage = () => {
                 <label className="block text-sm text-[#475569] font-medium mb-2">Supervisor</label>
                 <CustomSelect 
                   value={supervisor}
-                  onChange={setSupervisor}
+                  onChange={(val) => {
+                  setSupervisor(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }}
                   options={['Semua Supervisor', 'Andi', 'Hariono', 'Deni', 'Rahmat', 'Dudu']}
                 />
               </div>
-              <div className="col-span-1">
-                <button className="w-full bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px]">
-                  <Filter size={18} />
-                  Terapkan
-                </button>
-              </div>
+              
             </div>
           </div>
 
@@ -309,14 +320,22 @@ export const SupervisorPage = () => {
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                   <CustomSelect 
-                    value={editArea} onChange={setEditArea} options={['Bandung', 'Jakarta', 'Cirebon', 'Kuningan']} 
+                    value={editArea} onChange={(val) => {
+                  setEditArea(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} options={['Bandung', 'Jakarta', 'Cirebon', 'Kuningan']} 
                     icon={<Map size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Role</label>
                   <CustomSelect 
-                    value={editRole} onChange={setEditRole} options={['Sales', 'Supervisor', 'Admin']} 
+                    value={editRole} onChange={(val) => {
+                  setEditRole(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} options={['Sales', 'Supervisor', 'Admin']} 
                     icon={<Briefcase size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
@@ -336,7 +355,11 @@ export const SupervisorPage = () => {
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
                   <CustomSelect 
-                    value={editStatus} onChange={setEditStatus} options={['Aktif', 'Tidak Aktif']} 
+                    value={editStatus} onChange={(val) => {
+                  setEditStatus(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} options={['Aktif', 'Tidak Aktif']} 
                     icon={<Info size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>

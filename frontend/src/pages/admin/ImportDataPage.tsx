@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
+
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Download, CheckCircle, CheckCircle2, XCircle, FileText, Search, Filter, Eye, Upload } from 'lucide-react';
@@ -13,6 +15,7 @@ import { kpiData } from '../../mock/dashboard';
 export const ImportDataPage = () => {
   const navigate = useNavigate();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [exportFileName, setExportFileName] = useState('');
   
@@ -85,6 +88,7 @@ export const ImportDataPage = () => {
 
   return (
     <MainLayout>
+      <LoadingOverlay isLoading={isLoading} />
       <Topbar 
         title="Riwayat Import" 
         subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB"
@@ -102,14 +106,18 @@ export const ImportDataPage = () => {
 
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div className="col-span-1 md:col-span-2">
               <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
               <div className="flex items-center gap-2">
                 <div className="flex-1">
                   <CustomSelect 
                     value={startDate} 
-                    onChange={setStartDate} 
+                    onChange={(val) => {
+                  setStartDate(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                     options={['01 Juli 2026', '01 Juni 2026']} 
                   />
                 </div>
@@ -117,7 +125,11 @@ export const ImportDataPage = () => {
                 <div className="flex-1">
                   <CustomSelect 
                     value={endDate} 
-                    onChange={setEndDate} 
+                    onChange={(val) => {
+                  setEndDate(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                     options={['30 Juni 2026', '31 Juli 2026']} 
                   />
                 </div>
@@ -128,7 +140,11 @@ export const ImportDataPage = () => {
               <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
               <CustomSelect 
                 value={status} 
-                onChange={setStatus} 
+                onChange={(val) => {
+                  setStatus(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                 options={['Berhasil', 'Gagal', 'Semua Status']} 
               />
             </div>
@@ -148,12 +164,7 @@ export const ImportDataPage = () => {
                 />
               </div>
             </div>
-            <div className="col-span-1">
-              <button className="w-full bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px]">
-                <Filter size={18} />
-                Terapkan
-              </button>
-            </div>
+            
           </div>
         </div>
 

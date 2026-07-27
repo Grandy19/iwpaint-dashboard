@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
+
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Upload, Plus, CheckCircle2, XCircle, Edit3, ArrowDown, Filter } from 'lucide-react';
@@ -13,6 +15,7 @@ import { ExportModal } from '../../components/ui/ExportModal';
 
 export const TargetSalesPage = () => {
   const [startDate, setStartDate] = useState('01 Juli 2026');
+  const [isLoading, setIsLoading] = useState(false);
   const [endDate, setEndDate] = useState('30 Juni 2026');
   const [area, setArea] = useState('Semua Area');
   const [salesName, setSalesName] = useState('Semua Sales');
@@ -109,6 +112,7 @@ export const TargetSalesPage = () => {
 
   return (
     <MainLayout>
+      <LoadingOverlay isLoading={isLoading} />
       <Topbar 
         title={isDetailView ? "Sales" : "Target Sales"}
         subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB"
@@ -119,14 +123,18 @@ export const TargetSalesPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
             <div className="col-span-1 md:col-span-2">
               <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <CustomSelect 
                     value={startDate} 
-                    onChange={setStartDate} 
+                    onChange={(val) => {
+                  setStartDate(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                     options={['01 Juli 2026', '01 Juni 2026']} 
                   />
                 </div>
@@ -134,7 +142,11 @@ export const TargetSalesPage = () => {
                 <div className="flex-1">
                   <CustomSelect 
                     value={endDate} 
-                    onChange={setEndDate} 
+                    onChange={(val) => {
+                  setEndDate(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                     options={['30 Juni 2026', '31 Juli 2026']} 
                   />
                 </div>
@@ -145,7 +157,11 @@ export const TargetSalesPage = () => {
               <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
               <CustomSelect 
                 value={area} 
-                onChange={setArea} 
+                onChange={(val) => {
+                  setArea(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                 options={['Semua Area', 'Bandung', 'Jakarta']} 
               />
             </div>
@@ -154,17 +170,16 @@ export const TargetSalesPage = () => {
               <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
               <CustomSelect 
                 value={salesName} 
-                onChange={setSalesName} 
+                onChange={(val) => {
+                  setSalesName(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                 options={['Semua Sales', 'Heri', 'Fransiskus', 'Rudi', 'Budi', 'Santoso']} 
               />
             </div>
 
-            <div className="col-span-1">
-              <button className="w-full bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px]">
-                <Filter size={18} />
-                Terapkan
-              </button>
-            </div>
+            
           </div>
         </div>
 

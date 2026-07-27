@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
+
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Download, Filter, Users, Target, User, Eye, CheckCircle2, XCircle, Banknote, Wallet, UserCircle, Mail, Phone, Lock, EyeOff, Map, Briefcase, Info, MapPin } from 'lucide-react';
@@ -11,6 +13,7 @@ import { distributorMenuItems } from '../../mock/distributorDashboard';
 
 export const DistributorSalesPage = () => {
   const [periodeAwal, setPeriodeAwal] = useState('30 Juni 2026');
+  const [isLoading, setIsLoading] = useState(false);
   const [periodeAkhir, setPeriodeAkhir] = useState('30 Juni 2026');
   const [supervisor, setSupervisor] = useState('Semua Supervisor');
   const [sales, setSales] = useState('Semua Sales');
@@ -105,20 +108,25 @@ export const DistributorSalesPage = () => {
   return (
     <>
       <MainLayout sidebarItems={distributorMenuItems}>
+      <LoadingOverlay isLoading={isLoading} />
         <Topbar title="Sales" subtitle="Pantau performa anggota tim sales di bawah naungan distributor" actionButton={ActionButtons} />
 
         <div className="px-8 pb-10">
           
           {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
               <div className="col-span-2">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
                     <CustomSelect 
                       value={periodeAwal} 
-                      onChange={setPeriodeAwal} 
+                      onChange={(val) => {
+                  setPeriodeAwal(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                       options={['30 Juni 2026', '01 Juli 2026', '02 Juli 2026']} 
                       showSearch={true}
                     />
@@ -127,7 +135,11 @@ export const DistributorSalesPage = () => {
                   <div className="flex-1">
                     <CustomSelect 
                       value={periodeAkhir} 
-                      onChange={setPeriodeAkhir} 
+                      onChange={(val) => {
+                  setPeriodeAkhir(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                       options={['30 Juni 2026', '01 Juli 2026', '02 Juli 2026']} 
                       showSearch={true}
                     />
@@ -139,7 +151,11 @@ export const DistributorSalesPage = () => {
                 <label className="block text-sm text-[#475569] font-medium mb-2">Supervisor</label>
                 <CustomSelect 
                   value={supervisor} 
-                  onChange={setSupervisor} 
+                  onChange={(val) => {
+                  setSupervisor(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                   options={['Semua Supervisor', 'Didi', 'Rafael', 'Julio', 'Asep', 'Rahmat']} 
                   showSearch={true}
                 />
@@ -149,18 +165,17 @@ export const DistributorSalesPage = () => {
                 <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
                 <CustomSelect 
                   value={sales} 
-                  onChange={setSales} 
+                  onChange={(val) => {
+                  setSales(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                   options={['Semua Sales', 'Heri', 'Fransiskus', 'Rudi', 'Budi', 'Santoso', 'Agus', 'Iwan', 'Joko', 'Cipto', 'Gilang', 'Bagas', 'Wahyu']} 
                   showSearch={true}
                 />
               </div>
               
-              <div className="col-span-1">
-                <button className="w-full bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px]">
-                  <Filter size={18} />
-                  Terapkan
-                </button>
-              </div>
+              
             </div>
           </div>
 

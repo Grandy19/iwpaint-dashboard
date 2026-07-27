@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Upload, Filter, Eye, Package, Download, User, Users, Receipt, Map, MapPin, Wallet, CalendarClock } from 'lucide-react';
@@ -12,6 +13,7 @@ import { customerKpiData, customerTableData, transactionTableData } from '../../
 
 export const CustomerPage = () => {
   const [area, setArea] = useState('Semua Area');
+  const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState('Semua Status');
   const [salesName, setSalesName] = useState('Semua Sales');
   const [customerName, setCustomerName] = useState('Semua Customer');
@@ -97,18 +99,23 @@ export const CustomerPage = () => {
   return (
     <>
       <MainLayout>
+      <LoadingOverlay isLoading={isLoading} />
         <Topbar title="Customer" subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB" actionButton={ActionButtons} />
 
         <div className="px-8 pb-10">
           
           {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                 <CustomSelect 
                   value={area} 
-                  onChange={setArea} 
+                  onChange={(val) => {
+                  setArea(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                   options={['Semua Area', 'Cirebon', 'Bandung', 'Jakarta']} 
                 />
               </div>
@@ -116,7 +123,11 @@ export const CustomerPage = () => {
                 <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
                 <CustomSelect 
                   value={status} 
-                  onChange={setStatus} 
+                  onChange={(val) => {
+                  setStatus(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                   options={['Semua Status', 'Aktif', 'Tidak Aktif']} 
                 />
               </div>
@@ -124,7 +135,11 @@ export const CustomerPage = () => {
                 <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
                 <CustomSelect 
                   value={salesName} 
-                  onChange={setSalesName} 
+                  onChange={(val) => {
+                  setSalesName(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                   options={['Semua Sales', 'Budi', 'Fransiskus', 'Rudi']} 
                 />
               </div>
@@ -132,16 +147,15 @@ export const CustomerPage = () => {
                 <label className="block text-sm text-[#475569] font-medium mb-2">Customer</label>
                 <CustomSelect 
                   value={customerName} 
-                  onChange={setCustomerName} 
+                  onChange={(val) => {
+                  setCustomerName(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                   options={['Semua Customer', 'TB Bangun Jaya', 'CV Sinar Mas', 'TB Toko Sejati']} 
                 />
               </div>
-              <div className="col-span-1">
-                <button className="w-full bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px]">
-                  <Filter size={18} />
-                  Terapkan
-                </button>
-              </div>
+              
             </div>
           </div>
 

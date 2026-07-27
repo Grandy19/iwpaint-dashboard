@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Download, Filter, Eye, LayoutDashboard, Users, Target, User, Map, MapPin, Receipt, Wallet, Package, CalendarClock } from 'lucide-react';
@@ -15,6 +16,7 @@ import { distributorMenuItems } from '../../mock/distributorDashboard';
 
 export const DistributorCustomerPage = () => {
   const [periodeAwal, setPeriodeAwal] = useState('01 Juli 2026');
+  const [isLoading, setIsLoading] = useState(false);
   const [periodeAkhir, setPeriodeAkhir] = useState('01 Juli 2026');
   const [area, setArea] = useState('Semua Area');
   const [sales, setSales] = useState('Semua Sales');
@@ -192,20 +194,25 @@ export const DistributorCustomerPage = () => {
   return (
     <>
       <MainLayout sidebarItems={distributorMenuItems}>
+      <LoadingOverlay isLoading={isLoading} />
         <Topbar title="Customer" subtitle="Pantau customer yang dikelola oleh tim sales di bawah naungan distributor." actionButton={ActionButtons} />
 
         <div className="px-8 pb-10">
           
           {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-6 gap-6 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
               <div className="col-span-2">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
                     <CustomSelect 
                       value={periodeAwal} 
-                      onChange={setPeriodeAwal} 
+                      onChange={(val) => {
+                  setPeriodeAwal(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                       options={['01 Juli 2026', '02 Juli 2026', '03 Juli 2026']} 
                       showSearch={true}
                     />
@@ -214,7 +221,11 @@ export const DistributorCustomerPage = () => {
                   <div className="flex-1">
                     <CustomSelect 
                       value={periodeAkhir} 
-                      onChange={setPeriodeAkhir} 
+                      onChange={(val) => {
+                  setPeriodeAkhir(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                       options={['01 Juli 2026', '02 Juli 2026', '03 Juli 2026']} 
                       showSearch={true}
                     />
@@ -226,7 +237,11 @@ export const DistributorCustomerPage = () => {
                 <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                 <CustomSelect 
                   value={area} 
-                  onChange={setArea} 
+                  onChange={(val) => {
+                  setArea(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                   options={['Semua Area', 'Bandung', 'Cirebon', 'Kuningan']} 
                   showSearch={true}
                 />
@@ -262,15 +277,7 @@ export const DistributorCustomerPage = () => {
                 />
               </div>
               
-              <div className="col-span-1">
-                <button 
-                  onClick={handleFilter}
-                  className="w-full bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px]"
-                >
-                  <Filter size={18} />
-                  Terapkan
-                </button>
-              </div>
+              
             </div>
           </div>
 
