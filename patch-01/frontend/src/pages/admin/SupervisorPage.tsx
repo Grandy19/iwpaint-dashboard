@@ -308,7 +308,7 @@ export const SupervisorPage = () => {
 
           {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                 <CustomSelect 
@@ -333,15 +333,7 @@ export const SupervisorPage = () => {
                   options={supervisorOptions} 
                 />
               </div>
-              <div className="col-span-1">
-                <button 
-                  onClick={loadData}
-                  className="w-full bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px] cursor-pointer"
-                >
-                  <Filter size={18} />
-                  Terapkan
-                </button>
-              </div>
+              
             </div>
           </div>
 
@@ -525,14 +517,7 @@ export const SupervisorPage = () => {
               })}
             </div>
             
-            <div className="flex gap-3 mt-6 border-t pt-4">
-              <button onClick={handleCloseSalesModal} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-gray-700 text-[14px] font-bold hover:bg-gray-50 transition-colors">
-                Batal
-              </button>
-              <button onClick={handleSaveSalesModal} className="flex-1 py-2.5 bg-[#3b0764] hover:bg-[#2e054e] text-white rounded-xl text-[14px] font-bold transition-colors">
-                Terapkan
-              </button>
-            </div>
+            
           </div>
         </div>
       )}

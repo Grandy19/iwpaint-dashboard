@@ -179,7 +179,7 @@ export const SupervisorSalesPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
             <div className="col-span-2">
               <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
               <div className="flex items-center gap-3">
@@ -203,7 +203,7 @@ export const SupervisorSalesPage = () => {
               </div>
             </div>
 
-            <div className="col-span-1">
+            <div className="col-span-2">
               <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
               <CustomSelect 
                 value={sales} 
@@ -213,15 +213,7 @@ export const SupervisorSalesPage = () => {
               />
             </div>
             
-            <div className="col-span-1">
-              <button 
-                onClick={loadData}
-                className="w-full bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 h-[42px] cursor-pointer"
-              >
-                <Filter size={18} />
-                Terapkan
-              </button>
-            </div>
+            
           </div>
         </div>
 

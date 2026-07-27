@@ -220,7 +220,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
         onClick={onClose}
       >
         <div 
-          className="bg-white rounded-2xl w-[800px] p-8 shadow-xl relative"
+          className="bg-white rounded-2xl w-[800px] max-h-[95vh] overflow-y-auto hide-scrollbar p-8 shadow-xl relative"
           onClick={(e) => e.stopPropagation()}
         >
           <button 
@@ -468,7 +468,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
                 )}
 
                 {/* Status */}
-                {mode === 'view_target' ? (
+                {mode === 'view_target' && (
                   <div>
                     <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
                     <div className="relative">
@@ -477,18 +477,6 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
                       </div>
                       <input type="text" value={data?.status || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                     </div>
-                  </div>
-                ) : (
-                  <div>
-                    <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
-                    <CustomSelect 
-                      value={status}
-                      onChange={setStatus}
-                      options={['Aktif', 'Tidak Aktif']}
-                      icon={<Info size={18} />}
-                      triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
-                      showSearch={false}
-                    />
                   </div>
                 )}
               </>

@@ -95,7 +95,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
         onClick={onClose}
       >
         <div 
-          className="bg-white rounded-2xl w-[800px] p-8 shadow-xl relative"
+          className="bg-white rounded-2xl w-[800px] max-h-[95vh] overflow-y-auto hide-scrollbar p-8 shadow-xl relative"
           onClick={(e) => e.stopPropagation()}
         >
           <button 
@@ -221,18 +221,6 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
                 onChange={setArea}
                 options={['Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera', 'DKI Jakarta']}
                 icon={<Map size={18} />}
-                triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764]"
-                showSearch={false}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
-              <CustomSelect 
-                value={status}
-                onChange={setStatus}
-                options={['Aktif', 'Tidak Aktif']}
-                icon={<Info size={18} />}
                 triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764]"
                 showSearch={false}
               />
