@@ -18,10 +18,10 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Database: `iwpaint2`
+-- Database: `iwpainttest`
 --
-CREATE DATABASE IF NOT EXISTS `iwpaint2` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `iwpaint2`;
+CREATE DATABASE IF NOT EXISTS `iwpainttest` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `iwpainttest`;
 
 -- --------------------------------------------------------
 
@@ -8819,8 +8819,8 @@ CREATE TABLE `upload_logs` (
 --
 
 INSERT INTO `upload_logs` (`id`, `file_name`, `status`, `message`, `total_rows`, `processed_rows`, `uploaded_at`) VALUES
-(1, 'Untitled spreadsheet - Sheet1 (7).csv', 'failed', 'Table \'iwpaint2.dim_distributors\' doesn\'t exist', 814, 0, '2026-07-07 13:19:13'),
-(2, 'Untitled spreadsheet - Sheet1 (7).csv', 'failed', 'Table \'iwpaint2.dim_divisions\' doesn\'t exist', 814, 0, '2026-07-07 13:23:13'),
+(1, 'Untitled spreadsheet - Sheet1 (7).csv', 'failed', 'Table \'iwpainttest.dim_distributors\' doesn\'t exist', 814, 0, '2026-07-07 13:19:13'),
+(2, 'Untitled spreadsheet - Sheet1 (7).csv', 'failed', 'Table \'iwpainttest.dim_divisions\' doesn\'t exist', 814, 0, '2026-07-07 13:23:13'),
 (3, 'Untitled spreadsheet - Sheet1 (7).csv', 'success', 'Import selesai', 814, 814, '2026-07-07 13:32:29'),
 (4, 'Untitled spreadsheet - Sheet1 (7).csv', 'success', 'Import selesai', 814, 814, '2026-07-07 13:34:15'),
 (5, 'Untitled spreadsheet - Sheet1 (7).csv', 'success', 'Import selesai', 814, 814, '2026-07-07 13:49:09'),

@@ -16,6 +16,8 @@ export const TargetSalesPage = () => {
   const [area, setArea] = useState('Semua Area');
   const [salesName, setSalesName] = useState('Semua Sales');
 
+  const isRange = startDate.substring(0, 7) !== endDate.substring(0, 7);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [selectedTarget, setSelectedTarget] = useState<any>(null);
@@ -39,7 +41,12 @@ export const TargetSalesPage = () => {
       const targetMonthName = monthNamesInd[dateObj.getMonth()] || "Juli";
 
       // Get targets from backend
-      const params: any = { tahun: targetYear, bulan_nama: targetMonthName };
+      const params: any = { 
+        tahun: targetYear, 
+        bulan_nama: targetMonthName,
+        periodeAwal: startDate,
+        periodeAkhir: endDate
+      };
       if (salesName !== 'Semua Sales') params.salesman = salesName;
 
       const targetRes = await api.get('/targets', { params });
@@ -59,7 +66,12 @@ export const TargetSalesPage = () => {
       setSalesOptions(['Semua Sales', ...salesUsersRes.data.data.map((u: any) => u.namaSales)]);
 
       // Load performance summary
-      const perfParams: any = { tahun: targetYear, bulan_nama: targetMonthName };
+      const perfParams: any = { 
+        tahun: targetYear, 
+        bulan_nama: targetMonthName,
+        periodeAwal: startDate,
+        periodeAkhir: endDate
+      };
       if (salesName !== 'Semua Sales') perfParams.salesman = salesName;
       if (area !== 'Semua Area') perfParams.area = area;
 
@@ -111,9 +123,9 @@ export const TargetSalesPage = () => {
             },
             {
               id: 2,
-              title: 'Total Target Bulan Ini',
+              title: isRange ? 'Total Target Periode' : 'Total Target Bulan Ini',
               value: selectedRow.totalTarget,
-              description: 'Target untuk bulan Juli 2026',
+              description: isRange ? `Target untuk periode ${startDate} s/d ${endDate}` : `Target untuk bulan ${targetMonthName} ${targetYear}`,
               icon: Target,
               iconColor: 'text-[#10b981]',
               iconBg: 'bg-[#dcfce7]',
@@ -131,7 +143,7 @@ export const TargetSalesPage = () => {
               id: 4,
               title: 'Total Transaksi',
               value: `${selectedRow.totalTransaksi} Transaksi`,
-              description: 'Periode Juni 2026',
+              description: isRange ? `Periode ${startDate} s/d ${endDate}` : `Periode ${targetMonthName} ${targetYear}`,
               icon: CreditCard,
               iconColor: 'text-[#10b981]',
               iconBg: 'bg-[#dcfce7]',
@@ -159,9 +171,9 @@ export const TargetSalesPage = () => {
           },
           {
             id: 2,
-            title: 'Total Target Bulan Ini',
+            title: isRange ? 'Total Target Periode' : 'Total Target Bulan Ini',
             value: perfRes.data.targetGlobal,
-            description: `Total Target ${targetMonthName} ${targetYear}`,
+            description: isRange ? `Total Target periode ${startDate} s/d ${endDate}` : `Total Target ${targetMonthName} ${targetYear}`,
             icon: Target,
             iconColor: 'text-[#10b981]',
             iconBg: 'bg-[#dcfce7]',
@@ -170,7 +182,7 @@ export const TargetSalesPage = () => {
             id: 3,
             title: 'Sales Sudah Memiliki Target',
             value: `${inputCount} Sales`,
-            description: `Target ${targetMonthName} ${targetYear} telah diinput`,
+            description: isRange ? `Target periode telah diinput` : `Target ${targetMonthName} ${targetYear} telah diinput`,
             icon: CheckCircle2,
             iconColor: 'text-[#10b981]',
             iconBg: 'bg-[#dcfce7]',
@@ -179,7 +191,7 @@ export const TargetSalesPage = () => {
             id: 4,
             title: 'Sales Belum Memiliki Target',
             value: `${noInputCount} Sales`,
-            description: `Target ${targetMonthName} ${targetYear} belum diinput`,
+            description: isRange ? `Target periode belum diinput` : `Target ${targetMonthName} ${targetYear} belum diinput`,
             icon: XCircle,
             iconColor: 'text-[#ef4444]',
             iconBg: 'bg-[#fee2e2]',
@@ -363,7 +375,7 @@ export const TargetSalesPage = () => {
 
           {/* Global Target Summary Card */}
           <div className="lg:col-span-1 bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col">
-            <h3 className="text-gray-600 text-[18px] font-medium mb-6">{isDetailView ? 'Ringkasan Target' : 'Ringkasan Target Global'}</h3>
+            <h3 className="text-gray-600 text-[18px] font-medium mb-6">{isDetailView ? 'Ringkasan Target' : (isRange ? 'Ringkasan Target Periode' : 'Ringkasan Target Global')}</h3>
             
             <div className="flex-1 flex flex-col justify-center">
               <div className="relative w-40 h-40 mx-auto mb-8">
@@ -381,7 +393,7 @@ export const TargetSalesPage = () => {
                 <div className="flex justify-between items-center text-sm">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-[#e0f2fe]"></div>
-                    <span className="text-gray-500">{isDetailView ? 'Total Target' : 'Target Global'}</span>
+                    <span className="text-gray-500">{isDetailView ? 'Total Target' : (isRange ? 'Target Periode' : 'Target Global')}</span>
                   </div>
                   <span className="font-semibold text-gray-800">{summaryData.targetGlobal}</span>
                 </div>
