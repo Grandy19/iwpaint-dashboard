@@ -50,7 +50,7 @@ export const TargetRealisasiCard: React.FC<TargetRealisasiCardProps> = ({ data, 
               <div className="w-full h-2.5 bg-[#e0f2fe] rounded-full mb-4">
                 <div 
                   className="h-2.5 bg-[#0ea5e9] rounded-full" 
-                  style={{ width: `${item.percentage}%` }}
+                  style={{ width: `${Math.min(item.percentage, 100)}%` }}
                 ></div>
               </div>
 

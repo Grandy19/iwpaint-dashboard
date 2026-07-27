@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
-
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Upload, Filter, Eye, CheckCircle2, XCircle, Plus, User, UserCircle, Mail, Phone, Lock, EyeOff, Map, Info, Save, MapPin, Trash2 } from 'lucide-react';
@@ -9,17 +7,22 @@ import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
 import { ExportModal } from '../../components/ui/ExportModal';
 import { KepalaDistributorModal } from '../../components/ui/KepalaDistributorModal';
-import { kepalaDistributorKpiData, kepalaDistributorTableData } from '../../mock/kepalaDistributor';
+import api from '../../utils/api';
 
 export const KepalaDistributorPage = () => {
   const [area, setArea] = useState('Semua Area');
-  const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState('Semua Status');
   const [kepalaDistributor, setKepalaDistributor] = useState('Semua Kepala Distributor');
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isKepalaDistributorModalOpen, setIsKepalaDistributorModalOpen] = useState(false);
   const [selectedKepalaDistributor, setSelectedKepalaDistributor] = useState<any>(null);
+
+  // Dynamic state
+  const [distributorData, setDistributorData] = useState<any[]>([]);
+  const [kpis, setKpis] = useState<any[]>([]);
+  const [areaOptions, setAreaOptions] = useState<string[]>(['Semua Area']);
+  const [distributorOptions, setDistributorOptions] = useState<string[]>(['Semua Kepala Distributor']);
 
   // Form states for inline editing
   const [editNamaKepalaDistributor, setEditNamaKepalaDistributor] = useState('');
@@ -37,17 +40,119 @@ export const KepalaDistributorPage = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
 
-  const handleSimpanClick = () => setShowConfirm(true);
-  const handleConfirmSimpan = () => {
-    setShowConfirm(false);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 1500);
+  const loadData = async () => {
+    try {
+      const res = await api.get('/users?role=distributor');
+      const allDistributors = res.data.data;
+      setDistributorData(allDistributors);
+
+      // Populate filters
+      const uniqueAreas = Array.from(new Set(allDistributors.map((d: any) => d.area).filter(Boolean))) as string[];
+      setAreaOptions(['Semua Area', ...uniqueAreas]);
+      setDistributorOptions(['Semua Kepala Distributor', ...allDistributors.map((d: any) => d.namaKepalaDistributor)]);
+
+      // Calculate KPIs
+      const totalCount = allDistributors.length;
+      const activeCount = allDistributors.filter((d: any) => d.status === 'Aktif').length;
+      const inactiveCount = totalCount - activeCount;
+
+      setKpis([
+        {
+          id: 1,
+          title: 'Total Kepala Distributor',
+          value: `${totalCount} Kepala Distributor`,
+          description: 'Total seluruh Kepala Distributor yang terdaftar.',
+          icon: User,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
+        },
+        {
+          id: 2,
+          title: 'Kepala Distributor Aktif',
+          value: `${activeCount} Kepala Distributor`,
+          description: 'Kepala Distributor dengan status aktif.',
+          icon: CheckCircle2,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
+        },
+        {
+          id: 3,
+          title: 'Kepala Distributor Tidak Aktif',
+          value: `${inactiveCount} Kepala Distributor`,
+          description: 'Kepala Distributor dengan status tidak aktif.',
+          icon: XCircle,
+          iconColor: 'text-[#ef4444]',
+          iconBg: 'bg-[#fee2e2]',
+        }
+      ]);
+
+    } catch (err) {
+      console.error('Failed to load distributors:', err);
+    }
   };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleSimpanClick = () => setShowConfirm(true);
+
+  const handleConfirmSimpan = async () => {
+    setShowConfirm(false);
+    try {
+      if (selectedDistributorData) {
+        await api.put(`/users/${selectedDistributorData.id}`, {
+          name: editNamaKepalaDistributor,
+          username: editUsername,
+          email: editEmail,
+          nomorHp: editNomorHp,
+          alamat: editAlamat,
+          password: editPassword,
+          area: editArea,
+          status: editStatus
+        });
+        setShowSuccess(true);
+        setTimeout(() => {
+          setShowSuccess(false);
+          loadData();
+        }, 1500);
+      }
+    } catch (err) {
+      console.error('Failed to update distributor:', err);
+    }
+  };
+
   const handleDeleteClick = () => setShowDeleteConfirm(true);
-  const handleConfirmDelete = () => {
+
+  const handleConfirmDelete = async () => {
     setShowDeleteConfirm(false);
-    setShowDeleteSuccess(true);
-    setTimeout(() => setShowDeleteSuccess(false), 1500);
+    try {
+      if (selectedDistributorData) {
+        await api.delete(`/users/${selectedDistributorData.id}`);
+        setShowDeleteSuccess(true);
+        setTimeout(() => {
+          setShowDeleteSuccess(false);
+          setKepalaDistributor('Semua Kepala Distributor');
+          loadData();
+        }, 1500);
+      }
+    } catch (err) {
+      console.error('Failed to delete distributor:', err);
+    }
+  };
+
+  const handleCreateOrUpdateModal = async (formData: any) => {
+    try {
+      if (selectedKepalaDistributor) {
+        await api.put(`/users/${selectedKepalaDistributor.id}`, formData);
+      } else {
+        await api.post('/users', { ...formData, role: 'distributor' });
+      }
+      setIsKepalaDistributorModalOpen(false);
+      loadData();
+    } catch (err) {
+      console.error('Failed to save distributor via modal:', err);
+    }
   };
 
   const ActionButtons = (
@@ -64,7 +169,7 @@ export const KepalaDistributorPage = () => {
           setSelectedKepalaDistributor(null);
           setIsKepalaDistributorModalOpen(true);
         }}
-        className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+        className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
       >
         <Plus size={18} />
         Distributor
@@ -103,7 +208,7 @@ export const KepalaDistributorPage = () => {
               setSelectedKepalaDistributor(item);
               setIsKepalaDistributorModalOpen(true);
             }}
-            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors"
+            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors cursor-pointer"
           >
             <Eye size={16} /> Detail
           </button>
@@ -113,38 +218,39 @@ export const KepalaDistributorPage = () => {
     }
   };
 
-  const isAllKepalaDistributor = kepalaDistributor === 'Semua Kepala Distributor';
-  const selectedData = kepalaDistributorTableData.find(k => k.namaKepalaDistributor === kepalaDistributor) || kepalaDistributorTableData[0];
+  const isAllDistributors = kepalaDistributor === 'Semua Kepala Distributor';
+  const filteredDistributors = distributorData.filter((d: any) => {
+    if (area !== 'Semua Area' && d.area !== area) return false;
+    if (status !== 'Semua Status' && d.status !== status) return false;
+    return true;
+  });
+
+  const selectedDistributorData = (!isAllDistributors ? distributorData.find(d => d.namaKepalaDistributor === kepalaDistributor) : null) as any;
 
   useEffect(() => {
-    if (!isAllKepalaDistributor && selectedData) {
-      setEditNamaKepalaDistributor(selectedData.namaKepalaDistributor || '');
-      setEditUsername(selectedData.email?.split('@')[0] || '');
-      setEditEmail(selectedData.email || '');
-      setEditNomorHp(selectedData.nomorHp || '');
-      setEditAlamat('Jl. Pahlawan No. 45'); // mock
+    if (!isAllDistributors && selectedDistributorData) {
+      setEditNamaKepalaDistributor(selectedDistributorData.namaKepalaDistributor || '');
+      setEditUsername(selectedDistributorData.username || '');
+      setEditEmail(selectedDistributorData.email || '');
+      setEditNomorHp(selectedDistributorData.nomorHp || '');
+      setEditAlamat(selectedDistributorData.alamat || 'Jl. Jenderal Sudirman No. 10 Jakarta');
+      setEditArea(selectedDistributorData.area || 'Jawa Barat');
+      setEditStatus(selectedDistributorData.status || 'Aktif');
       setEditPassword('**********');
-      setEditArea(selectedData.area || 'Jawa Barat');
-      setEditStatus(selectedData.status || 'Aktif');
       setShowPassword(false);
     }
-  }, [selectedData, isAllKepalaDistributor]);
+  }, [selectedDistributorData, isAllDistributors]);
 
   return (
     <>
       <MainLayout>
-      <LoadingOverlay isLoading={isLoading} />
-        <Topbar 
-          title="Kepala Distributor" 
-          subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB"
-          actionButton={ActionButtons}
-        />
-        
+        <Topbar title="Kepala Distributor" subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB" actionButton={ActionButtons} />
+
         <div className="px-8 pb-10">
           
-          {/* KPI Section */}
+          {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 pt-4">
-            {kepalaDistributorKpiData.map((kpi) => (
+            {kpis.map((kpi) => (
               <KpiCard key={kpi.id} {...kpi} />
             ))}
           </div>
@@ -155,55 +261,43 @@ export const KepalaDistributorPage = () => {
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                 <CustomSelect 
-                  value={area}
-                  onChange={(val) => {
-                  setArea(val);
-                  setIsLoading(true);
-                  setTimeout(() => setIsLoading(false), 500);
-                }}
-                  options={['Semua Area', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera', 'DKI Jakarta']}
+                  value={area} 
+                  onChange={setArea} 
+                  options={areaOptions} 
                 />
               </div>
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
                 <CustomSelect 
-                  value={status}
-                  onChange={(val) => {
-                  setStatus(val);
-                  setIsLoading(true);
-                  setTimeout(() => setIsLoading(false), 500);
-                }}
-                  options={['Semua Status', 'Aktif', 'Tidak Aktif']}
+                  value={status} 
+                  onChange={setStatus} 
+                  options={['Semua Status', 'Aktif', 'Tidak Aktif']} 
                 />
               </div>
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Kepala Distributor</label>
                 <CustomSelect 
-                  value={kepalaDistributor}
-                  onChange={(val) => {
-                  setKepalaDistributor(val);
-                  setIsLoading(true);
-                  setTimeout(() => setIsLoading(false), 500);
-                }}
-                  options={['Semua Kepala Distributor', 'Bambang', 'Hendra', 'Dedi', 'Anton', 'Gery']}
+                  value={kepalaDistributor} 
+                  onChange={setKepalaDistributor} 
+                  options={distributorOptions} 
                 />
               </div>
               
             </div>
           </div>
 
-          {/* Table Section */}
-          {isAllKepalaDistributor ? (
+          {/* Table or Detail Form Section */}
+          {isAllDistributors ? (
             <DataTable
               title="Tabel Kepala Distributor"
               columns={tableColumns}
-              data={kepalaDistributorTableData}
+              data={filteredDistributors}
               renderCell={renderCell}
             />
           ) : (
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
               <h3 className="text-gray-600 text-[18px] font-medium mb-6">Informasi Kepala Distributor</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Nama Kepala Distributor</label>
                   <div className="relative">
@@ -264,32 +358,24 @@ export const KepalaDistributorPage = () => {
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                   <CustomSelect 
-                    value={editArea} onChange={(val) => {
-                  setEditArea(val);
-                  setIsLoading(true);
-                  setTimeout(() => setIsLoading(false), 500);
-                }} options={['Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera', 'DKI Jakarta']} 
+                    value={editArea} onChange={setEditArea} options={['Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera', 'DKI Jakarta', 'Kalimantan', 'Sulawesi']} 
                     icon={<Map size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
                   <CustomSelect 
-                    value={editStatus} onChange={(val) => {
-                  setEditStatus(val);
-                  setIsLoading(true);
-                  setTimeout(() => setIsLoading(false), 500);
-                }} options={['Aktif', 'Tidak Aktif']} 
+                    value={editStatus} onChange={setEditStatus} options={['Aktif', 'Tidak Aktif']} 
                     icon={<Info size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-center pt-2 gap-4">
-                <button onClick={handleDeleteClick} className="w-[160px] bg-[#ef4444] hover:bg-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2">
+              <div className="flex items-center justify-center pt-8 gap-4">
+                <button onClick={handleDeleteClick} className="w-[160px] bg-[#ef4444] hover:bg-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer">
                   <Trash2 size={18} />
                   Hapus
                 </button>
-                <button onClick={handleSimpanClick} className="w-[160px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2">
+                <button onClick={handleSimpanClick} className="w-[160px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer">
                   <Save size={18} />
                   Simpan
                 </button>
@@ -300,16 +386,17 @@ export const KepalaDistributorPage = () => {
         </div>
       </MainLayout>
 
+      <KepalaDistributorModal 
+        isOpen={isKepalaDistributorModalOpen}
+        onClose={() => setIsKepalaDistributorModalOpen(false)}
+        data={selectedKepalaDistributor}
+        onSave={handleCreateOrUpdateModal}
+      />
+
       <ExportModal 
         isOpen={isExportModalOpen} 
         onClose={() => setIsExportModalOpen(false)} 
         fileName="Data_Kepala_Distributor.xlsx" 
-      />
-
-      <KepalaDistributorModal 
-        isOpen={isKepalaDistributorModalOpen} 
-        onClose={() => setIsKepalaDistributorModalOpen(false)}
-        data={selectedKepalaDistributor}
       />
 
       {/* Confirm Modal */}
@@ -321,13 +408,13 @@ export const KepalaDistributorPage = () => {
             <div className="flex justify-center gap-4">
               <button 
                 onClick={() => setShowConfirm(false)}
-                className="w-[120px] bg-[#ef4444] hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition-colors"
+                className="w-[120px] bg-[#ef4444] hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition-colors cursor-pointer"
               >
                 Tidak
               </button>
               <button 
                 onClick={handleConfirmSimpan}
-                className="w-[120px] bg-[#52b788] hover:bg-[#40916c] text-white py-2.5 rounded-xl font-medium transition-colors"
+                className="w-[120px] bg-[#52b788] hover:bg-[#40916c] text-white py-2.5 rounded-xl font-medium transition-colors cursor-pointer"
               >
                 Simpan
               </button>
@@ -358,13 +445,13 @@ export const KepalaDistributorPage = () => {
             <div className="flex justify-center gap-4">
               <button 
                 onClick={() => setShowDeleteConfirm(false)}
-                className="w-[120px] bg-gray-200 hover:bg-gray-300 text-gray-800 py-2.5 rounded-xl font-medium transition-colors"
+                className="w-[120px] bg-gray-200 hover:bg-gray-300 text-gray-800 py-2.5 rounded-xl font-medium transition-colors cursor-pointer"
               >
                 Tidak
               </button>
               <button 
                 onClick={handleConfirmDelete}
-                className="w-[120px] bg-[#ef4444] hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition-colors"
+                className="w-[120px] bg-[#ef4444] hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition-colors cursor-pointer"
               >
                 Hapus
               </button>

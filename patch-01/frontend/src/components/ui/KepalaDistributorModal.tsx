@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, Info, Save, CheckCircle2, MapPin, Trash2, Tag } from 'lucide-react';
+import { X, User, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, Info, Save, CheckCircle2, MapPin, Trash2 } from 'lucide-react';
 import { CustomSelect } from './CustomSelect';
 
 interface KepalaDistributorModalProps {
@@ -18,7 +18,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
   const [username, setUsername] = useState('');
   const [nomorHp, setNomorHp] = useState('');
   const [password, setPassword] = useState('');
-  const [kodeDistributor, setKodeDistributor] = useState('');
+  const [status, setStatus] = useState('Aktif');
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -37,7 +37,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
         setUsername(data.username || `${data.namaKepalaDistributor || 'User'}KD01`.replace(/\s/g, ''));
         setNomorHp(data.nomorHp || '');
         setPassword(data.password || '**********');
-        setKodeDistributor(data.kodeDistributor || '');
+        setStatus(data.status || 'Aktif');
       } else {
         setNamaKepalaDistributor('');
         setEmail('');
@@ -47,7 +47,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
         setUsername('');
         setNomorHp('');
         setPassword('');
-        setKodeDistributor('');
+        setStatus('Aktif');
       }
       setShowPassword(false);
       setShowConfirm(false);
@@ -66,7 +66,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
     setShowSuccess(true);
     setTimeout(() => {
       if (onSave) {
-        onSave({ namaKepalaDistributor, email, alamat, area, username, nomorHp, password, kodeDistributor });
+        onSave({ namaKepalaDistributor, email, alamat, area, username, nomorHp, password, status });
       }
       setShowSuccess(false);
       onClose();
@@ -91,7 +91,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
   return (
     <>
       <div 
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4 sm:p-6 md:p-8"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px]"
         onClick={onClose}
       >
         <div 
@@ -111,133 +111,117 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 mb-8">
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Nama Kepala Distributor</label>
+              <label className="block text-sm text-[#475569] font-medium mb-2">Nama Kepala Distributor</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <User size={16} />
+                  <User size={18} />
                 </div>
                 <input 
                   type="text" 
                   value={namaKepalaDistributor}
                   onChange={(e) => setNamaKepalaDistributor(e.target.value)}
                   placeholder="Masukkan nama"
-                  className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]"
+                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Username</label>
+              <label className="block text-sm text-[#475569] font-medium mb-2">Username</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <UserCircle size={16} />
+                  <UserCircle size={18} />
                 </div>
                 <input 
                   type="text" 
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Masukkan username"
-                  className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]"
+                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Kode Distributor</label>
+              <label className="block text-sm text-[#475569] font-medium mb-2">Email</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <Tag size={16} />
-                </div>
-                <input 
-                  type="text" 
-                  value={kodeDistributor}
-                  onChange={(e) => setKodeDistributor(e.target.value)}
-                  placeholder="Masukkan kode distributor"
-                  className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Email</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <Mail size={16} />
+                  <Mail size={18} />
                 </div>
                 <input 
                   type="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Masukkan email"
-                  className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]"
+                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Nomor HP</label>
+              <label className="block text-sm text-[#475569] font-medium mb-2">Nomor HP</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <Phone size={16} />
+                  <Phone size={18} />
                 </div>
                 <input 
                   type="text" 
                   value={nomorHp}
                   onChange={(e) => setNomorHp(e.target.value)}
                   placeholder="Masukkan nomor HP"
-                  className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]"
+                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Alamat</label>
+              <label className="block text-sm text-[#475569] font-medium mb-2">Alamat</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <MapPin size={16} />
+                  <MapPin size={18} />
                 </div>
                 <input 
                   type="text" 
                   value={alamat}
                   onChange={(e) => setAlamat(e.target.value)}
                   placeholder="Masukkan alamat"
-                  className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]"
+                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Password</label>
+              <label className="block text-sm text-[#475569] font-medium mb-2">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <Lock size={16} />
+                  <Lock size={18} />
                 </div>
                 <input 
                   type={showPassword ? "text" : "password"} 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Masukkan password"
-                  className="w-full pl-10 pr-12 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]"
+                  className="w-full pl-11 pr-12 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]"
                 />
                 <div 
                   className="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer text-gray-400 hover:text-gray-600"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
+                  {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Area</label>
+              <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
               <CustomSelect 
                 value={area}
                 onChange={setArea}
                 options={['Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera', 'DKI Jakarta']}
-                icon={<Map size={16} />}
-                triggerClassName="flex items-center justify-between w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764]"
+                icon={<Map size={18} />}
+                triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764]"
                 showSearch={false}
               />
             </div>
@@ -250,7 +234,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
                 onClick={handleDeleteClick}
                 className="w-[160px] bg-[#ef4444] hover:bg-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
               >
-                <Trash2 size={16} />
+                <Trash2 size={18} />
                 Hapus
               </button>
             )}
@@ -258,7 +242,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
               onClick={handleSimpanClick}
               className="w-[160px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
             >
-              <Save size={16} />
+              <Save size={18} />
               Simpan
             </button>
           </div>

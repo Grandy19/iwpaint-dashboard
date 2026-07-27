@@ -1,30 +1,216 @@
-import React, { useState } from 'react';
-import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
-
+import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Upload, Plus, CheckCircle2, XCircle, Edit3, ArrowDown, Filter } from 'lucide-react';
+import { Upload, Plus, CheckCircle2, XCircle, Edit3, ArrowDown, Filter, Wallet, Target, CreditCard, Users, PaintRoller, Wrench, Factory, User } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { DataTable } from '../../components/common/DataTable';
 import { KpiCard } from '../../components/common/KpiCard';
-import { targetSalesKpiData, targetSalesSummary, targetSalesTableData } from '../../mock/targetSales';
-import { salesDetailKpiData, salesDetailSummary, salesDetailTargetRealisasi } from '../../mock/targetSalesDetail';
 import { TargetSalesModal } from '../../components/ui/TargetSalesModal';
 import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
 import { ExportModal } from '../../components/ui/ExportModal';
+import api from '../../utils/api';
 
 export const TargetSalesPage = () => {
-  const [startDate, setStartDate] = useState('2026-07-01');
-  const [isLoading, setIsLoading] = useState(false);
-  const [endDate, setEndDate] = useState('2026-06-30');
+  const monthNamesInd = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+  const now = new Date();
+  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+  const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
+
+  const [startDate, setStartDate] = useState(currentMonthStart);
+  const [endDate, setEndDate] = useState(currentMonthEnd);
   const [area, setArea] = useState('Semua Area');
   const [salesName, setSalesName] = useState('Semua Sales');
+
+  const isRange = startDate.substring(0, 7) !== endDate.substring(0, 7);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [selectedTarget, setSelectedTarget] = useState<any>(null);
   
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
+  // Dynamic state
+  const [targetsList, setTargetsList] = useState<any[]>([]);
+  const [kpiData, setKpiData] = useState<any[]>([]);
+  const [summaryData, setSummaryData] = useState<any>({ percentage: 0, targetGlobal: 'Rp 0 Jt', realisasi: 'Rp 0 Jt', selisih: 'Rp 0 Jt' });
+  const [detailTargetRealisasi, setDetailTargetRealisasi] = useState<any[]>([]);
+
+  const [areaOptions, setAreaOptions] = useState<string[]>(['Semua Area']);
+  const [salesOptions, setSalesOptions] = useState<string[]>(['Semua Sales']);
+
+  const loadData = async () => {
+    try {
+      const dateObj = new Date(startDate);
+      const targetYear = dateObj.getFullYear() || now.getFullYear();
+      const monthNamesInd = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      const targetMonthName = monthNamesInd[dateObj.getMonth()] || monthNamesInd[now.getMonth()];
+
+      // Get targets from backend
+      const params: any = { 
+        tahun: targetYear, 
+        bulan_nama: targetMonthName,
+        periodeAwal: startDate,
+        periodeAkhir: endDate
+      };
+      if (salesName !== 'Semua Sales') params.salesman = salesName;
+
+      const targetRes = await api.get('/targets', { params });
+      let allTargets = targetRes.data.data;
+
+      // Filter by Area client-side
+      if (area !== 'Semua Area') {
+        allTargets = allTargets.filter((t: any) => t.area === area);
+      }
+      setTargetsList(allTargets);
+
+      // Populate unique area options & sales options
+      const areas = Array.from(new Set(allTargets.map((t: any) => t.area).filter(Boolean))) as string[];
+      setAreaOptions(['Semua Area', ...areas]);
+      
+      const salesUsersRes = await api.get('/users?role=sales');
+      setSalesOptions(['Semua Sales', ...salesUsersRes.data.data.map((u: any) => u.namaSales)]);
+
+      // Load performance summary
+      const perfParams: any = { 
+        tahun: targetYear, 
+        bulan_nama: targetMonthName,
+        periodeAwal: startDate,
+        periodeAkhir: endDate
+      };
+      if (salesName !== 'Semua Sales') perfParams.salesman = salesName;
+      if (area !== 'Semua Area') perfParams.area = area;
+
+      const perfRes = await api.get('/targets/performance', { params: perfParams });
+      setSummaryData(perfRes.data);
+
+      const isDetailView = salesName !== 'Semua Sales';
+      if (isDetailView) {
+        // Find selected sales target details
+        const selectedRow = allTargets.find((t: any) => t.sales === salesName);
+        if (selectedRow) {
+          setDetailTargetRealisasi([
+            {
+              id: 'decorative',
+              title: 'Decorative',
+              icon: PaintRoller,
+              percentage: selectedRow.raw_target_deco > 0 ? Math.min(Math.round((selectedRow.realisasi_deco / selectedRow.raw_target_deco) * 100), 100) : 0,
+              realisasi: `Rp ${Number(selectedRow.realisasi_deco / 1e6).toFixed(1)} Jt`,
+              target: `Rp ${Number(selectedRow.raw_target_deco / 1e6).toFixed(1)} Jt`
+            },
+            {
+              id: 'automotive',
+              title: 'Automotive',
+              icon: Wrench,
+              percentage: selectedRow.raw_target_auto > 0 ? Math.min(Math.round((selectedRow.realisasi_auto / selectedRow.raw_target_auto) * 100), 100) : 0,
+              realisasi: `Rp ${Number(selectedRow.realisasi_auto / 1e6).toFixed(1)} Jt`,
+              target: `Rp ${Number(selectedRow.raw_target_auto / 1e6).toFixed(1)} Jt`
+            },
+            {
+              id: 'industri',
+              title: 'Industri',
+              icon: Factory,
+              percentage: selectedRow.raw_target_ind > 0 ? Math.min(Math.round((selectedRow.realisasi_ind / selectedRow.raw_target_ind) * 100), 100) : 0,
+              realisasi: `Rp ${Number(selectedRow.realisasi_ind / 1e6).toFixed(1)} Jt`,
+              target: `Rp ${Number(selectedRow.raw_target_ind / 1e6).toFixed(1)} Jt`
+            }
+          ]);
+
+          setKpiData([
+            {
+              id: 1,
+              title: 'Total Penjualan (Rp)',
+              value: selectedRow.totalRealisasi,
+              description: 'Total penjualan pada periode terpilih',
+              icon: Wallet,
+              iconColor: 'text-[#10b981]',
+              iconBg: 'bg-[#dcfce7]',
+              percentageLabel: `${selectedRow.percentage}%`,
+            },
+            {
+              id: 2,
+              title: isRange ? 'Total Target Periode' : 'Total Target Bulan Ini',
+              value: selectedRow.totalTarget,
+              description: isRange ? `Target untuk periode ${startDate} s/d ${endDate}` : `Target untuk bulan ${targetMonthName} ${targetYear}`,
+              icon: Target,
+              iconColor: 'text-[#10b981]',
+              iconBg: 'bg-[#dcfce7]',
+            },
+            {
+              id: 3,
+              title: 'Total Customer',
+              value: `${selectedRow.status === 'Sudah Input' ? 12 : 0} Customer`, // placeholder/derived
+              description: 'Customer yang dilayani',
+              icon: Users,
+              iconColor: 'text-[#10b981]',
+              iconBg: 'bg-[#dcfce7]',
+            },
+            {
+              id: 4,
+              title: 'Total Transaksi',
+              value: `${selectedRow.totalTransaksi} Transaksi`,
+              description: isRange ? `Periode ${startDate} s/d ${endDate}` : `Periode ${targetMonthName} ${targetYear}`,
+              icon: CreditCard,
+              iconColor: 'text-[#10b981]',
+              iconBg: 'bg-[#dcfce7]',
+            }
+          ]);
+        }
+      } else {
+        // Global KPIs
+        const totalSalesRes = await api.get('/dashboard/total-sales');
+        const totalSalesVal = totalSalesRes.data.total_sales;
+
+        const totalSalesmenCount = salesUsersRes.data.data.length;
+        const inputCount = allTargets.filter((t: any) => t.status === 'Sudah Input').length;
+        const noInputCount = totalSalesmenCount - inputCount;
+
+        setKpiData([
+          {
+            id: 1,
+            title: 'Total Sales',
+            value: `${totalSalesmenCount} Sales`,
+            description: 'Total Semua Sales',
+            icon: User,
+            iconColor: 'text-[#10b981]',
+            iconBg: 'bg-[#dcfce7]',
+          },
+          {
+            id: 2,
+            title: isRange ? 'Total Target Periode' : 'Total Target Bulan Ini',
+            value: perfRes.data.targetGlobal,
+            description: isRange ? `Total Target periode ${startDate} s/d ${endDate}` : `Total Target ${targetMonthName} ${targetYear}`,
+            icon: Target,
+            iconColor: 'text-[#10b981]',
+            iconBg: 'bg-[#dcfce7]',
+          },
+          {
+            id: 3,
+            title: 'Sales Sudah Memiliki Target',
+            value: `${inputCount} Sales`,
+            description: isRange ? `Target periode telah diinput` : `Target ${targetMonthName} ${targetYear} telah diinput`,
+            icon: CheckCircle2,
+            iconColor: 'text-[#10b981]',
+            iconBg: 'bg-[#dcfce7]',
+          },
+          {
+            id: 4,
+            title: 'Sales Belum Memiliki Target',
+            value: `${noInputCount} Sales`,
+            description: isRange ? `Target periode belum diinput` : `Target ${targetMonthName} ${targetYear} belum diinput`,
+            icon: XCircle,
+            iconColor: 'text-[#ef4444]',
+            iconBg: 'bg-[#fee2e2]',
+          }
+        ]);
+      }
+    } catch (err) {
+      console.error('Failed to load targets performance:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [salesName, area, startDate, endDate]);
 
   const isDetailView = salesName !== 'Semua Sales';
 
@@ -43,7 +229,7 @@ export const TargetSalesPage = () => {
           setModalMode('create');
           setIsModalOpen(true);
         }}
-        className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+        className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
       >
         <Plus size={18} />
         {isDetailView ? 'Sales' : 'Target'}
@@ -75,19 +261,16 @@ export const TargetSalesPage = () => {
           </span>
         );
       case 'aksi':
-        return item.status === 'Sudah Input' ? (
+        return (
           <button 
-            onClick={() => { setSelectedTarget(item); setModalMode('edit'); setIsModalOpen(true); }}
-            className="flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors"
+            onClick={() => { 
+              setSelectedTarget(item); 
+              setModalMode('edit'); 
+              setIsModalOpen(true); 
+            }}
+            className="flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
-            <Edit3 size={18} strokeWidth={2.5} />
-          </button>
-        ) : (
-          <button 
-            onClick={() => { setSelectedTarget(item); setModalMode('edit'); setIsModalOpen(true); }}
-            className="flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            <Plus size={18} strokeWidth={2.5} />
+            {item.status === 'Sudah Input' ? <Edit3 size={18} strokeWidth={2.5} /> : <Plus size={18} strokeWidth={2.5} />}
           </button>
         );
       default:
@@ -95,24 +278,32 @@ export const TargetSalesPage = () => {
     }
   };
 
-  const sortedTableData = [...targetSalesTableData].sort((a, b) => {
-    if (a.status !== b.status) {
-      return a.status === 'Sudah Input' ? -1 : 1;
-    }
-    if (a.status === 'Sudah Input') {
-      const valA = parseInt(a.totalTarget.replace(/[^0-9]/g, '')) || 0;
-      const valB = parseInt(b.totalTarget.replace(/[^0-9]/g, '')) || 0;
-      return valB - valA;
-    }
-    return 0;
-  });
+  const handleSaveModal = async (formData: any) => {
+    const parseNum = (val: any) => {
+      if (typeof val === 'number') return val;
+      if (!val) return 0;
+      const clean = String(val).replace(/[^0-9]/g, '');
+      return parseInt(clean) || 0;
+    };
 
-  const displayKpiData = isDetailView ? salesDetailKpiData : targetSalesKpiData;
-  const displaySummary = isDetailView ? salesDetailSummary : targetSalesSummary;
+    try {
+      await api.post('/targets', {
+        sales: formData.sales,
+        decorative: parseNum(formData.decorative),
+        automotive: parseNum(formData.automotive),
+        industri: parseNum(formData.industri),
+        tahun: Number(formData.tahun) || 2026,
+        bulan_nama: formData.bulan || 'Juli'
+      });
+      setIsModalOpen(false);
+      loadData();
+    } catch (err) {
+      console.error('Failed to save targets:', err);
+    }
+  };
 
   return (
     <MainLayout>
-      <LoadingOverlay isLoading={isLoading} />
       <Topbar 
         title={isDetailView ? "Sales" : "Target Sales"}
         subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB"
@@ -131,12 +322,8 @@ export const TargetSalesPage = () => {
                   <input 
                     type="date" 
                     value={startDate} 
-                    onChange={(e) => {
-                      setStartDate(e.target.value);
-                      setIsLoading(true);
-                      setTimeout(() => setIsLoading(false), 500);
-                    }} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b0764] focus:border-transparent h-[42px] text-gray-700" 
+                    onChange={(e) => setStartDate(e.target.value)} 
+                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                   />
                 </div>
                 <span className="text-gray-500 font-bold">-</span>
@@ -144,12 +331,8 @@ export const TargetSalesPage = () => {
                   <input 
                     type="date" 
                     value={endDate} 
-                    onChange={(e) => {
-                      setEndDate(e.target.value);
-                      setIsLoading(true);
-                      setTimeout(() => setIsLoading(false), 500);
-                    }} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b0764] focus:border-transparent h-[42px] text-gray-700" 
+                    onChange={(e) => setEndDate(e.target.value)} 
+                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                   />
                 </div>
               </div>
@@ -159,12 +342,8 @@ export const TargetSalesPage = () => {
               <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
               <CustomSelect 
                 value={area} 
-                onChange={(val) => {
-                  setArea(val);
-                  setIsLoading(true);
-                  setTimeout(() => setIsLoading(false), 500);
-                }} 
-                options={['Semua Area', 'Bandung', 'Jakarta']} 
+                onChange={setArea} 
+                options={areaOptions} 
               />
             </div>
 
@@ -172,12 +351,8 @@ export const TargetSalesPage = () => {
               <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
               <CustomSelect 
                 value={salesName} 
-                onChange={(val) => {
-                  setSalesName(val);
-                  setIsLoading(true);
-                  setTimeout(() => setIsLoading(false), 500);
-                }} 
-                options={['Semua Sales', 'Heri', 'Fransiskus', 'Rudi', 'Budi', 'Santoso']} 
+                onChange={setSalesName} 
+                options={salesOptions} 
               />
             </div>
 
@@ -190,23 +365,23 @@ export const TargetSalesPage = () => {
           
           {/* KPI Cards */}
           <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {displayKpiData.map((kpi) => (
+            {kpiData.map((kpi) => (
               <KpiCard key={kpi.id} {...kpi} />
             ))}
           </div>
 
           {/* Global Target Summary Card */}
           <div className="lg:col-span-1 bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col">
-            <h3 className="text-gray-600 text-[18px] font-medium mb-6">{isDetailView ? 'Ringkasan Target' : 'Ringkasan Target Global'}</h3>
+            <h3 className="text-gray-600 text-[18px] font-medium mb-6">{isDetailView ? 'Ringkasan Target' : (isRange ? 'Ringkasan Target Periode' : 'Ringkasan Target Global')}</h3>
             
             <div className="flex-1 flex flex-col justify-center">
               <div className="relative w-40 h-40 mx-auto mb-8">
                 <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
                   <circle cx="50" cy="50" r="40" fill="none" stroke="#e0f2fe" strokeWidth="12" />
-                  <circle cx="50" cy="50" r="40" fill="none" stroke="#0ea5e9" strokeWidth="12" strokeDasharray={`${displaySummary.percentage * 2.51} 251`} strokeLinecap="round" />
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="#0ea5e9" strokeWidth="12" strokeDasharray={`${summaryData.percentage * 2.51} 251`} strokeLinecap="round" />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                  <span className="text-[24px] font-bold text-[#0ea5e9]">{displaySummary.percentage}%</span>
+                  <span className="text-[24px] font-bold text-[#0ea5e9]">{summaryData.percentage}%</span>
                   <span className="text-xs text-gray-500 font-medium mt-1">Tercapai</span>
                 </div>
               </div>
@@ -215,9 +390,9 @@ export const TargetSalesPage = () => {
                 <div className="flex justify-between items-center text-sm">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-[#e0f2fe]"></div>
-                    <span className="text-gray-500">{isDetailView ? 'Total Target' : 'Target Global'}</span>
+                    <span className="text-gray-500">{isDetailView ? 'Total Target' : (isRange ? 'Target Periode' : 'Target Global')}</span>
                   </div>
-                  <span className="font-semibold text-gray-800">{displaySummary.targetGlobal}</span>
+                  <span className="font-semibold text-gray-800">{summaryData.targetGlobal}</span>
                 </div>
                 
                 <div className="flex justify-between items-center text-sm">
@@ -225,7 +400,7 @@ export const TargetSalesPage = () => {
                     <div className="w-2 h-2 rounded-full bg-[#0ea5e9]"></div>
                     <span className="text-gray-500">Realisasi</span>
                   </div>
-                  <span className="font-semibold text-gray-800">{displaySummary.realisasi}</span>
+                  <span className="font-semibold text-gray-800">{summaryData.realisasi}</span>
                 </div>
 
                 <div className="flex justify-between items-center text-sm bg-[#fee2e2] px-3 py-2 rounded-lg mt-1">
@@ -233,7 +408,7 @@ export const TargetSalesPage = () => {
                     <ArrowDown size={14} />
                     <span className="font-medium">Selisih</span>
                   </div>
-                  <span className="font-bold text-[#ef4444]">{displaySummary.selisih}</span>
+                  <span className="font-bold text-[#ef4444]">{summaryData.selisih}</span>
                 </div>
               </div>
             </div>
@@ -243,9 +418,9 @@ export const TargetSalesPage = () => {
         {/* Section Content: Table or Detailed View */}
         {isDetailView ? (
           <TargetRealisasiCard 
-            data={salesDetailTargetRealisasi} 
+            data={detailTargetRealisasi} 
             onEdit={() => {
-              const row = targetSalesTableData.find(s => s.sales === salesName);
+              const row = targetsList.find(s => s.sales === salesName);
               setSelectedTarget(row || { sales: salesName, area: 'Semua Area' });
               setModalMode('edit');
               setIsModalOpen(true);
@@ -255,7 +430,7 @@ export const TargetSalesPage = () => {
           <DataTable
             title="Tabel Target Sales"
             columns={tableColumns}
-            data={sortedTableData}
+            data={targetsList}
             renderCell={renderCell}
           />
         )}
@@ -266,9 +441,8 @@ export const TargetSalesPage = () => {
           mode={modalMode}
           onClose={() => setIsModalOpen(false)}
           data={selectedTarget}
-          onSave={(updatedData) => {
-            console.log('Saved data:', updatedData);
-          }}
+          onSave={handleSaveModal}
+          salesList={salesOptions.filter((s: string) => s !== 'Semua Sales')}
         />
       </div>
 

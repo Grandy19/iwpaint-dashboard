@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, Briefcase, Info, Users, Save, CheckCircle2, MapPin, ChevronDown, Search, Trash2, Target, Tag, TrendingUp } from 'lucide-react';
+import { X, User, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, Briefcase, Info, Users, Save, CheckCircle2, MapPin, ChevronDown, Search, Trash2, Target, TrendingUp } from 'lucide-react';
 import { CustomSelect } from './CustomSelect';
 import { DataTable } from '../common/DataTable';
 import { mockSupervisorSalesData } from '../../mock/distributorSupervisor';
+import { distributorSupervisorTargetSalesBawahan } from '../../mock/distributorTargetSales';
 import clsx from 'clsx';
 
 interface SupervisorModalProps {
@@ -42,7 +43,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
   const [nomorHp, setNomorHp] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('Supervisor');
-  const [kodeSupervisor, setKodeSupervisor] = useState('');
+  const [status, setStatus] = useState('Aktif');
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -84,7 +85,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
         setNomorHp(data.nomorHp || '');
         setPassword(data.password || '**********');
         setRole(data.role || 'Supervisor');
-        setKodeSupervisor(data.kodeSupervisor || '');
+        setStatus(data.status || 'Aktif');
       } else {
         setNamaSupervisor('');
         setEmail('');
@@ -96,7 +97,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
         setNomorHp('');
         setPassword('');
         setRole('Supervisor');
-        setKodeSupervisor('');
+        setStatus('Aktif');
       }
       setShowPassword(false);
       setShowConfirm(false);
@@ -119,7 +120,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
     // Simulasikan delay simpan lalu tutup modal
     setTimeout(() => {
       if (onSave) {
-        onSave({ namaSupervisor, email, alamat, area, selectedSales, username, nomorHp, password, role, kodeSupervisor });
+        onSave({ namaSupervisor, email, alamat, area, selectedSales, username, nomorHp, password, role, status });
       }
       setShowSuccess(false);
       onClose();
@@ -215,7 +216,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
     <>
       {/* Main Modal */}
       <div 
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4 sm:p-6 md:p-8"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px]"
         onClick={onClose}
       >
         <div 
@@ -235,24 +236,24 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 mb-8">
             
             {/* ================= KOLOM KIRI ================= */}
 
             {/* Nama Supervisor */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Nama Supervisor</label>
+              <label className="block text-sm text-[#475569] font-medium mb-2">Nama Supervisor</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <User size={16} />
+                  <User size={18} />
                 </div>
                 <input 
                   type="text" 
                   value={mode === 'view_target' ? (data?.namaSupervisor || 'Nama Supervisor') : namaSupervisor}
                   onChange={(e) => setNamaSupervisor(e.target.value)}
                   placeholder="Masukkan nama"
-                  readOnly={mode === 'view_only' || mode === 'view_target' || mode === 'detail'}
-                  className={`w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${(mode !== 'view_only' && mode !== 'view_target' && mode !== 'detail') ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
+                  readOnly={mode === 'view_only' || mode === 'view_target'}
+                  className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${(mode !== 'view_only' && mode !== 'view_target') ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                 />
               </div>
             </div>
@@ -260,56 +261,38 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             {/* Username (Not in view_target) */}
             {mode !== 'view_target' && (
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Username</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Username</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <UserCircle size={16} />
+                    <UserCircle size={18} />
                   </div>
                   <input 
                     type="text" 
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Masukkan username"
-                    readOnly={mode === 'view_only' || mode === 'detail'}
-                    className={`w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${(mode !== 'view_only' && mode !== 'detail') ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
+                    readOnly={mode === 'view_only'}
+                    className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                   />
                 </div>
               </div>
             )}
 
-            {/* Kode Supervisor */}
-            <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Kode Supervisor</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <Tag size={16} />
-                </div>
-                <input 
-                  type="text" 
-                  value={kodeSupervisor}
-                  onChange={(e) => setKodeSupervisor(e.target.value)}
-                  placeholder="Masukkan kode supervisor"
-                  readOnly={mode === 'view_only' || mode === 'view_target' || mode === 'detail'}
-                  className={`w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${(mode !== 'view_only' && mode !== 'view_target' && mode !== 'detail') ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
-                />
-              </div>
-            </div>
-
             {/* Email (Not in view_target) */}
             {mode !== 'view_target' && (
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Email</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Email</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Mail size={16} />
+                    <Mail size={18} />
                   </div>
                   <input 
                     type="email" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Masukkan email"
-                    readOnly={mode === 'view_only' || mode === 'detail'}
-                    className={`w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${(mode !== 'view_only' && mode !== 'detail') ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
+                    readOnly={mode === 'view_only'}
+                    className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                   />
                 </div>
               </div>
@@ -318,18 +301,18 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             {/* Nomor HP (Not in view_target) */}
             {mode !== 'view_target' && (
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Nomor HP</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Nomor HP</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Phone size={16} />
+                    <Phone size={18} />
                   </div>
                   <input 
                     type="text" 
                     value={nomorHp}
                     onChange={(e) => setNomorHp(e.target.value)}
                     placeholder="Masukkan nomor HP"
-                    readOnly={mode === 'view_only' || mode === 'detail'}
-                    className={`w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${(mode !== 'view_only' && mode !== 'detail') ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
+                    readOnly={mode === 'view_only'}
+                    className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                   />
                 </div>
               </div>
@@ -338,18 +321,18 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             {/* Alamat (Not in view_target) */}
             {mode !== 'view_target' && (
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Alamat</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Alamat</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <MapPin size={16} />
+                    <MapPin size={18} />
                   </div>
                   <input 
                     type="text" 
                     value={alamat}
                     onChange={(e) => setAlamat(e.target.value)}
                     placeholder="Masukkan alamat"
-                    readOnly={mode === 'view_only' || mode === 'detail'}
-                    className={`w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${(mode !== 'view_only' && mode !== 'detail') ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
+                    readOnly={mode === 'view_only'}
+                    className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                   />
                 </div>
               </div>
@@ -357,21 +340,21 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
 
             {/* Area */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Area</label>
-              {(mode === 'view_only' || mode === 'view_target' || mode === 'detail') ? (
+              <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
+              {(mode === 'view_only' || mode === 'view_target') ? (
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Map size={16} />
+                    <Map size={18} />
                   </div>
-                  <input type="text" value={mode === 'view_target' ? data?.area || '' : area} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value={mode === 'view_target' ? data?.area || '' : area} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               ) : (
                 <CustomSelect 
                   value={area}
                   onChange={setArea}
                   options={['Bandung', 'Jakarta', 'Cirebon', 'Kuningan']}
-                  icon={<Map size={16} />}
-                  triggerClassName="flex items-center justify-between w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
+                  icon={<Map size={18} />}
+                  triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
                   showSearch={false}
                 />
               )}
@@ -380,21 +363,21 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             {/* Role (Not in view_target) */}
             {mode !== 'view_target' && (
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Role</label>
-                {(mode === 'view_only' || mode === 'detail') ? (
+                <label className="block text-sm text-[#475569] font-medium mb-2">Role</label>
+                {mode === 'view_only' ? (
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                      <Briefcase size={16} />
+                      <Briefcase size={18} />
                     </div>
-                    <input type="text" value={role} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                    <input type="text" value={role} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                   </div>
                 ) : (
                   <CustomSelect 
                     value={role}
                     onChange={setRole}
                     options={['Sales', 'Supervisor', 'Admin']}
-                    icon={<Briefcase size={16} />}
-                    triggerClassName="flex items-center justify-between w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
+                    icon={<Briefcase size={18} />}
+                    triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
                     showSearch={false}
                   />
                 )}
@@ -403,14 +386,14 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
 
             {/* Sales */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">{(mode === 'view_only' || mode === 'view_target') ? 'Jumlah Sales' : 'Sales'}</label>
-              {(mode === 'view_only' || mode === 'view_target' || mode === 'detail') ? (
+              <label className="block text-sm text-[#475569] font-medium mb-2">{(mode === 'view_only' || mode === 'view_target') ? 'Jumlah Sales' : 'Sales'}</label>
+              {(mode === 'view_only' || mode === 'view_target') ? (
                 <div 
                   onClick={() => setShowViewSalesModal(true)}
-                  className="relative flex items-center justify-between w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer hover:border-[#3b0764] hover:ring-1 hover:ring-[#3b0764] transition-colors"
+                  className="relative flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer hover:border-[#3b0764] hover:ring-1 hover:ring-[#3b0764] transition-colors"
                 >
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Users size={16} />
+                    <Users size={18} />
                   </div>
                   <span>{mode === 'view_target' ? (data?.jumlahSales || '0 Sales') : `${selectedSales.length} Sales Bawahan`}</span>
                   <div className="w-6 h-6 bg-purple-50 text-[#3b0764] rounded-md flex items-center justify-center">
@@ -420,10 +403,10 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
               ) : (
                 <div 
                   onClick={handleOpenSalesModal}
-                  className="relative flex items-center justify-between w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer hover:border-[#3b0764] hover:ring-1 hover:ring-[#3b0764] transition-colors"
+                  className="relative flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer hover:border-[#3b0764] hover:ring-1 hover:ring-[#3b0764] transition-colors"
                 >
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Users size={16} />
+                    <Users size={18} />
                   </div>
                   <span className="truncate">{salesDisplayText}</span>
                   <ChevronDown size={16} className="text-gray-500" />
@@ -431,109 +414,125 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
               )}
             </div>
 
-            {/* Target Penjualan */}
-            {(mode === 'view_only' || mode === 'detail') && (
-              <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Target Penjualan</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Target size={16} />
+            {/* Conditional Fields for view_only: Target and Realisasi */}
+            {mode === 'view_only' ? (
+              <>
+                {/* Target */}
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Target</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Target size={18} />
+                    </div>
+                    <input type="text" value={data?.target || 'Rp 0'} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                   </div>
-                  <input type="text" value={data?.target || 'Rp 0'} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
-              </div>
-            )}
 
-            {/* Realisasi */}
-            {mode === 'view_only' && (
-              <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Realisasi</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <CheckCircle2 size={16} />
+                {/* Realisasi */}
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Realisasi</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <CheckCircle2 size={18} />
+                    </div>
+                    <input type="text" value={data?.realisasi || 'Rp 0'} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                   </div>
-                  <input type="text" value={data?.realisasi || 'Rp 0'} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
-              </div>
-            )}
+              </>
+            ) : (
+              <>
+                {/* Password (Not in view_target) */}
+                {mode === 'edit' && (
+                  <div>
+                    <label className="block text-sm text-[#475569] font-medium mb-2">Password</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <Lock size={18} />
+                      </div>
+                      <input 
+                        type={showPassword ? "text" : "password"} 
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder={data ? "Kosongkan jika tidak diubah" : "Masukkan password"}
+                        className="w-full pl-11 pr-12 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                        autoComplete="new-password"
+                      />
+                      <div 
+                        className="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer text-gray-400 hover:text-gray-600"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-            {/* Password (Not in view_target) */}
-            {mode === 'edit' && (
-              <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Password</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Lock size={16} />
+                {/* Status */}
+                {mode === 'view_target' && (
+                  <div>
+                    <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <Info size={18} />
+                      </div>
+                      <input type="text" value={data?.status || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                    </div>
                   </div>
-                  <input 
-                    type={showPassword ? "text" : "password"} 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={data ? "Kosongkan jika tidak diubah" : "Masukkan password"}
-                    className="w-full pl-10 pr-12 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
-                    autoComplete="new-password"
-                  />
-                  <div 
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer text-gray-400 hover:text-gray-600"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
-                  </div>
-                </div>
-              </div>
+                )}
+              </>
             )}
 
           </div>
 
           {mode === 'view_target' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 mb-8 mt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 mb-8 mt-2">
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Target</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Target</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Target size={16} />
+                    <Target size={18} />
                   </div>
-                  <input type="text" value={data?.target || 'Rp 0'} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value={data?.target || 'Rp 0'} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Realisasi</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Realisasi</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <CheckCircle2 size={16} />
+                    <CheckCircle2 size={18} />
                   </div>
-                  <input type="text" value={data?.realisasi || 'Rp 0'} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value={data?.realisasi || 'Rp 0'} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Qty Penjualan</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Qty Penjualan</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <CheckCircle2 size={16} />
+                    <CheckCircle2 size={18} />
                   </div>
-                  <input type="text" value={data?.qty || '0 Kg'} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value={data?.qty || '0 Kg'} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Pencapaian</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Pencapaian</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <TrendingUp size={16} />
+                    <TrendingUp size={18} />
                   </div>
-                  <input type="text" value={data?.pencapaian || '0%'} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value={data?.pencapaian || '0%'} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
             </div>
           )}
 
-          {mode !== 'view_only' && mode !== 'view_target' && mode !== 'detail' && (
+          {mode !== 'view_only' && mode !== 'view_target' && (
             <div className="flex items-center justify-center pt-2 gap-4">
               {data && (
                 <button 
                   onClick={handleDeleteClick}
                   className="w-[160px] bg-[#ef4444] hover:bg-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={18} />
                   Hapus
                 </button>
               )}
@@ -541,7 +540,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
                 onClick={handleSimpanClick}
                 className="w-[160px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
               >
-                <Save size={16} />
+                <Save size={18} />
                 Simpan
               </button>
             </div>
@@ -560,10 +559,10 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
       {/* ============================================================ */}
       {showViewSalesModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-[2px]" onClick={() => setShowViewSalesModal(false)}>
-          <div className="bg-white rounded-2xl w-[700px] shadow-2xl relative flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl w-[800px] shadow-2xl relative flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100">
-              <h3 className="text-xl font-bold text-gray-900">Daftar Sales Bawahan</h3>
+              <h3 className="text-gray-600 text-[18px] font-medium">Daftar Sales Bawahan</h3>
               <button 
                 onClick={() => setShowViewSalesModal(false)}
                 className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition-colors"
@@ -577,7 +576,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
               <DataTable 
                 title=""
                 columns={salesTableColumns}
-                data={mode === 'view_target' ? require('../../mock/distributorTargetSales').distributorSupervisorTargetSalesBawahan : mockSupervisorSalesData}
+                data={mode === 'view_target' ? distributorSupervisorTargetSalesBawahan : mockSupervisorSalesData}
                 renderCell={renderSalesTableCell}
               />
             </div>
@@ -594,12 +593,12 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h3 className="text-xl font-bold text-gray-900">Pilih Sales</h3>
+              <h3 className="text-lg font-bold text-gray-900">Pilih Sales</h3>
               <button 
                 onClick={handleCloseSalesModal}
                 className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-full transition-colors"
               >
-                <X size={16} />
+                <X size={18} />
               </button>
             </div>
 
@@ -611,7 +610,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
                 </div>
                 <input
                   type="text"
-                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-[14px] focus:outline-none focus:ring-1 focus:ring-[#3b0764] focus:border-[#3b0764]"
+                  className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#3b0764] focus:border-[#3b0764]"
                   placeholder="Cari nama atau area sales..."
                   value={salesSearchQuery}
                   onChange={(e) => setSalesSearchQuery(e.target.value)}
@@ -645,12 +644,12 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
                       </div>
                       {/* Label Content */}
                       <div className="flex-1 flex items-center justify-between min-w-0">
-                        <span className={clsx("text-[14px] truncate", isSelected ? "text-[#3b0764] font-medium" : "text-gray-800 font-medium")}>
+                        <span className={clsx("text-sm truncate", isSelected ? "text-[#3b0764] font-medium" : "text-gray-800 font-medium")}>
                           {option.label}
                         </span>
                         {option.subLabel && (
                           <div className="flex items-center pl-4 ml-auto">
-                            <span className="text-[13px] text-gray-500 whitespace-nowrap">
+                            <span className="text-xs text-gray-500 whitespace-nowrap">
                               {option.subLabel}
                             </span>
                           </div>
@@ -660,7 +659,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
                   );
                 })
               ) : (
-                <div className="px-4 py-8 text-[14px] text-gray-500 text-center">
+                <div className="px-4 py-8 text-sm text-gray-500 text-center">
                   Tidak ada sales ditemukan
                 </div>
               )}

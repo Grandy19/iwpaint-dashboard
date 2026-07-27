@@ -1,8 +1,7 @@
-import { useState, useMemo } from 'react';
-import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
+import { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, Filter, Eye, LayoutDashboard, Users, Target, User, Map, MapPin, Receipt, Wallet, Package, CalendarClock } from 'lucide-react';
+import { Download, Filter, Eye, LayoutDashboard, Users, Target, User, Map, MapPin, Receipt, Wallet, Package, CalendarClock, Briefcase, Banknote } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
@@ -10,14 +9,13 @@ import { ExportModal } from '../../components/ui/ExportModal';
 import { CustomerModal } from '../../components/ui/CustomerModal';
 import { ChartCard } from '../../components/ui/ChartCard';
 import { TopProductsCard } from '../../components/ui/TopProductsCard';
-import { salesChartData, salesTopProductsData } from '../../mock/salesDashboard';
-import { supervisorCustomerKpiData, supervisorCustomerTableData, supervisorTransactionTableData } from '../../mock/supervisorCustomer';
-import { distributorMenuItems } from '../../mock/distributorDashboard';
+import { useAuth } from '../../context/AuthContext';
+import api from '../../utils/api';
 
 export const DistributorCustomerPage = () => {
-  const [periodeAwal, setPeriodeAwal] = useState('2026-07-01');
-  const [isLoading, setIsLoading] = useState(false);
-  const [periodeAkhir, setPeriodeAkhir] = useState('2026-06-30');
+  const { user } = useAuth();
+  const [periodeAwal, setPeriodeAwal] = useState('2026-01-01');
+  const [periodeAkhir, setPeriodeAkhir] = useState('2026-12-31');
   const [area, setArea] = useState('Semua Area');
   const [sales, setSales] = useState('Semua Sales');
   const [customer, setCustomer] = useState('Semua Customer');
@@ -29,15 +27,178 @@ export const DistributorCustomerPage = () => {
   const [appliedArea, setAppliedArea] = useState('Semua Area');
   const [appliedSales, setAppliedSales] = useState('Semua Sales');
   const [appliedCustomer, setAppliedCustomer] = useState('Semua Customer');
+  const [refreshKey, setRefreshKey] = useState(0);
 
+  // Dynamic states
+  const [customersData, setCustomersData] = useState<any[]>([]);
+  const [transactionsData, setTransactionsData] = useState<any[]>([]);
+  const [kpis, setKpis] = useState<any[]>([]);
+  
   const [chartJenisData, setChartJenisData] = useState('Total Penjualan');
-  const [chartPeriode, setChartPeriode] = useState('2026-07-01');
+  const [chartPeriode, setChartPeriode] = useState('Bulan');
+  const [trendData, setTrendData] = useState<any[]>([]);
+  const [topProducts, setTopProducts] = useState<any[]>([]);
+  
+  const [areaOptions, setAreaOptions] = useState<string[]>(['Semua Area']);
+  const [salesOptions, setSalesOptions] = useState<string[]>(['Semua Sales']);
+  const [customerOptions, setCustomerOptions] = useState<string[]>(['Semua Customer']);
+
+  const loadData = async () => {
+    if (!user) return;
+    try {
+      const myArea = 'Semua Area';
+      const params: any = { area: myArea, periodeAwal, periodeAkhir };
+      if (appliedArea !== 'Semua Area') params.area = appliedArea;
+      if (appliedSales !== 'Semua Sales') params.salesName = appliedSales;
+      if (appliedCustomer !== 'Semua Customer') params.customerName = appliedCustomer;
+
+      // Load customers
+      const res = await api.get('/customers', { params });
+      const myCustomers = res.data.data;
+      setCustomersData(myCustomers);
+
+      // Populate filter options
+      const uniqueAreas = Array.from(new Set(myCustomers.map((c: any) => c.area).filter(Boolean))) as string[];
+      const uniqueSales = Array.from(new Set(myCustomers.map((c: any) => c.sales).filter(Boolean))) as string[];
+      setAreaOptions(['Semua Area', ...uniqueAreas]);
+      setSalesOptions(['Semua Sales', ...uniqueSales]);
+
+      // KPIs
+      const totalSalesVal = myCustomers.reduce((acc: number, c: any) => acc + c.raw_total_penjualan, 0);
+      const totalTxVal = myCustomers.reduce((acc: number, c: any) => acc + Number(c.totalTransaksi), 0);
+      const totalCustomersVal = myCustomers.length;
+
+      setKpis([
+        {
+          id: 1,
+          title: 'Total Penjualan (Rp)',
+          value: totalSalesVal >= 1e9 ? `Rp ${(totalSalesVal / 1e9).toFixed(1)} M` : `Rp ${(totalSalesVal / 1e6).toFixed(1)} Jt`,
+          description: 'Total penjualan customer wilayah Anda',
+          icon: Banknote,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
+        },
+        {
+          id: 2,
+          title: 'Total Transaksi',
+          value: `${totalTxVal.toLocaleString('id-ID')} Transaksi`,
+          description: 'Total transaksi customer wilayah Anda',
+          icon: Wallet,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
+        },
+        {
+          id: 3,
+          title: 'Total Customer',
+          value: `${totalCustomersVal.toLocaleString('id-ID')} Customer`,
+          description: 'Total customer wilayah Anda',
+          icon: Users,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
+        }
+      ]);
+
+      // Top Products
+      const tpParams: any = { area: 'Semua Area', periodeAwal, periodeAkhir };
+      if (appliedArea !== 'Semua Area') tpParams.area = appliedArea;
+      if (appliedSales !== 'Semua Sales') tpParams.salesman = appliedSales;
+      if (appliedCustomer !== 'Semua Customer') tpParams.customerName = appliedCustomer;
+      
+      const topProductsRes = await api.get('/sales/top-products', { params: tpParams });
+      const products = topProductsRes.data.data;
+      const maxVal = products.length > 0 ? Math.max(...products.map((p: any) => p.total_sales)) : 1;
+      setTopProducts(products.map((p: any, idx: number) => ({
+        id: idx + 1,
+        name: p.nama_produk,
+        value: p.total_sales,
+        max: maxVal,
+        label: p.total_sales >= 1e6 ? `Rp ${(p.total_sales / 1e6).toFixed(1)} Jt` : `Rp ${Number(p.total_sales).toLocaleString('id-ID')}`
+      })));
+
+    } catch (err) {
+      console.error('Failed to load distributor customer metrics:', err);
+    }
+  };
+
+  const loadTransactions = async () => {
+    if (!user) return;
+    try {
+      const params: any = { area: 'Semua Area', periodeAwal, periodeAkhir };
+      if (appliedArea !== 'Semua Area') params.area = appliedArea;
+      if (appliedSales !== 'Semua Sales') params.salesName = appliedSales;
+      if (appliedCustomer !== 'Semua Customer') params.customerName = appliedCustomer;
+
+      const res = await api.get('/customers/transactions', { params });
+      setTransactionsData(res.data.data);
+    } catch (err) {
+      console.error('Failed to load customer transactions:', err);
+    }
+  };
+
+  const loadTrendData = async () => {
+    if (!user) return;
+    try {
+      const tpParams: any = { 
+        area: 'Semua Area', 
+        periodeAwal, 
+        periodeAkhir, 
+        periode: chartPeriode, 
+        jenisData: chartJenisData 
+      };
+      if (appliedArea !== 'Semua Area') tpParams.area = appliedArea;
+      if (appliedSales !== 'Semua Sales') tpParams.salesman = appliedSales;
+      if (appliedCustomer !== 'Semua Customer') tpParams.customerName = appliedCustomer;
+
+      const trendRes = await api.get('/sales/trend', { params: tpParams });
+      const trend = trendRes.data;
+      setTrendData(trend.labels.map((lbl: string, idx: number) => ({
+        date: chartPeriode === 'Bulan' ? lbl.slice(0, 3) : lbl,
+        value: trend.values[idx]
+      })));
+    } catch (err) {
+      console.error('Failed to load trend data:', err);
+    }
+  };
+
+  const loadCustomerOptions = async () => {
+    if (!user) return;
+    try {
+      const params: any = { area: 'Semua Area' };
+      if (area !== 'Semua Area') params.area = area;
+      if (sales !== 'Semua Sales') params.salesName = sales;
+      const res = await api.get('/customers', { params });
+      const cOptions = ['Semua Customer', ...res.data.data.map((c: any) => c.namaCustomer)];
+      setCustomerOptions(cOptions);
+      if (!cOptions.includes(customer)) {
+        setCustomer('Semua Customer');
+      }
+    } catch (err) {
+      console.error('Failed to load customer options:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadCustomerOptions();
+  }, [user, area, sales]);
+
+  useEffect(() => {
+    loadData();
+  }, [user, appliedArea, appliedSales, appliedCustomer, refreshKey]);
+
+  useEffect(() => {
+    loadTransactions();
+    loadTrendData();
+  }, [user, appliedArea, appliedSales, appliedCustomer, refreshKey, chartPeriode, chartJenisData]);
 
   const handleFilter = () => {
     setAppliedArea(area);
     setAppliedSales(sales);
     setAppliedCustomer(customer);
+    setRefreshKey(prev => prev + 1);
   };
+
+  const isAllCustomers = appliedCustomer === 'Semua Customer';
+  const selectedCustomerData = (!isAllCustomers ? customersData.find(c => c.namaCustomer === appliedCustomer) : null) as any;
 
   const ActionButtons = (
     <button 
@@ -79,7 +240,7 @@ export const DistributorCustomerPage = () => {
               setSelectedCustomer(item);
               setIsCustomerModalOpen(true);
             }}
-            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors"
+            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors cursor-pointer"
           >
             <Eye size={16} /> Detail
           </button>
@@ -98,343 +259,238 @@ export const DistributorCustomerPage = () => {
     }
   };
 
-  const isAllCustomers = appliedCustomer === 'Semua Customer';
-  const isAllSales = appliedSales === 'Semua Sales';
-  const isAllArea = appliedArea === 'Semua Area';
-
-  const isSpecificCustomer = !isAllCustomers;
-  const isSpecificSalesOnly = !isAllSales && isAllCustomers;
-
-  const displayKpiData = useMemo(() => {
-    if (isSpecificSalesOnly) {
-      return supervisorCustomerKpiData.map(kpi => {
-        if (kpi.id === 1) return { ...kpi, title: 'Total Penjualan' };
-        if (kpi.id === 3) return { ...kpi, title: 'Total QTY Penjualan', description: 'Total qty pembelian customer yang ditangani sales terpilih', value: '4.800 Kg' };
-        return kpi;
-      });
-    }
-    if (isSpecificCustomer) {
-      return supervisorCustomerKpiData.map(kpi => {
-        if (kpi.id === 1) return { ...kpi, value: 'Rp 20 Jt' };
-        if (kpi.id === 2) return { ...kpi, value: '300 Transaksi' };
-        if (kpi.id === 3) return { ...kpi, title: 'Total Qty Penjualan', description: 'Total qty pembelian customer terpilih', value: '45 Kg' };
-        return kpi;
-      });
-    }
-    return supervisorCustomerKpiData; // Default: Total Penjualan, Total Transaksi, Total Customer
-  }, [isSpecificSalesOnly, isSpecificCustomer]);
-
-  const displayCustomersTable = useMemo(() => {
-    if (isSpecificSalesOnly) {
-      return supervisorCustomerTableData.filter(c => c.sales === appliedSales);
-    }
-    return supervisorCustomerTableData;
-  }, [isSpecificSalesOnly, appliedSales]);
-
-  const displayTransactions = useMemo(() => {
-    if (isSpecificCustomer) {
-      return supervisorTransactionTableData.map(t => ({ ...t, customer: appliedCustomer }));
-    }
-    if (isSpecificSalesOnly) {
-      const allowedCustomers = supervisorCustomerTableData.filter(c => c.sales === appliedSales).map(c => c.namaCustomer);
-      return supervisorTransactionTableData.filter(t => allowedCustomers.includes(t.customer));
-    }
-    return supervisorTransactionTableData;
-  }, [isSpecificCustomer, isSpecificSalesOnly, appliedCustomer, appliedSales]);
-
-  const displayTopProducts = useMemo(() => {
-    if (isSpecificSalesOnly) {
-      return salesTopProductsData.map(item => ({
-        ...item,
-        value: item.value * 0.8,
-        label: `Rp ${(item.value * 0.8 / 1000000).toFixed(0)} Jt`
-      }));
-    }
-    if (isSpecificCustomer) {
-      return salesTopProductsData.map(item => ({
-        ...item,
-        value: item.value * 0.3,
-        label: `Rp ${(item.value * 0.3 / 1000000).toFixed(0)} Jt`
-      }));
-    }
-    return salesTopProductsData;
-  }, [isSpecificSalesOnly, isSpecificCustomer]);
-
-  const dynamicChartData = useMemo(() => {
-    if (chartPeriode === 'Hari') {
-      const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-      return days.map(d => ({
-        date: d,
-        value: Math.floor(100000000 + Math.random() * 200000000) / (chartJenisData === 'Total Qty' ? 10000 : 1)
-      }));
-    } else if (chartPeriode === 'Minggu') {
-      const weeks = ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'];
-      return weeks.map(w => ({
-        date: w,
-        value: Math.floor(200000000 + Math.random() * 300000000) / (chartJenisData === 'Total Qty' ? 10000 : 1)
-      }));
-    } else if (chartPeriode === 'Bulan') {
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
-      return months.map(m => ({
-        date: m,
-        value: Math.floor(400000000 + Math.random() * 600000000) / (chartJenisData === 'Total Qty' ? 10000 : 1)
-      }));
-    } else if (chartPeriode === 'Tahun') {
-      const years = ['2023', '2024', '2025', '2026'];
-      return years.map(y => ({
-        date: y,
-        value: Math.floor(400000000 + Math.random() * 600000000) / (chartJenisData === 'Total Qty' ? 10000 : 1)
-      }));
-    }
-    return salesChartData;
-  }, [chartPeriode, chartJenisData]);
-
-  const selectedCustomerData = (supervisorCustomerTableData.find(c => c.namaCustomer === appliedCustomer) || supervisorCustomerTableData[0]) as any;
+  const distributorMenuItems = [
+    { name: 'Dashboard', icon: LayoutDashboard, path: '/distributor-dashboard' },
+    { name: 'Supervisor', icon: User, path: '/distributor-dashboard/supervisor' },
+    { name: 'Sales', icon: Briefcase, path: '/distributor-dashboard/sales' },
+    { name: 'Customer', icon: Users, path: '/distributor-dashboard/customer' },
+    { name: 'Target Sales', icon: Target, path: '/distributor-dashboard/target-sales' },
+  ];
 
   return (
-    <>
-      <MainLayout sidebarItems={distributorMenuItems}>
-      <LoadingOverlay isLoading={isLoading} />
-        <Topbar title="Customer" subtitle="Pantau customer yang dikelola oleh tim sales di bawah naungan distributor." actionButton={ActionButtons} />
+    <MainLayout sidebarItems={distributorMenuItems}>
+      <Topbar title="Customer Sales" subtitle={`Selamat datang, ${user?.name || ''}`} actionButton={ActionButtons} />
 
-        <div className="px-8 pb-10">
-          
-          {/* Filter Section */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
-              <div className="col-span-2">
-                <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <input 
+      <div className="px-8 pb-10">
+        
+        {/* Filter Section */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
+            <div className="lg:col-span-2">
+              <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <input 
                     type="date" 
                     value={periodeAwal} 
-                    onChange={(e) => {
-                      setPeriodeAwal(e.target.value);
-                      setIsLoading(true);
-                      setTimeout(() => setIsLoading(false), 500);
-                    }} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b0764] focus:border-transparent h-[42px] text-gray-700" 
+                    onChange={(e) => setPeriodeAwal(e.target.value)} 
+                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                   />
-                  </div>
-                  <span className="text-gray-400 font-bold">-</span>
-                  <div className="flex-1">
-                    <input 
+                </div>
+                <span className="text-gray-400 font-bold">-</span>
+                <div className="flex-1">
+                  <input 
                     type="date" 
                     value={periodeAkhir} 
-                    onChange={(e) => {
-                      setPeriodeAkhir(e.target.value);
-                      setIsLoading(true);
-                      setTimeout(() => setIsLoading(false), 500);
-                    }} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b0764] focus:border-transparent h-[42px] text-gray-700" 
+                    onChange={(e) => setPeriodeAkhir(e.target.value)} 
+                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                   />
-                  </div>
                 </div>
               </div>
-              
-              <div className="col-span-1">
+            </div>
+
+            <div>
+              <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
+              <CustomSelect 
+                value={area} 
+                onChange={(val) => { setArea(val); setAppliedArea(val); }} 
+                options={areaOptions} 
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
+              <CustomSelect 
+                value={sales} 
+                onChange={(val) => { setSales(val); setAppliedSales(val); }} 
+                options={salesOptions} 
+                showSearch={true}
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm text-[#475569] font-medium mb-2">Customer</label>
+              <CustomSelect 
+                value={customer} 
+                onChange={(val) => { setCustomer(val); setAppliedCustomer(val); }} 
+                options={customerOptions} 
+                showSearch={true}
+              />
+            </div>
+            
+            
+          </div>
+        </div>
+
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {kpis.map((kpi) => {
+            if (isAllCustomers) return <KpiCard key={kpi.id} {...kpi} />;
+            
+            if (kpi.id === 1) {
+              return <KpiCard key={kpi.id} {...kpi} value={selectedCustomerData?.totalPenjualan || 'Rp 0 Jt'} description="Total penjualan untuk customer terpilih" />;
+            }
+            if (kpi.id === 2) {
+              return <KpiCard key={kpi.id} {...kpi} value={selectedCustomerData?.totalTransaksi ? `${selectedCustomerData.totalTransaksi} Transaksi` : '0 Transaksi'} description="Total transaksi untuk customer terpilih" />;
+            }
+            if (kpi.id === 3) {
+              return <KpiCard key={kpi.id} {...kpi} title="Total QTY (Kg)" value={selectedCustomerData?.totalQty || '0 Kg'} description="Total qty penjualan untuk customer terpilih" />;
+            }
+            
+            return <KpiCard key={kpi.id} {...kpi} />;
+          })}
+        </div>
+
+        {/* Customer Info or Table */}
+        {isAllCustomers ? (
+          <DataTable
+            title="Tabel Customer"
+            columns={customerColumns}
+            data={customersData}
+            renderCell={renderCustomerCell}
+          />
+        ) : (
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
+            <h3 className="text-gray-600 text-[18px] font-medium mb-6">Informasi Customer</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+              <div>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Nama Customer</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <User size={18} />
+                  </div>
+                  <input type="text" value={selectedCustomerData?.namaCustomer || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                </div>
+              </div>
+              <div>
                 <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
-                <CustomSelect 
-                  value={area} 
-                  onChange={(val) => {
-                  setArea(val);
-                  setIsLoading(true);
-                  setTimeout(() => setIsLoading(false), 500);
-                }} 
-                  options={['Semua Area', 'Bandung', 'Cirebon', 'Kuningan']} 
-                  showSearch={true}
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <Map size={18} />
+                  </div>
+                  <input type="text" value={selectedCustomerData?.area || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                </div>
               </div>
-
-              <div className="col-span-1">
-                <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
-                <CustomSelect 
-                  value={sales} 
-                  onChange={(val) => {
-                    setSales(val);
-                    setAppliedSales(val);
-                    if (val !== 'Semua Sales') {
-                      setCustomer('Semua Customer');
-                      setAppliedCustomer('Semua Customer');
-                    }
-                  }} 
-                  options={['Semua Sales', 'Budi', 'Fransiskus', 'Andi', 'Citra']} 
-                  showSearch={true}
-                />
+              <div>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Sales yang Menangani</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <Users size={18} />
+                  </div>
+                  <input type="text" value={selectedCustomerData?.sales || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                </div>
               </div>
-
-              <div className="col-span-1">
-                <label className="block text-sm text-[#475569] font-medium mb-2">Customer</label>
-                <CustomSelect 
-                  value={customer} 
-                  onChange={(val) => {
-                    setCustomer(val);
-                    setAppliedCustomer(val);
-                  }} 
-                  options={['Semua Customer', 'TB Bangun Jaya', 'CV Sinar Mas', 'TB Toko Sejati', 'TB Sejahtera', 'CV Cirebon I']} 
-                  showSearch={true}
-                />
+              <div>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Alamat</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <MapPin size={18} />
+                  </div>
+                  <input type="text" value={selectedCustomerData?.alamat || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                </div>
               </div>
-              
-              
-            </div>
-          </div>
-
-          {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {displayKpiData.map((kpi) => (
-              <KpiCard key={kpi.id} {...kpi} />
-            ))}
-          </div>
-
-          {/* Table Customer */}
-          {isSpecificCustomer ? (
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-              <h3 className="text-gray-600 text-[18px] font-medium mb-6">Informasi Customer</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
-                <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Nama Customer</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                      <User size={18} />
-                    </div>
-                    <input type="text" value={selectedCustomerData?.namaCustomer || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+              <div>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Total Transaksi</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <Receipt size={18} />
                   </div>
+                  <input type="text" value={selectedCustomerData?.totalTransaksi ? `${selectedCustomerData.totalTransaksi} Transaksi` : ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
-                <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                      <Map size={18} />
-                    </div>
-                    <input type="text" value={selectedCustomerData?.area || 'Bandung'} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+              </div>
+              <div>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Total Penjualan</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <Wallet size={18} />
                   </div>
+                  <input type="text" value={selectedCustomerData?.totalPenjualan || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
-                <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Sales yang Menangani</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                      <Users size={18} />
-                    </div>
-                    <input type="text" value={selectedCustomerData?.sales || 'Budi'} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+              </div>
+              <div>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Total QTY</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <Package size={18} />
                   </div>
+                  <input type="text" value={selectedCustomerData?.totalQty || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
-                <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Alamat</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                      <MapPin size={18} />
-                    </div>
-                    <input type="text" value={selectedCustomerData?.alamat || 'Jl. Moh Toha No.18'} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+              </div>
+              <div>
+                <label className="block text-sm text-[#475569] font-medium mb-2">Transaksi Terakhir</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <CalendarClock size={18} />
                   </div>
-                </div>
-                <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Total Transaksi</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                      <Receipt size={18} />
-                    </div>
-                    <input type="text" value={selectedCustomerData?.totalTransaksi ? `${selectedCustomerData.totalTransaksi} Transaksi` : ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Total Penjualan</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                      <Wallet size={18} />
-                    </div>
-                    <input type="text" value={selectedCustomerData?.totalPenjualan || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Total QTY</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                      <Package size={18} />
-                    </div>
-                    <input type="text" value={selectedCustomerData?.totalQty || '230 Kg'} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Transaksi Terakhir</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                      <CalendarClock size={18} />
-                    </div>
-                    <input type="text" value={selectedCustomerData?.transaksiTerakhir || '13 Juli 2026'} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
-                  </div>
+                  <input type="text" value={selectedCustomerData?.transaksiTerakhir || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
             </div>
-          ) : (
-            <DataTable
-              title="Tabel Keseluruhan Customer Berdasarkan Total Penjualan"
-              columns={customerColumns}
-              data={displayCustomersTable}
-              renderCell={renderCustomerCell}
-            />
-          )}
-
-          {/* Tren Pembelian Customer */}
-          <div className="mb-8">
-            <ChartCard 
-              data={dynamicChartData} 
-              title={
-                isSpecificCustomer 
-                  ? `Tren Pembelian Customer ${appliedCustomer}` 
-                  : isSpecificSalesOnly
-                    ? `Tren Pembelian Keseluruhan Customer yang ditangani ${appliedSales}`
-                    : "Tren Pembelian Keseluruhan Customer"
-              }
-              jenisData={chartJenisData}
-              setJenisData={setChartJenisData}
-              periode={chartPeriode}
-              setPeriode={setChartPeriode}
-              filterAktifLabel={`${periodeAwal} - ${periodeAkhir}`}
-            />
           </div>
+        )}
 
-          {/* Top 10 Produk */}
-          <TopProductsCard 
-            data={displayTopProducts} 
+        {/* Tren Pembelian Customer */}
+        <div className="mb-8 mt-8">
+          <ChartCard 
+            data={trendData} 
             title={
-              isSpecificCustomer 
+              !isAllCustomers 
+                ? `Tren Pembelian Customer ${appliedCustomer}` 
+                : appliedSales !== 'Semua Sales'
+                  ? `Tren Pembelian Keseluruhan Customer yang ditangani ${appliedSales}`
+                  : "Tren Pembelian Keseluruhan Customer"
+            }
+            jenisData={chartJenisData}
+            setJenisData={setChartJenisData}
+            periode={chartPeriode}
+            setPeriode={setChartPeriode}
+            filterAktifLabel={`${periodeAwal} - ${periodeAkhir}`}
+          />
+        </div>
+
+        {/* Top 10 Produk */}
+        <div className="mb-8">
+          <TopProductsCard 
+            data={topProducts} 
+            title={
+              !isAllCustomers 
                 ? `Top 10 Produk Terlaris Penjualan Customer ${appliedCustomer}`
-                : isSpecificSalesOnly
+                : appliedSales !== 'Semua Sales'
                   ? `Top 10 Produk Terlaris Penjualan Keseluruhan Customer yang ditangani ${appliedSales}`
                   : "Top 10 Produk Terlaris Penjualan Keseluruhan Customer"
             } 
           />
-
-          {/* Table Transaksi */}
-          <DataTable
-            title={
-              isSpecificCustomer 
-                ? `Tabel Transaksi Customer ${appliedCustomer}`
-                : isSpecificSalesOnly
-                  ? `Tabel Transaksi Seluruh Customer yang ditangani ${appliedSales}`
-                  : "Tabel Transaksi Seluruh Customer"
-            }
-            columns={transactionColumns}
-            data={displayTransactions}
-            renderCell={renderTransactionCell}
-          />
-
         </div>
-      </MainLayout>
 
+        {/* Table Transaksi */}
+        <DataTable
+          title={isAllCustomers ? "Tabel Transaksi Seluruh Customer" : "Tabel Transaksi Customer Terpilih"}
+          columns={transactionColumns}
+          data={transactionsData}
+          renderCell={renderTransactionCell}
+        />
+
+      </div>
       <ExportModal 
         isOpen={isExportModalOpen} 
         onClose={() => setIsExportModalOpen(false)} 
-        fileName="Data_Customer.xlsx" 
+        fileName="Data_Customer_Distributor.xlsx" 
       />
-
       <CustomerModal 
         isOpen={isCustomerModalOpen}
         onClose={() => setIsCustomerModalOpen(false)}
         data={selectedCustomer}
       />
-    </>
+    </MainLayout>
   );
 };
