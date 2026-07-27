@@ -39,7 +39,7 @@ export const LoginPage = () => {
     setError('');
 
     if (!email) {
-      setError('Email perusahaan tidak boleh kosong');
+      setError('Username atau email tidak boleh kosong');
       return;
     }
     if (!password) {
@@ -254,17 +254,17 @@ export const LoginPage = () => {
                 {/* Email Input */}
                 <div className={clsx("space-y-1.5 start-item-hidden w-full", isMounted && "item-reveal-2")}>
                   <label className="text-[13px] font-semibold ml-1" style={{ color: '#464255' }}>
-                    Email
+                    Username atau Email
                   </label>
                   <div className="relative group/input">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-colors group-focus-within/input:text-[#3b0764]">
                       <Mail size={18} strokeWidth={2.5} />
                     </div>
                     <input
-                      type="email"
+                      type="text"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="admin@iwpaint.com"
+                      placeholder="contoh@perusahaan.com atau username"
                       className={clsx(
                         "w-full pl-11 pr-4 py-3.5 bg-white border rounded-2xl outline-none transition-all duration-300 font-medium text-[14px]",
                         error && !email 

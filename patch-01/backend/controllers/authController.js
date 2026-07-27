@@ -8,7 +8,7 @@ async function login(req, res, next) {
       return res.status(400).json({ message: "Email dan password wajib diisi." });
     }
 
-    const [rows] = await pool.query("SELECT * FROM users WHERE email = ? LIMIT 1", [email]);
+    const [rows] = await pool.query("SELECT * FROM users WHERE email = ? OR username = ? LIMIT 1", [email, email]);
 
     if (rows.length === 0) {
       return res.status(404).json({ message: "Akun tidak terdaftar dalam sistem." });
