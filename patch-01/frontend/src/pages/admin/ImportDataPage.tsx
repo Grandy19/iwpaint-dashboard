@@ -86,6 +86,26 @@ export const ImportDataPage = () => {
     }
   };
 
+  const filteredHistoryData = historyData.filter((item) => {
+    if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+    if (status !== 'Semua Status') {
+      const isSuccess = item.status === 'success' || item.status === 'Berhasil';
+      if (status === 'Berhasil' && !isSuccess) return false;
+      if (status === 'Gagal' && isSuccess) return false;
+    }
+    const rowDate = new Date(item.date);
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
+    if (rowDate < start || rowDate > end) {
+      return false;
+    }
+    return true;
+  });
+
   return (
     <MainLayout>
       <Topbar 
@@ -142,7 +162,7 @@ export const ImportDataPage = () => {
               <CustomSelect 
                 value={status} 
                 onChange={setStatus} 
-                options={['Berhasil', 'Gagal', 'Semua Status']} 
+                options={['Semua Status', 'Berhasil', 'Gagal']} 
               />
             </div>
 
@@ -169,7 +189,7 @@ export const ImportDataPage = () => {
         <DataTable
           title="Tabel Riwayat Import"
           columns={historyImportColumns}
-          data={historyData}
+          data={filteredHistoryData}
           renderCell={renderHistoryCell}
         />
       </div>

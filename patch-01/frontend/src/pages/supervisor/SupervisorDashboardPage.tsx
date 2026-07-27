@@ -188,12 +188,11 @@ export const SupervisorDashboardPage = () => {
 
   useEffect(() => {
     loadData();
-    loadTrendData();
-  }, [user]);
+  }, [user, periodeAwal, periodeAkhir, kategoriProduk]);
 
   useEffect(() => {
     loadTrendData();
-  }, [chartPeriode, chartJenisData]);
+  }, [user, chartPeriode, chartJenisData, periodeAwal, periodeAkhir, kategoriProduk]);
 
   const ActionButtons = (
     <button 

@@ -99,7 +99,7 @@ export const DistributorSalesPage = () => {
 
   useEffect(() => {
     loadData();
-  }, [user]);
+  }, [user, periodeAwal, periodeAkhir, supervisor, sales]);
 
   const isAllSales = sales === 'Semua Sales';
   const selectedSalesData = (!isAllSales ? salesData.find(s => s.namaSales === sales) : null) as any;
@@ -322,7 +322,7 @@ export const DistributorSalesPage = () => {
       <SalesModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        mode="detail"
+        mode="view_only"
         data={selectedSales}
       />
     </MainLayout>

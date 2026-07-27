@@ -248,11 +248,11 @@ export const DistributorDashboardPage = () => {
 
   useEffect(() => {
     loadTrendData();
-  }, [user, chartPeriode, chartJenisData]);
+  }, [user, chartPeriode, chartJenisData, periodeAwal, periodeAkhir, kategoriProduk]);
 
   useEffect(() => {
     loadData();
-  }, [user]);
+  }, [user, periodeAwal, periodeAkhir, kategoriProduk]);
 
   const ActionButtons = (
     <button 

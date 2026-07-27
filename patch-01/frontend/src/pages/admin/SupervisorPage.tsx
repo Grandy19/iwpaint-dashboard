@@ -609,6 +609,14 @@ export const SupervisorPage = () => {
           </div>
         </div>
       )}
+
+      <SupervisorModal
+        isOpen={isSupervisorModalOpen}
+        onClose={() => setIsSupervisorModalOpen(false)}
+        mode="edit"
+        data={selectedSupervisor}
+        onSave={handleCreateOrUpdateModal}
+      />
     </>
   );
 };

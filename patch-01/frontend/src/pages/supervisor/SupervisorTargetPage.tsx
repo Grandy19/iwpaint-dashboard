@@ -265,10 +265,19 @@ export const SupervisorTargetPage = () => {
         return (
           <button 
             onClick={async () => {
-              // Get details
-              const usersRes = await api.get(`/users?role=sales&name=${item.sales}`);
-              if (usersRes.data.data.length > 0) {
-                setSelectedSalesData(usersRes.data.data[0]);
+              const usersRes = await api.get('/users?role=sales');
+              const foundUser = usersRes.data.data.find((u: any) => u.namaSales === item.sales);
+              if (foundUser) {
+                const modalData = {
+                  sales: item.sales,
+                  area: foundUser.area,
+                  supervisor: foundUser.supervisor,
+                  target: item.totalTarget,
+                  realisasi: item.totalRealisasi,
+                  pencapaian: `${item.percentage}%`,
+                  status: item.percentage >= 100 ? 'Tercapai' : 'Belum Tercapai'
+                };
+                setSelectedSalesData(modalData);
                 setShowSalesModal(true);
               }
             }}
@@ -413,7 +422,7 @@ export const SupervisorTargetPage = () => {
       <SalesModal
         isOpen={showSalesModal}
         onClose={() => setShowSalesModal(false)}
-        mode="detail"
+        mode="view_target"
         data={selectedSalesData}
       />
     </MainLayout>

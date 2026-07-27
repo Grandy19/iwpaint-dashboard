@@ -183,12 +183,12 @@ export const DistributorCustomerPage = () => {
 
   useEffect(() => {
     loadData();
-  }, [user, appliedArea, appliedSales, appliedCustomer, refreshKey]);
+  }, [user, appliedArea, appliedSales, appliedCustomer, refreshKey, periodeAwal, periodeAkhir]);
 
   useEffect(() => {
     loadTransactions();
     loadTrendData();
-  }, [user, appliedArea, appliedSales, appliedCustomer, refreshKey, chartPeriode, chartJenisData]);
+  }, [user, appliedArea, appliedSales, appliedCustomer, refreshKey, chartPeriode, chartJenisData, periodeAwal, periodeAkhir]);
 
   const handleFilter = () => {
     setAppliedArea(area);

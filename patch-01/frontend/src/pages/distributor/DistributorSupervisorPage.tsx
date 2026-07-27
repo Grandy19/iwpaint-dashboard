@@ -108,7 +108,7 @@ export const DistributorSupervisorPage = () => {
 
   useEffect(() => {
     loadData();
-  }, [user]);
+  }, [user, periodeAwal, periodeAkhir, area, supervisor]);
 
   const ActionButtons = (
     <button className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
@@ -247,7 +247,7 @@ export const DistributorSupervisorPage = () => {
       <SupervisorModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        mode="detail"
+        mode="view_only"
         data={selectedSupervisor}
       />
     </MainLayout>

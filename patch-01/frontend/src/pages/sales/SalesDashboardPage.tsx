@@ -178,11 +178,11 @@ export const SalesDashboardPage = () => {
 
   useEffect(() => {
     loadData();
-  }, [user]);
+  }, [user, periodeAwal, periodeAkhir, kategoriProduk]);
 
   useEffect(() => {
     loadTrendData();
-  }, [user, chartPeriode, chartJenisData]);
+  }, [user, chartPeriode, chartJenisData, periodeAwal, periodeAkhir, kategoriProduk]);
 
   const ActionButtons = (
     <button 

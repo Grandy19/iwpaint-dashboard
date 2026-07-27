@@ -227,7 +227,7 @@ export const DistributorTargetSalesPage = () => {
 
   useEffect(() => {
     loadData();
-  }, [user, appliedArea, appliedSupervisor, refreshKey]);
+  }, [user, appliedArea, appliedSupervisor, refreshKey, periodeAwal, periodeAkhir]);
 
   const handleFilter = () => {
     setAppliedArea(area);

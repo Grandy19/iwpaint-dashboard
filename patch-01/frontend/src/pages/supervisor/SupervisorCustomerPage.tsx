@@ -172,15 +172,15 @@ export const SupervisorCustomerPage = () => {
 
   useEffect(() => {
     loadData();
-  }, [user, appliedSales, appliedCustomer, refreshKey]);
+  }, [user, appliedSales, appliedCustomer, refreshKey, periodeAwal, periodeAkhir]);
 
   useEffect(() => {
     loadTransactions();
-  }, [user, appliedSales, appliedCustomer, refreshKey]);
+  }, [user, appliedSales, appliedCustomer, refreshKey, periodeAwal, periodeAkhir]);
 
   useEffect(() => {
     loadTrendData();
-  }, [user, appliedSales, appliedCustomer, chartPeriode, chartJenisData, refreshKey]);
+  }, [user, appliedSales, appliedCustomer, chartPeriode, chartJenisData, refreshKey, periodeAwal, periodeAkhir]);
 
   const handleFilter = () => {
     setAppliedSales(sales);
