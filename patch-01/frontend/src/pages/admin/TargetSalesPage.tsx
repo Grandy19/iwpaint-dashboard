@@ -11,8 +11,13 @@ import { ExportModal } from '../../components/ui/ExportModal';
 import api from '../../utils/api';
 
 export const TargetSalesPage = () => {
-  const [startDate, setStartDate] = useState('2026-01-01');
-  const [endDate, setEndDate] = useState('2026-12-31');
+  const monthNamesInd = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+  const now = new Date();
+  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+  const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
+
+  const [startDate, setStartDate] = useState(currentMonthStart);
+  const [endDate, setEndDate] = useState(currentMonthEnd);
   const [area, setArea] = useState('Semua Area');
   const [salesName, setSalesName] = useState('Semua Sales');
 
@@ -36,9 +41,9 @@ export const TargetSalesPage = () => {
   const loadData = async () => {
     try {
       const dateObj = new Date(startDate);
-      const targetYear = dateObj.getFullYear() || 2026;
+      const targetYear = dateObj.getFullYear() || now.getFullYear();
       const monthNamesInd = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-      const targetMonthName = monthNamesInd[dateObj.getMonth()] || "Juli";
+      const targetMonthName = monthNamesInd[dateObj.getMonth()] || monthNamesInd[now.getMonth()];
 
       // Get targets from backend
       const params: any = { 

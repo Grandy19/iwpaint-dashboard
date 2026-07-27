@@ -24,6 +24,8 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   // Utility to format number as Rupiah
   const formatRupiah = (val: string) => {
@@ -41,6 +43,7 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
 
   useEffect(() => {
     if (isOpen) {
+      setErrorMessage('');
       if (mode === 'edit' && data) {
         setArea(data.area !== '-' ? data.area : 'Semua Area');
         setSalesName(data.sales);
@@ -58,11 +61,11 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
         setAutomotive(expandJt(data.automotive));
         setIndustri(expandJt(data.industri));
       } else {
-        // Create mode: clear data
+        // Create mode: clear data and default to first sales option if available
         setTahun('2026');
         setBulan('Juli');
         setArea('Semua Area');
-        setSalesName('Semua Sales');
+        setSalesName(salesList[0] || 'Semua Sales');
         setDecorative('');
         setAutomotive('');
         setIndustri('');
@@ -70,7 +73,7 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
       setShowConfirm(false);
       setShowSuccess(false);
     }
-  }, [isOpen, mode, data]);
+  }, [isOpen, mode, data, salesList]);
 
   // Calculate total automatically
   useEffect(() => {
@@ -90,18 +93,33 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
     setShowConfirm(true);
   };
 
-  const handleConfirmSimpan = () => {
+  const handleConfirmSimpan = async () => {
+    if (salesName === 'Semua Sales') {
+      setErrorMessage('Pilih sales terlebih dahulu sebelum menyimpan target.');
+      setShowConfirm(false);
+      return;
+    }
+
     setShowConfirm(false);
-    setShowSuccess(true);
-    
-    setTimeout(() => {
-      const resultData = { ...data, area, sales: salesName, decorative, automotive, industri, totalTarget, tahun, bulan };
+    setIsSaving(true);
+    setErrorMessage('');
+
+    try {
+      const resultData = { ...(data || {}), area, sales: salesName, decorative, automotive, industri, totalTarget, tahun, bulan };
       if (onSave) {
-        onSave(resultData);
+        await onSave(resultData);
       }
-      setShowSuccess(false);
-      onClose();
-    }, 1500);
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        onClose();
+      }, 1500);
+    } catch (err) {
+      console.error('Failed to save target:', err);
+      setErrorMessage('Gagal menyimpan target. Silakan coba lagi.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -212,10 +230,14 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-center pt-2">
+          <div className="flex flex-col items-center justify-center pt-2 gap-3">
+            {errorMessage && (
+              <div className="text-sm text-red-600">{errorMessage}</div>
+            )}
             <button 
               onClick={handleSimpanClick}
-              className="w-[200px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+              disabled={isSaving}
+              className="w-[200px] bg-[#52b788] hover:bg-[#40916c] disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
             >
               <Save size={18} />
               Simpan

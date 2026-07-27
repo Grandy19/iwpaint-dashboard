@@ -1,4 +1,4 @@
-﻿-- phpMyAdmin SQL Dump
+-- phpMyAdmin SQL Dump
 -- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
@@ -15,12 +15,12 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `iwpaint2`
 --
-CREATE DATABASE IF NOT EXISTS `iwpaint2` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE DATABASE IF NOT EXISTS `iwpaint2` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `iwpaint2`;
 
 -- --------------------------------------------------------
@@ -33,7 +33,7 @@ CREATE TABLE `dim_distributors` (
   `id` int NOT NULL,
   `kode_distributor` varchar(10) NOT NULL,
   `nama_distributor` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `dim_distributors`
@@ -61,7 +61,7 @@ CREATE TABLE `dim_gudang` (
   `kode_gudang` varchar(20) NOT NULL,
   `nama_gudang` varchar(150) NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `dim_gudang`
@@ -90,7 +90,7 @@ CREATE TABLE `dim_products` (
   `kategori` varchar(100) DEFAULT NULL,
   `berat` double DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `dim_products`
@@ -923,7 +923,7 @@ CREATE TABLE `dim_salesman` (
   `kode_salesman` varchar(20) NOT NULL,
   `nama_salesman` varchar(150) NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `dim_salesman`
@@ -959,7 +959,7 @@ CREATE TABLE `dim_supplier` (
   `kode_supplier` varchar(50) NOT NULL,
   `nama_supplier` varchar(150) NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `dim_supplier`
@@ -982,7 +982,7 @@ CREATE TABLE `fact_distributor_targets` (
   `distributor_id` int DEFAULT NULL,
   `target_value` decimal(15,2) DEFAULT '0.00',
   `acv_score` decimal(5,2) DEFAULT '0.00'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `fact_distributor_targets`
@@ -1032,7 +1032,7 @@ CREATE TABLE `fact_sales` (
   `kode_suplier` varchar(50) DEFAULT NULL,
   `nama_suplier` varchar(150) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `fact_sales`
@@ -8781,7 +8781,7 @@ CREATE TABLE `fact_targets` (
   `target_auto` decimal(15,2) DEFAULT '0.00',
   `target_ind` decimal(15,2) DEFAULT '0.00',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `fact_targets`
@@ -8812,7 +8812,7 @@ CREATE TABLE `upload_logs` (
   `total_rows` int NOT NULL DEFAULT '0',
   `processed_rows` int NOT NULL DEFAULT '0',
   `uploaded_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `upload_logs`
@@ -8871,7 +8871,7 @@ CREATE TABLE `users` (
   `tanggal_bergabung` date DEFAULT NULL,
   `kode_salesman` varchar(20) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
@@ -8989,7 +8989,7 @@ CREATE TABLE `vw_tren_penjualan` (
 --
 DROP TABLE IF EXISTS `vw_distribusi_kategori`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_distribusi_kategori`  AS SELECT coalesce(`p`.`kategori`,'UNKNOWN') AS `kategori`, coalesce(sum(`f`.`netto`),0) AS `total_netto` FROM (`fact_sales` `f` left join `dim_products` `p` on(((`p`.`id` = `f`.`product_id`) or (`p`.`kode_produk` = `f`.`kode_barang`)))) GROUP BY `p`.`kategori` ORDER BY `total_netto` DESC  ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_distribusi_kategori`  AS SELECT coalesce(`p`.`kategori`,'UNKNOWN') AS `kategori`, coalesce(sum(`f`.`netto`),0) AS `total_netto` FROM (`fact_sales` `f` left join `dim_products` `p` on(((`p`.`id` = `f`.`product_id`) or (`p`.`kode_produk` = `f`.`kode_barang`)))) GROUP BY `p`.`kategori` ORDER BY `total_netto` AS `DESCdesc` ASC  ;
 
 -- --------------------------------------------------------
 
@@ -8998,7 +8998,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vw_penjualan_per_sales`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_penjualan_per_sales`  AS SELECT coalesce(`f`.`nama_salesman`,`f`.`kode_salesman`,'UNKNOWN') AS `nama_salesman`, sum(`f`.`netto`) AS `total_penjualan` FROM `fact_sales` AS `f` GROUP BY `f`.`nama_salesman` ORDER BY `total_penjualan` DESC  ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_penjualan_per_sales`  AS SELECT coalesce(`f`.`nama_salesman`,`f`.`kode_salesman`,'UNKNOWN') AS `nama_salesman`, sum(`f`.`netto`) AS `total_penjualan` FROM `fact_sales` AS `f` GROUP BY `f`.`nama_salesman` ORDER BY `total_penjualan` AS `DESCdesc` ASC  ;
 
 -- --------------------------------------------------------
 
@@ -9016,7 +9016,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vw_total_penjualan`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_total_penjualan`  AS SELECT coalesce(sum(`fact_sales`.`netto`),0) AS `total_penjualan` FROM `fact_sales`  ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_total_penjualan`  AS SELECT coalesce(sum(`fact_sales`.`netto`),0) AS `total_penjualan` FROM `fact_sales``fact_sales`  ;
 
 -- --------------------------------------------------------
 
@@ -9025,7 +9025,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vw_total_qty`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_total_qty`  AS SELECT coalesce(sum(`fact_sales`.`qty`),0) AS `total_qty` FROM `fact_sales`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_total_qty`  AS SELECT coalesce(sum(`fact_sales`.`qty`),0) AS `total_qty` FROM `fact_sales``fact_sales`  ;
 
 -- --------------------------------------------------------
 
@@ -9034,7 +9034,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vw_total_transaksi`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_total_transaksi`  AS SELECT count(distinct coalesce(`fact_sales`.`nofaktur`,'')) AS `total_transaksi` FROM `fact_sales`  ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_total_transaksi`  AS SELECT count(distinct coalesce(`fact_sales`.`nofaktur`,'')) AS `total_transaksi` FROM `fact_sales``fact_sales`  ;
 
 -- --------------------------------------------------------
 
@@ -9207,4 +9207,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
