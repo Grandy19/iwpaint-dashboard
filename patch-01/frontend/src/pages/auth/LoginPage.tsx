@@ -50,7 +50,7 @@ export const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      await login(email, password);
+      await login(email.trim(), password);
 
       // Trigger exit animation
       setIsExiting(true);
