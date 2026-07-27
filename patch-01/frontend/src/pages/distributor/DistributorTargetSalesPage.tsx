@@ -13,8 +13,8 @@ import api from '../../utils/api';
 
 export const DistributorTargetSalesPage = () => {
   const { user } = useAuth();
-  const [periodeAwal, setPeriodeAwal] = useState('2026-01-01');
-  const [periodeAkhir, setPeriodeAkhir] = useState('2026-12-31');
+  const [periodeAwal, setPeriodeAwal] = useState('2026-07-01');
+  const [periodeAkhir, setPeriodeAkhir] = useState('2026-06-30');
   const [area, setArea] = useState('Semua Area');
   const [supervisor, setSupervisor] = useState('Semua Supervisor');
   const [refreshKey, setRefreshKey] = useState(0);
@@ -317,7 +317,7 @@ export const DistributorTargetSalesPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
             <div className="md:col-span-2">
               <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
               <div className="flex items-center gap-3">

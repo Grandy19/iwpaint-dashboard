@@ -13,12 +13,12 @@ import api from '../../utils/api';
 
 export const SalesDashboardPage = () => {
   const { user } = useAuth();
-  const [periodeAwal, setPeriodeAwal] = useState('2026-01-01');
-  const [periodeAkhir, setPeriodeAkhir] = useState('2026-12-31');
+  const [periodeAwal, setPeriodeAwal] = useState('2026-07-01');
+  const [periodeAkhir, setPeriodeAkhir] = useState('2026-06-30');
   const [kategoriProduk, setKategoriProduk] = useState('Semua Kategori');
 
   const [chartJenisData, setChartJenisData] = useState('Total Penjualan');
-  const [chartPeriode, setChartPeriode] = useState('Bulan');
+  const [chartPeriode, setChartPeriode] = useState('2026-07-01');
 
   const [kpiData, setKpiData] = useState<any[]>([]);
   const [ringkasanTarget, setRingkasanTarget] = useState<any>({ percentage: 0, targetGlobal: 'Rp 0 Jt', realisasi: 'Rp 0 Jt', selisih: 'Rp 0 Jt' });

@@ -14,8 +14,8 @@ import api from '../../utils/api';
 
 export const DistributorCustomerPage = () => {
   const { user } = useAuth();
-  const [periodeAwal, setPeriodeAwal] = useState('2026-01-01');
-  const [periodeAkhir, setPeriodeAkhir] = useState('2026-12-31');
+  const [periodeAwal, setPeriodeAwal] = useState('2026-07-01');
+  const [periodeAkhir, setPeriodeAkhir] = useState('2026-06-30');
   const [area, setArea] = useState('Semua Area');
   const [sales, setSales] = useState('Semua Sales');
   const [customer, setCustomer] = useState('Semua Customer');
@@ -35,7 +35,7 @@ export const DistributorCustomerPage = () => {
   const [kpis, setKpis] = useState<any[]>([]);
   
   const [chartJenisData, setChartJenisData] = useState('Total Penjualan');
-  const [chartPeriode, setChartPeriode] = useState('Bulan');
+  const [chartPeriode, setChartPeriode] = useState('2026-07-01');
   const [trendData, setTrendData] = useState<any[]>([]);
   const [topProducts, setTopProducts] = useState<any[]>([]);
   

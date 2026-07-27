@@ -20,11 +20,11 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
     <>
       {/* Main Modal */}
       <div 
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px]"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4 sm:p-6 md:p-8"
         onClick={onClose}
       >
         <div 
-          className="bg-white rounded-2xl w-[800px] p-8 shadow-xl relative"
+          className="bg-white rounded-2xl w-[800px] max-h-[95vh] overflow-y-auto hide-scrollbar p-8 shadow-xl relative"
           onClick={(e) => e.stopPropagation()}
         >
           <button 
@@ -40,133 +40,133 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
             
             {/* Kolom Kiri */}
             {/* Nama Customer */}
             <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2">Nama Customer</label>
+              <label className="block text-[13px] text-[#475569] font-medium mb-2">Nama Customer</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <User size={18} />
+                  <User size={16} />
                 </div>
                 <input 
                   type="text" 
                   value={data?.namaCustomer || ''}
                   readOnly
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             {/* Area (Kolom Kanan) */}
             <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
+              <label className="block text-[13px] text-[#475569] font-medium mb-2">Area</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <Map size={18} />
+                  <Map size={16} />
                 </div>
                 <input 
                   type="text" 
                   value={data?.area || ''}
                   readOnly
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             {/* Sales yang Menangani */}
             <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2">Sales yang Menangani</label>
+              <label className="block text-[13px] text-[#475569] font-medium mb-2">Sales yang Menangani</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <Users size={18} />
+                  <Users size={16} />
                 </div>
                 <input 
                   type="text" 
                   value={data?.sales || ''}
                   readOnly
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             {/* Alamat */}
             <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2">Alamat</label>
+              <label className="block text-[13px] text-[#475569] font-medium mb-2">Alamat</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <MapPin size={18} />
+                  <MapPin size={16} />
                 </div>
                 <input 
                   type="text" 
                   value={alamat}
                   readOnly
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             {/* Total Transaksi */}
             <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2">Total Transaksi</label>
+              <label className="block text-[13px] text-[#475569] font-medium mb-2">Total Transaksi</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <Receipt size={18} />
+                  <Receipt size={16} />
                 </div>
                 <input 
                   type="text" 
                   value={totalTransaksiLabel}
                   readOnly
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             {/* Total Penjualan */}
             <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2">Total Penjualan</label>
+              <label className="block text-[13px] text-[#475569] font-medium mb-2">Total Penjualan</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <Wallet size={18} />
+                  <Wallet size={16} />
                 </div>
                 <input 
                   type="text" 
                   value={data?.totalPenjualan || ''}
                   readOnly
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             {/* Total QTY */}
             <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2">Total QTY</label>
+              <label className="block text-[13px] text-[#475569] font-medium mb-2">Total QTY</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <Package size={18} />
+                  <Package size={16} />
                 </div>
                 <input 
                   type="text" 
                   value={totalQty}
                   readOnly
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             {/* Transaksi Terakhir */}
             <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2">Transaksi Terakhir</label>
+              <label className="block text-[13px] text-[#475569] font-medium mb-2">Transaksi Terakhir</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <CalendarClock size={18} />
+                  <CalendarClock size={16} />
                 </div>
                 <input 
                   type="text" 
                   value={transaksiTerakhir}
                   readOnly
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors"
                 />
               </div>
             </div>
