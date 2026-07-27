@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
+
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Download, Filter, LayoutDashboard, Users, Target, User, Eye, CheckCircle2, XCircle, Banknote, Wallet, UserCircle, Mail, Phone, Lock, EyeOff, Map, Briefcase, Info, MapPin } from 'lucide-react';
@@ -6,113 +8,50 @@ import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { SalesModal } from '../../components/ui/SalesModal';
-import { useAuth } from '../../context/AuthContext';
-import api from '../../utils/api';
+import { supervisorSalesKpiData, supervisorSalesTableData } from '../../mock/supervisorSales';
 
 export const SupervisorSalesPage = () => {
-  const { user } = useAuth();
-  const [periodeAwal, setPeriodeAwal] = useState('2026-01-01');
-  const [periodeAkhir, setPeriodeAkhir] = useState('2026-12-31');
+  const [periodeAwal, setPeriodeAwal] = useState('30 Juni 2026');
+  const [isLoading, setIsLoading] = useState(false);
+  const [periodeAkhir, setPeriodeAkhir] = useState('30 Juni 2026');
   const [sales, setSales] = useState('Semua Sales');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSales, setSelectedSales] = useState<any>(null);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Dynamic states
-  const [salesData, setSalesData] = useState<any[]>([]);
-  const [kpis, setKpis] = useState<any[]>([]);
-  const [salesOptions, setSalesOptions] = useState<string[]>(['Semua Sales']);
-
-  const loadData = async () => {
-    if (!user) return;
-    try {
-      // Fetch sales under this supervisor
-      const res = await api.get(`/users?role=sales&supervisor_name=${user.name}`);
-      const mySales = res.data.data;
-      setSalesData(mySales);
-      setSalesOptions(['Semua Sales', ...mySales.map((s: any) => s.namaSales)]);
-
-      // Load general KPIs for the team in the date range
-      const kpiParams: any = { supervisor: user.name, periodeAwal, periodeAkhir };
-      if (sales !== 'Semua Sales') {
-        kpiParams.salesman = sales;
-      }
-      const kpisRes = await api.get('/sales/kpis', { params: kpiParams });
-      const kpisVal = kpisRes.data;
-
-      if (sales === 'Semua Sales') {
-        setKpis([
-          {
-            id: 1,
-            title: 'Total Sales',
-            value: `${mySales.length} Sales`,
-            description: 'Total anggota sales yang terdaftar',
-            icon: User,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          },
-          {
-            id: 2,
-            title: 'Total Customer Ditangani',
-            value: `${kpisVal.total_customers} Customer`,
-            description: 'Total customer yang dikelola seluruh tim sales',
-            icon: Users,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          },
-          {
-            id: 3,
-            title: 'Total Transaksi',
-            value: `${Number(kpisVal.total_transactions).toLocaleString('id-ID')} Transaksi`,
-            description: 'Total transaksi dari seluruh sales pada periode aktif',
-            icon: Wallet,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          }
-        ]);
-      } else {
-        setKpis([
-          {
-            id: 1,
-            title: 'Total Penjualan',
-            value: kpisVal.total_sales >= 1e9 ? `Rp ${(kpisVal.total_sales / 1e9).toFixed(1)} M` : `Rp ${(kpisVal.total_sales / 1e6).toFixed(1)} Jt`,
-            description: `Total penjualan oleh ${sales}`,
-            icon: Banknote,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          },
-          {
-            id: 2,
-            title: 'Total Customer Ditangani',
-            value: `${kpisVal.total_customers} Customer`,
-            description: `Total customer yang dikelola oleh ${sales}`,
-            icon: Users,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          },
-          {
-            id: 3,
-            title: 'Total Transaksi',
-            value: `${Number(kpisVal.total_transactions).toLocaleString('id-ID')} Transaksi`,
-            description: `Total transaksi oleh ${sales}`,
-            icon: Wallet,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          }
-        ]);
-      }
-    } catch (err) {
-      console.error('Failed to load supervisor sales:', err);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, [user]);
-
   const isAllSales = sales === 'Semua Sales';
-  const selectedSalesData = (!isAllSales ? salesData.find(s => s.namaSales === sales) : null) as any;
+  const selectedSalesData = supervisorSalesTableData.find(s => s.namaSales === sales) || supervisorSalesTableData[0];
+
+  const currentKpiData = isAllSales ? supervisorSalesKpiData : [
+    {
+      id: 1,
+      title: 'Total Penjualan',
+      value: 'Rp 45 Jt',
+      description: `Total penjualan oleh ${sales}`,
+      icon: Banknote,
+      iconColor: 'text-[#10b981]',
+      iconBg: 'bg-[#dcfce7]',
+    },
+    {
+      id: 2,
+      title: 'Total Customer Ditangani',
+      value: `${selectedSalesData.customer} Customer`,
+      description: `Total customer yang dikelola oleh ${sales}`,
+      icon: Users,
+      iconColor: 'text-[#10b981]',
+      iconBg: 'bg-[#dcfce7]',
+    },
+    {
+      id: 3,
+      title: 'Total Transaksi',
+      value: `${selectedSalesData.transaksi} Transaksi`,
+      description: `Total transaksi oleh ${sales}`,
+      icon: Wallet,
+      iconColor: 'text-[#10b981]',
+      iconBg: 'bg-[#dcfce7]',
+    }
+  ];
 
   const ActionButtons = (
     <button 
@@ -134,9 +73,9 @@ export const SupervisorSalesPage = () => {
     { key: 'namaSales', label: 'Nama Sales' },
     { key: 'email', label: 'Email' },
     { key: 'nomorHp', label: 'Nomor HP' },
-    { key: 'area', label: 'Area' },
+    { key: 'customer', label: 'Customer' },
+    { key: 'transaksi', label: 'Transaksi' },
     { key: 'status', label: 'Status' },
-    { key: 'tanggalBergabung', label: 'Tanggal Bergabung' },
     { key: 'detail', label: 'Detail' },
   ];
 
@@ -161,7 +100,7 @@ export const SupervisorSalesPage = () => {
               setSelectedSales(item);
               setIsModalOpen(true);
             }}
-            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors"
           >
             <Eye size={16} /> Detail
           </button>
@@ -172,144 +111,193 @@ export const SupervisorSalesPage = () => {
   };
 
   return (
-    <MainLayout sidebarItems={supervisorMenuItems}>
-      <Topbar title="Sales Dikelola" subtitle={`Selamat datang, ${user?.name || ''}`} actionButton={ActionButtons} />
+    <>
+      <MainLayout sidebarItems={supervisorMenuItems}>
+      <LoadingOverlay isLoading={isLoading} />
+        <Topbar title="Sales" subtitle="Pantau performa anggota tim sales" actionButton={ActionButtons} />
 
-      <div className="px-8 pb-10">
-        
-        {/* Filter Section */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-            <div className="col-span-2">
-              <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
-              <div className="flex items-center gap-3">
-                <div className="flex-1">
-                  <input 
-                    type="date" 
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-[#3b0764]"
-                    value={periodeAwal}
-                    onChange={(e) => setPeriodeAwal(e.target.value)}
-                  />
-                </div>
-                <span className="text-gray-400 font-bold">-</span>
-                <div className="flex-1">
-                  <input 
-                    type="date" 
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-[#3b0764]"
-                    value={periodeAkhir}
-                    onChange={(e) => setPeriodeAkhir(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="col-span-2">
-              <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
-              <CustomSelect 
-                value={sales} 
-                onChange={setSales} 
-                options={salesOptions} 
-                showSearch={true}
-              />
-            </div>
-            
-            
-          </div>
-        </div>
-
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {kpis.map((kpi) => (
-            <KpiCard key={kpi.id} {...kpi} />
-          ))}
-        </div>
-
-        {/* Table or Detail Section */}
-        {isAllSales ? (
-          <DataTable
-            title="Daftar Sales Penjualan"
-            columns={tableColumns}
-            data={salesData}
-            renderCell={renderTableCell}
-          />
-        ) : (
+        <div className="px-8 pb-10">
+          
+          {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-            <h3 className="text-gray-600 text-[18px] font-medium mb-6 font-semibold">Informasi Detail Sales</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
-              <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Nama Sales</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <User size={18} />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+              <div className="col-span-2">
+                <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <CustomSelect 
+                      value={periodeAwal} 
+                      onChange={(val) => {
+                  setPeriodeAwal(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
+                      options={['30 Juni 2026', '01 Juli 2026', '02 Juli 2026']} 
+                      showSearch={true}
+                    />
                   </div>
-                  <input type="text" value={selectedSalesData?.namaSales || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <span className="text-gray-400 font-bold">-</span>
+                  <div className="flex-1">
+                    <CustomSelect 
+                      value={periodeAkhir} 
+                      onChange={(val) => {
+                  setPeriodeAkhir(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
+                      options={['30 Juni 2026', '01 Juli 2026', '02 Juli 2026']} 
+                      showSearch={true}
+                    />
+                  </div>
                 </div>
               </div>
-              <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Username</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <UserCircle size={18} />
-                  </div>
-                  <input type="text" value={selectedSalesData?.username || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
-                </div>
+
+              <div className="col-span-2">
+                <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
+                <CustomSelect 
+                  value={sales} 
+                  onChange={(val) => {
+                  setSales(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
+                  options={['Semua Sales', 'Heri', 'Fransiskus', 'Rudi', 'Budi', 'Santoso', 'Agus', 'Iwan', 'Joko', 'Cipto', 'Gilang', 'Bagas', 'Wahyu']} 
+                  showSearch={true}
+                />
               </div>
-              <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Email</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Mail size={18} />
-                  </div>
-                  <input type="email" value={selectedSalesData?.email || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Nomor HP</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Phone size={18} />
-                  </div>
-                  <input type="text" value={selectedSalesData?.nomorHp || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Alamat</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <MapPin size={18} />
-                  </div>
-                  <input type="text" value={selectedSalesData?.alamat || 'Jl. Sudirman No 12 Bandung'} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Map size={18} />
-                  </div>
-                  <input type="text" value={selectedSalesData?.area || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Info size={18} />
-                  </div>
-                  <input type="text" value={selectedSalesData?.status || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
-                </div>
-              </div>
+              
+              
             </div>
           </div>
-        )}
 
-      </div>
+          {/* KPI Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            {currentKpiData.map((kpi) => (
+              <KpiCard key={kpi.id} {...kpi} />
+            ))}
+          </div>
+
+          {/* Tabel Sales atau Informasi Sales */}
+          <div className="mb-8">
+            {isAllSales ? (
+              <DataTable
+                title="Tabel Sales"
+                columns={tableColumns}
+                data={supervisorSalesTableData}
+                renderCell={renderTableCell}
+              />
+            ) : (
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <h3 className="text-gray-600 text-[18px] font-medium mb-6">Informasi Sales</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+                  <div>
+                    <label className="block text-sm text-[#475569] font-medium mb-2">Nama Sales</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <User size={18} />
+                      </div>
+                      <input type="text" readOnly value={selectedSalesData.namaSales || ''} className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[#475569] font-medium mb-2">Username</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <UserCircle size={18} />
+                      </div>
+                      <input type="text" readOnly value={selectedSalesData.username || ''} className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[#475569] font-medium mb-2">Email</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <Mail size={18} />
+                      </div>
+                      <input type="email" readOnly value={selectedSalesData.email || ''} className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[#475569] font-medium mb-2">Nomor HP</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <Phone size={18} />
+                      </div>
+                      <input type="text" readOnly value={selectedSalesData.nomorHp || ''} className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[#475569] font-medium mb-2">Alamat</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <MapPin size={18} />
+                      </div>
+                      <input type="text" readOnly value={selectedSalesData.alamat || ''} className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[#475569] font-medium mb-2">Password</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <Lock size={18} />
+                      </div>
+                      <input type={showPassword ? "text" : "password"} readOnly value="**********" className="w-full pl-11 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 focus:outline-none" />
+                      <div className="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer text-gray-400 hover:text-gray-600" onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <Map size={18} />
+                      </div>
+                      <input type="text" readOnly value={selectedSalesData.area || ''} className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[#475569] font-medium mb-2">Role</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <Briefcase size={18} />
+                      </div>
+                      <input type="text" readOnly value="Sales" className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[#475569] font-medium mb-2">Supervisor</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <Users size={18} />
+                      </div>
+                      <input type="text" readOnly value={selectedSalesData.supervisor || ''} className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <Info size={18} />
+                      </div>
+                      <input type="text" readOnly value={selectedSalesData.status || ''} className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 focus:outline-none" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+        </div>
+      </MainLayout>
+
+      {/* Popup Detail Sales (Read-Only) */}
       <SalesModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        mode="detail"
+        mode="view_only"
         data={selectedSales}
       />
-    </MainLayout>
+    </>
   );
 };

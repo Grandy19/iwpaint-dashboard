@@ -1,231 +1,83 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, LayoutDashboard, Users, Target, CheckCircle2, XCircle, Filter, Eye, Wallet, Scale, CreditCard, PaintRoller, Wrench, Factory, User, TrendingUp, UserCheck } from 'lucide-react';
+import { Download, LayoutDashboard, Users, Target, CheckCircle2, XCircle, Filter, Eye, Banknote, Package, Wallet, User } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { RingkasanTargetCard } from '../../components/ui/RingkasanTargetCard';
 import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
 import { DataTable } from '../../components/common/DataTable';
 import { CustomSelect } from '../../components/ui/CustomSelect';
+import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
 import { SalesModal } from '../../components/ui/SalesModal';
-import { useAuth } from '../../context/AuthContext';
-import api from '../../utils/api';
+
+import { 
+  supervisorTargetKpiData, 
+  supervisorTargetRingkasanData, 
+  supervisorTargetRealisasiData,
+  supervisorTargetPerformanceData,
+  supervisorTargetHistoryData
+} from '../../mock/supervisorTargetSales';
 
 export const SupervisorTargetPage = () => {
-  const { user } = useAuth();
-  const [periodeAwal, setPeriodeAwal] = useState('2026-01-01');
-  const [periodeAkhir, setPeriodeAkhir] = useState('2026-12-31');
+  const [isLoading, setIsLoading] = useState(false);
+  const [periodeAwal, setPeriodeAwal] = useState('30 Juni 2026');
+  const [periodeAkhir, setPeriodeAkhir] = useState('30 Juni 2026');
   const [sales, setSales] = useState('Semua Sales');
   const [appliedSales, setAppliedSales] = useState('Semua Sales');
   
   const [showSalesModal, setShowSalesModal] = useState(false);
   const [selectedSalesData, setSelectedSalesData] = useState<any>(null);
 
-  // Dynamic states
-  const [targetsList, setTargetsList] = useState<any[]>([]);
-  const [kpiData, setKpiData] = useState<any[]>([]);
-  const [ringkasanTarget, setRingkasanTarget] = useState<any>({ percentage: 0, targetGlobal: 'Rp 0 Jt', realisasi: 'Rp 0 Jt', selisih: 'Rp 0 Jt' });
-  const [targetRealisasi, setTargetRealisasi] = useState<any[]>([]);
-  const [historyData, setHistoryData] = useState<any[]>([]);
-  const [salesOptions, setSalesOptions] = useState<string[]>(['Semua Sales']);
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  const loadData = async () => {
-    if (!user) return;
-    try {
-      // Load sales list for option dropdown
-      const salesRes = await api.get(`/users?role=sales&supervisor_name=${user.name}`);
-      const mySales = salesRes.data.data;
-      setSalesOptions(['Semua Sales', ...mySales.map((s: any) => s.namaSales)]);
-
-      // Resolve target year & month dynamically
-      const dateObj = new Date(periodeAwal);
-      const targetYear = dateObj.getFullYear() || 2026;
-      const monthNamesInd = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-      const targetMonthName = monthNamesInd[dateObj.getMonth()] || "Juli";
-
-      // Load targets performance summary
-      const perfParams: any = { supervisor: user.name, tahun: targetYear, bulan_nama: targetMonthName, periodeAwal, periodeAkhir };
-      if (appliedSales !== 'Semua Sales') perfParams.salesman = appliedSales;
-      const perfRes = await api.get('/targets/performance', { params: perfParams });
-      setRingkasanTarget(perfRes.data);
-
-      // Load target list
-      const targetParams: any = { supervisor: user.name, tahun: targetYear, bulan_nama: targetMonthName, periodeAwal, periodeAkhir };
-      if (appliedSales !== 'Semua Sales') targetParams.salesman = appliedSales;
-      const targetRes = await api.get('/targets', { params: targetParams });
-      const rows = targetRes.data.data;
-      setTargetsList(rows);
-
-      // Set KPIs
-      if (appliedSales !== 'Semua Sales') {
-        const selectedRow = rows.find((r: any) => r.sales === appliedSales);
-        if (selectedRow) {
-          setKpiData([
-            {
-              id: 1,
-              title: 'Total Penjualan (Rp)',
-              value: selectedRow.totalRealisasi,
-              description: `Total realisasi oleh ${appliedSales}`,
-              icon: Wallet,
-              iconColor: 'text-[#10b981]',
-              iconBg: 'bg-[#dcfce7]',
-            },
-            {
-              id: 2,
-              title: 'Total Target',
-              value: selectedRow.totalTarget,
-              description: `Target bulanan ${appliedSales}`,
-              icon: Target,
-              iconColor: 'text-[#10b981]',
-              iconBg: 'bg-[#dcfce7]',
-            },
-            {
-              id: 3,
-              title: 'Total QTY Penjualan',
-              value: `${selectedRow.totalQty || 0} Kg`,
-              description: `Total QTY terjual oleh ${appliedSales}`,
-              icon: Scale,
-              iconColor: 'text-[#10b981]',
-              iconBg: 'bg-[#dcfce7]',
-            },
-            {
-              id: 4,
-              title: 'Total Transaksi',
-              value: `${selectedRow.totalTransaksi || 0} Transaksi`,
-              description: `Total transaksi oleh ${appliedSales}`,
-              icon: CreditCard,
-              iconColor: 'text-[#10b981]',
-              iconBg: 'bg-[#dcfce7]',
-            }
-          ]);
-
-          setTargetRealisasi([
-            {
-              id: 'decorative',
-              title: 'Decorative',
-              icon: PaintRoller,
-              percentage: selectedRow.raw_target_deco > 0 ? Math.min(Math.round((selectedRow.realisasi_deco / selectedRow.raw_target_deco) * 100), 100) : 0,
-              realisasi: `Rp ${Number(selectedRow.realisasi_deco / 1e6).toFixed(1)} Jt`,
-              target: `Rp ${Number(selectedRow.raw_target_deco / 1e6).toFixed(1)} Jt`
-            },
-            {
-              id: 'automotive',
-              title: 'Automotive',
-              icon: Wrench,
-              percentage: selectedRow.raw_target_auto > 0 ? Math.min(Math.round((selectedRow.realisasi_auto / selectedRow.raw_target_auto) * 100), 100) : 0,
-              realisasi: `Rp ${Number(selectedRow.realisasi_auto / 1e6).toFixed(1)} Jt`,
-              target: `Rp ${Number(selectedRow.raw_target_auto / 1e6).toFixed(1)} Jt`
-            },
-            {
-              id: 'industri',
-              title: 'Industri',
-              icon: Factory,
-              percentage: selectedRow.raw_target_ind > 0 ? Math.min(Math.round((selectedRow.realisasi_ind / selectedRow.raw_target_ind) * 100), 100) : 0,
-              realisasi: `Rp ${Number(selectedRow.realisasi_ind / 1e6).toFixed(1)} Jt`,
-              target: `Rp ${Number(selectedRow.raw_target_ind / 1e6).toFixed(1)} Jt`
-            }
-          ]);
-        }
-      } else {
-        const targetTim = perfRes.data.targetGlobal || 'Rp 0 Jt';
-        const realisasiTim = perfRes.data.realisasi || 'Rp 0 Jt';
-        const pencapaianTim = perfRes.data.percentage || 0;
-        const salesMencapaiTarget = rows.filter((r: any) => r.percentage >= 100).length;
-
-        setKpiData([
-          {
-            id: 1,
-            title: 'Target Penjualan Tim',
-            value: targetTim,
-            description: 'Total target penjualan tim Anda',
-            icon: Target,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          },
-          {
-            id: 2,
-            title: 'Realisasi Penjualan Tim',
-            value: realisasiTim,
-            description: 'Total realisasi penjualan tim Anda',
-            icon: Wallet,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          },
-          {
-            id: 3,
-            title: 'Pencapaian Target Tim',
-            value: `${pencapaianTim}%`,
-            description: 'Persentase pencapaian target tim',
-            icon: TrendingUp,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-            progress: pencapaianTim > 100 ? 100 : pencapaianTim,
-          },
-          {
-            id: 4,
-            title: 'Sales Mencapai Target',
-            value: `${salesMencapaiTarget} Sales`,
-            description: 'Jumlah sales yang telah mencapai target',
-            icon: UserCheck,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          }
-        ]);
-
-        const totalDecoTarget = rows.reduce((acc: number, s: any) => acc + s.raw_target_deco, 0);
-        const totalDecoRealisasi = rows.reduce((acc: number, s: any) => acc + s.realisasi_deco, 0);
-        const totalAutoTarget = rows.reduce((acc: number, s: any) => acc + s.raw_target_auto, 0);
-        const totalAutoRealisasi = rows.reduce((acc: number, s: any) => acc + s.realisasi_auto, 0);
-        const totalIndTarget = rows.reduce((acc: number, s: any) => acc + s.raw_target_ind, 0);
-        const totalIndRealisasi = rows.reduce((acc: number, s: any) => acc + s.realisasi_ind, 0);
-
-        setTargetRealisasi([
-          {
-            id: 'decorative',
-            title: 'Decorative',
-            icon: PaintRoller,
-            percentage: totalDecoTarget > 0 ? Math.min(Math.round((totalDecoRealisasi / totalDecoTarget) * 100), 100) : 0,
-            realisasi: `Rp ${Number(totalDecoRealisasi / 1e6).toFixed(1)} Jt`,
-            target: `Rp ${Number(totalDecoTarget / 1e6).toFixed(1)} Jt`
-          },
-          {
-            id: 'automotive',
-            title: 'Automotive',
-            icon: Wrench,
-            percentage: totalAutoTarget > 0 ? Math.min(Math.round((totalAutoRealisasi / totalAutoTarget) * 100), 100) : 0,
-            realisasi: `Rp ${Number(totalAutoRealisasi / 1e6).toFixed(1)} Jt`,
-            target: `Rp ${Number(totalAutoTarget / 1e6).toFixed(1)} Jt`
-          },
-          {
-            id: 'industri',
-            title: 'Industri',
-            icon: Factory,
-            percentage: totalIndTarget > 0 ? Math.min(Math.round((totalIndRealisasi / totalIndTarget) * 100), 100) : 0,
-            realisasi: `Rp ${Number(totalIndRealisasi / 1e6).toFixed(1)} Jt`,
-            target: `Rp ${Number(totalIndTarget / 1e6).toFixed(1)} Jt`
-          }
-        ]);
-      }
-
-      // Load history
-      const historyParams: any = { supervisor: user.name };
-      if (appliedSales !== 'Semua Sales') historyParams.salesman = appliedSales;
-      const historyRes = await api.get('/targets/history', { params: historyParams });
-      setHistoryData(historyRes.data.data || []);
-    } catch (err) {
-      console.error('Failed to load targets performance:', err);
+  const displayPerformanceData = React.useMemo(() => {
+    if (appliedSales !== 'Semua Sales') {
+      return supervisorTargetPerformanceData.filter(item => item.sales === appliedSales);
     }
-  };
+    return supervisorTargetPerformanceData;
+  }, [appliedSales]);
 
-  useEffect(() => {
-    loadData();
-  }, [user, appliedSales, refreshKey]);
-
-  const handleFilter = () => {
-    setAppliedSales(sales);
-    setRefreshKey(prev => prev + 1);
-  };
+  const displayKpiData = React.useMemo(() => {
+    if (appliedSales !== 'Semua Sales') {
+      return [
+        {
+          id: 1,
+          title: 'Total Penjualan (Rp)',
+          value: 'Rp 45 Jt',
+          description: `Total penjualan ${appliedSales}`,
+          icon: Banknote,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
+        },
+        {
+          id: 2,
+          title: 'Total Target Bulan Ini',
+          value: 'Rp 60 Jt',
+          description: `Target bulanan ${appliedSales}`,
+          icon: Target,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
+        },
+        {
+          id: 3,
+          title: 'Total QTY Penjualan',
+          value: '1.250 Kg',
+          description: `Total QTY dari ${appliedSales}`,
+          icon: Package,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
+        },
+        {
+          id: 4,
+          title: 'Total Transaksi',
+          value: '120 Transaksi',
+          description: `Total transaksi oleh ${appliedSales}`,
+          icon: Wallet,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
+        }
+      ];
+    }
+    return supervisorTargetKpiData;
+  }, [appliedSales]);
 
   const ActionButtons = (
     <button 
@@ -238,9 +90,9 @@ export const SupervisorTargetPage = () => {
 
   const performaColumns = [
     { key: 'sales', label: 'Sales', className: 'w-[15%]' },
-    { key: 'totalTarget', label: 'Target', className: 'w-[15%]' },
+    { key: 'target', label: 'Target', className: 'w-[15%]' },
     { key: 'realisasi', label: 'Realisasi', className: 'w-[15%]' },
-    { key: 'percentage', label: 'Pencapaian', className: 'w-[15%]' },
+    { key: 'pencapaian', label: 'Pencapaian', className: 'w-[15%]' },
     { key: 'status', label: 'Status', className: 'w-[20%]' },
     { key: 'detail', label: 'Detail', className: 'w-[10%] text-center' },
   ];
@@ -248,37 +100,34 @@ export const SupervisorTargetPage = () => {
   const renderPerformaCell = (item: any, columnKey: string) => {
     switch (columnKey) {
       case 'sales':
-        return <span className="text-gray-700 font-medium">{item.sales}</span>;
-      case 'realisasi':
-        return item.totalRealisasi;
+        return <span className="text-gray-800 font-semibold">{item.sales}</span>;
       case 'status':
-        return item.status === 'Sudah Input' ? (
-          <span className="flex items-center gap-1.5 text-[#10b981] font-medium">
-            <CheckCircle2 size={16} /> Sudah Input
+        return item.status === 'Tercapai' ? (
+          <span className="flex items-center gap-1.5 text-[#10b981] text-sm font-medium">
+            <CheckCircle2 size={16} /> Tercapai
           </span>
         ) : (
-          <span className="flex items-center gap-1.5 text-[#ef4444] font-medium">
-            <XCircle size={16} /> Belum Input
+          <span className="flex items-center gap-1.5 text-[#ef4444] text-sm font-medium">
+            <XCircle size={16} /> Belum Tercapai
           </span>
         );
       case 'detail':
         return (
-          <button 
-            onClick={async () => {
-              // Get details
-              const usersRes = await api.get(`/users?role=sales&name=${item.sales}`);
-              if (usersRes.data.data.length > 0) {
-                setSelectedSalesData(usersRes.data.data[0]);
+          <div className="flex justify-center">
+            <button 
+              onClick={() => {
+                setSelectedSalesData(item);
                 setShowSalesModal(true);
-              }
-            }}
-            className="flex items-center justify-center text-gray-400 hover:text-[#3b0764] transition-colors w-full cursor-pointer"
-          >
-            <Eye size={18} />
-          </button>
+              }}
+              className="flex items-center gap-1 text-gray-500 hover:text-[#3b0764] transition-colors"
+            >
+              <Eye size={16} />
+              <span className="text-sm font-medium">Detail</span>
+            </button>
+          </div>
         );
       default:
-        return item[columnKey];
+        return <span className="text-gray-600">{item[columnKey]}</span>;
     }
   };
 
@@ -318,9 +167,10 @@ export const SupervisorTargetPage = () => {
 
   return (
     <MainLayout sidebarItems={supervisorMenuItems}>
+      <LoadingOverlay isLoading={isLoading} />
       <Topbar 
         title="Target Sales" 
-        subtitle="Pantau pencapaian target penjualan sales Anda pada bulan ini." 
+        subtitle="Pantau pencapaian target seluruh anggota tim sales" 
         actionButton={ActionButtons} 
       />
 
@@ -328,92 +178,105 @@ export const SupervisorTargetPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-            <div className="col-span-1">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+            <div className="col-span-2">
               <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
-                  <input 
-                    type="date" 
+                  <CustomSelect 
                     value={periodeAwal} 
-                    onChange={(e) => setPeriodeAwal(e.target.value)} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    onChange={(val) => {
+                      setPeriodeAwal(val);
+                      setIsLoading(true);
+                      setTimeout(() => setIsLoading(false), 500);
+                    }} 
+                    options={['30 Juni 2026', '01 Juli 2026', '02 Juli 2026']} 
+                    showSearch={true}
                   />
                 </div>
                 <span className="text-gray-400 font-bold">-</span>
                 <div className="flex-1">
-                  <input 
-                    type="date" 
+                  <CustomSelect 
                     value={periodeAkhir} 
-                    onChange={(e) => setPeriodeAkhir(e.target.value)} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    onChange={(val) => {
+                      setPeriodeAkhir(val);
+                      setIsLoading(true);
+                      setTimeout(() => setIsLoading(false), 500);
+                    }} 
+                    options={['30 Juni 2026', '01 Juli 2026', '02 Juli 2026']} 
+                    showSearch={true}
                   />
                 </div>
               </div>
             </div>
             
-            <div className="col-span-2">
+            <div className="col-span-1">
               <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
               <CustomSelect 
                 value={sales} 
-                onChange={(val) => { setSales(val); setAppliedSales(val); }} 
-                options={salesOptions} 
+                onChange={(val) => {
+                  setSales(val);
+                  setAppliedSales(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
+                options={['Semua Sales', 'Budi', 'Fransiskus']} 
                 showSearch={true}
               />
             </div>
-            
-            
           </div>
         </div>
 
         {/* Top Section: KPIs and Ringkasan */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 mt-4">
           <div className="lg:col-span-2">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {kpiData.map((kpi) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 h-full">
+              {displayKpiData.map((kpi) => (
                 <KpiCard key={kpi.id} {...kpi} />
               ))}
             </div>
           </div>
-          <div className="lg:col-span-1">
-            <RingkasanTargetCard {...ringkasanTarget} />
+          <div className="lg:col-span-1 h-full">
+            <RingkasanTargetCard {...supervisorTargetRingkasanData} title="Ringkasan Target Bulan Ini" />
           </div>
         </div>
 
         {/* Target vs Realisasi Full Width */}
         <div className="mb-8">
           <TargetRealisasiCard 
-            data={targetRealisasi} 
-            title="Target vs Realisasi" 
+            data={supervisorTargetRealisasiData} 
+            title="Target vs Realisasi Bulan Ini" 
           />
         </div>
 
-        {/* Performa Table */}
-        <div className="mb-8">
-          <DataTable
-            title="Tabel Performa Target Sales"
-            columns={performaColumns}
-            data={targetsList}
-            renderCell={renderPerformaCell}
-          />
-        </div>
+        {/* Tabel Performa Target Sales */}
+        {appliedSales === 'Semua Sales' && (
+          <div className="mb-8">
+            <DataTable
+              title="Tabel Performa Target Sales"
+              columns={performaColumns}
+              data={displayPerformanceData}
+              renderCell={renderPerformaCell}
+            />
+          </div>
+        )}
 
         {/* History Table */}
         <div className="mb-8">
           <DataTable
             title="Riwayat Target"
             columns={historyColumns}
-            data={historyData}
+            data={supervisorTargetHistoryData}
             renderCell={renderHistoryCell}
           />
         </div>
 
       </div>
 
-      <SalesModal
+      <SalesModal 
         isOpen={showSalesModal}
         onClose={() => setShowSalesModal(false)}
-        mode="detail"
+        mode="view_target"
         data={selectedSalesData}
       />
     </MainLayout>

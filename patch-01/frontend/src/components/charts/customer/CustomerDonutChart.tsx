@@ -32,7 +32,7 @@ export const CustomerDonutChart = () => {
                 ))}
               </Pie>
               <Tooltip 
-                formatter={(value: any) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value)}
+                formatter={(value: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value)}
               />
             </PieChart>
           </ResponsiveContainer>

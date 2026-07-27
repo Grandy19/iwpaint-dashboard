@@ -6,16 +6,15 @@ interface TargetSalesModalProps {
   isOpen: boolean;
   onClose: () => void;
   mode: 'create' | 'edit';
-  data?: any;
+  data?: any; // The selected row data if edit mode
   onSave: (data: any) => void;
-  salesList: string[];
 }
 
-export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onClose, mode, data, onSave, salesList }) => {
+export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onClose, mode, data, onSave }) => {
   const [tahun, setTahun] = useState('2026');
   const [bulan, setBulan] = useState('Juli');
   const [area, setArea] = useState('Semua Area');
-  const [salesName, setSalesName] = useState(salesList[0] || 'Semua Sales');
+  const [salesName, setSalesName] = useState('Semua Sales');
 
   const [decorative, setDecorative] = useState('');
   const [automotive, setAutomotive] = useState('');
@@ -24,8 +23,6 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
 
   // Utility to format number as Rupiah
   const formatRupiah = (val: string) => {
@@ -43,7 +40,6 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
 
   useEffect(() => {
     if (isOpen) {
-      setErrorMessage('');
       if (mode === 'edit' && data) {
         setArea(data.area !== '-' ? data.area : 'Semua Area');
         setSalesName(data.sales);
@@ -61,11 +57,11 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
         setAutomotive(expandJt(data.automotive));
         setIndustri(expandJt(data.industri));
       } else {
-        // Create mode: clear data and default to first sales option if available
+        // Create mode: clear data
         setTahun('2026');
         setBulan('Juli');
         setArea('Semua Area');
-        setSalesName(salesList[0] || 'Semua Sales');
+        setSalesName('Semua Sales');
         setDecorative('');
         setAutomotive('');
         setIndustri('');
@@ -73,7 +69,7 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
       setShowConfirm(false);
       setShowSuccess(false);
     }
-  }, [isOpen, mode, data, salesList]);
+  }, [isOpen, mode, data]);
 
   // Calculate total automatically
   useEffect(() => {
@@ -93,33 +89,18 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
     setShowConfirm(true);
   };
 
-  const handleConfirmSimpan = async () => {
-    if (salesName === 'Semua Sales') {
-      setErrorMessage('Pilih sales terlebih dahulu sebelum menyimpan target.');
-      setShowConfirm(false);
-      return;
-    }
-
+  const handleConfirmSimpan = () => {
     setShowConfirm(false);
-    setIsSaving(true);
-    setErrorMessage('');
-
-    try {
-      const resultData = { ...(data || {}), area, sales: salesName, decorative, automotive, industri, totalTarget, tahun, bulan };
+    setShowSuccess(true);
+    
+    setTimeout(() => {
+      const resultData = { ...data, area, sales: salesName, decorative, automotive, industri, totalTarget };
       if (onSave) {
-        await onSave(resultData);
+        onSave(resultData);
       }
-      setShowSuccess(true);
-      setTimeout(() => {
-        setShowSuccess(false);
-        onClose();
-      }, 1500);
-    } catch (err) {
-      console.error('Failed to save target:', err);
-      setErrorMessage('Gagal menyimpan target. Silakan coba lagi.');
-    } finally {
-      setIsSaving(false);
-    }
+      setShowSuccess(false);
+      onClose();
+    }, 1500);
   };
 
   if (!isOpen) return null;
@@ -154,7 +135,7 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
             </div>
             <div className="col-span-1">
               <label className="block text-sm text-[#475569] font-medium mb-2">Bulan</label>
-              <CustomSelect value={bulan} onChange={setBulan} options={['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']} />
+              <CustomSelect value={bulan} onChange={setBulan} options={['Juli', 'Agustus']} />
             </div>
             <div className="col-span-1">
               <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
@@ -162,7 +143,7 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
             </div>
             <div className="col-span-1">
               <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
-              <CustomSelect value={salesName} onChange={setSalesName} options={salesList.length > 0 ? salesList : ['Semua Sales']} />
+              <CustomSelect value={salesName} onChange={setSalesName} options={['Semua Sales', 'Santoso', 'Heri', 'Fransiskus', 'Rudi', 'Budi']} />
             </div>
           </div>
 
@@ -230,14 +211,10 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col items-center justify-center pt-2 gap-3">
-            {errorMessage && (
-              <div className="text-sm text-red-600">{errorMessage}</div>
-            )}
+          <div className="flex items-center justify-center pt-2">
             <button 
               onClick={handleSimpanClick}
-              disabled={isSaving}
-              className="w-[200px] bg-[#52b788] hover:bg-[#40916c] disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-[200px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
             >
               <Save size={18} />
               Simpan

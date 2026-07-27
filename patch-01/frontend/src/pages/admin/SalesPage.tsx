@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
+import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Upload, Plus, CheckCircle2, XCircle, Eye, Filter, User, UserCircle, Mail, Phone, Lock, Map, MapPin, Briefcase, Users, Info, EyeOff, Save, Trash2 } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { DataTable } from '../../components/common/DataTable';
 import { KpiCard } from '../../components/common/KpiCard';
+import { salesAdminKpiData, salesAdminTableData } from '../../mock/salesAdmin';
 import { SalesModal } from '../../components/ui/SalesModal';
 import { ExportModal } from '../../components/ui/ExportModal';
-import api from '../../utils/api';
 
 export const SalesPage = () => {
   const [area, setArea] = useState('Semua Area');
+  const [isLoading, setIsLoading] = useState(false);
   const [supervisor, setSupervisor] = useState('Semua Supervisor');
   const [status, setStatus] = useState('Semua Status');
   const [salesName, setSalesName] = useState('Semua Sales');
@@ -20,15 +22,6 @@ export const SalesPage = () => {
   const [selectedSales, setSelectedSales] = useState<any>(null);
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-
-  // Dynamic dropdown options
-  const [areaOptions, setAreaOptions] = useState<string[]>(['Semua Area']);
-  const [supervisorOptions, setSupervisorOptions] = useState<string[]>(['Semua Supervisor']);
-  const [salesOptions, setSalesOptions] = useState<string[]>(['Semua Sales']);
-
-  // Sales data list
-  const [salesData, setSalesData] = useState<any[]>([]);
-  const [kpis, setKpis] = useState<any[]>([]);
 
   // Form states for inline editing
   const [editNamaSales, setEditNamaSales] = useState('');
@@ -48,124 +41,17 @@ export const SalesPage = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
 
-  const loadData = async () => {
-    try {
-      // Load sales
-      const salesRes = await api.get('/users?role=sales');
-      const allSales = salesRes.data.data;
-      setSalesData(allSales);
-
-      // Load supervisors
-      const supervisorRes = await api.get('/users?role=supervisor');
-      const allSupervisors = supervisorRes.data.data;
-
-      // Populate filters
-      const uniqueAreas = Array.from(new Set(allSales.map((s: any) => s.area).filter(Boolean))) as string[];
-      setAreaOptions(['Semua Area', ...uniqueAreas]);
-      setSupervisorOptions(['Semua Supervisor', ...allSupervisors.map((s: any) => s.namaSupervisor)]);
-      setSalesOptions(['Semua Sales', ...allSales.map((s: any) => s.namaSales)]);
-
-      // Calculate KPIs
-      const totalCount = allSales.length;
-      const activeCount = allSales.filter((s: any) => s.status === 'Aktif').length;
-      const inactiveCount = totalCount - activeCount;
-
-      setKpis([
-        {
-          id: 1,
-          title: 'Total Sales',
-          value: `${totalCount} Sales`,
-          description: 'Total sales aktif yang terdaftar',
-          icon: User,
-          iconColor: 'text-[#10b981]',
-          iconBg: 'bg-[#dcfce7]',
-        },
-        {
-          id: 2,
-          title: 'Sales Aktif',
-          value: `${activeCount} Sales`,
-          description: 'Sales dengan Status Aktif',
-          icon: CheckCircle2,
-          iconColor: 'text-[#10b981]',
-          iconBg: 'bg-[#dcfce7]',
-        },
-        {
-          id: 3,
-          title: 'Sales Tidak Aktif',
-          value: `${inactiveCount} Sales`,
-          description: 'Sales dengan Status Tidak Aktif dalam Sebulan Terakhir',
-          icon: XCircle,
-          iconColor: 'text-[#ef4444]',
-          iconBg: 'bg-[#fee2e2]',
-        }
-      ]);
-    } catch (err) {
-      console.error('Failed to load sales data:', err);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const handleSimpanClick = () => setShowConfirm(true);
-
-  const handleConfirmSimpan = async () => {
+  const handleConfirmSimpan = () => {
     setShowConfirm(false);
-    try {
-      if (selectedSalesData) {
-        await api.put(`/users/${selectedSalesData.id}`, {
-          namaSales: editNamaSales,
-          username: editUsername,
-          email: editEmail,
-          nomorHp: editNomorHp,
-          password: editPassword,
-          area: editArea,
-          supervisor: editSupervisor,
-          status: editStatus,
-        });
-        setShowSuccess(true);
-        setTimeout(() => {
-          setShowSuccess(false);
-          loadData();
-        }, 1500);
-      }
-    } catch (err) {
-      console.error('Failed to save user:', err);
-    }
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 1500);
   };
-
   const handleDeleteClick = () => setShowDeleteConfirm(true);
-
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     setShowDeleteConfirm(false);
-    try {
-      if (selectedSalesData) {
-        await api.delete(`/users/${selectedSalesData.id}`);
-        setShowDeleteSuccess(true);
-        setTimeout(() => {
-          setShowDeleteSuccess(false);
-          setSalesName('Semua Sales');
-          loadData();
-        }, 1500);
-      }
-    } catch (err) {
-      console.error('Failed to delete user:', err);
-    }
-  };
-
-  const handleCreateOrUpdateModal = async (formData: any) => {
-    try {
-      if (modalMode === 'create') {
-        await api.post('/users', { ...formData, role: 'sales' });
-      } else if (selectedSales) {
-        await api.put(`/users/${selectedSales.id}`, formData);
-      }
-      setIsModalOpen(false);
-      loadData();
-    } catch (err) {
-      console.error('Failed to save user via modal:', err);
-    }
+    setShowDeleteSuccess(true);
+    setTimeout(() => setShowDeleteSuccess(false), 1500);
   };
 
   const ActionButtons = (
@@ -183,14 +69,14 @@ export const SalesPage = () => {
           setModalMode('create');
           setIsModalOpen(true);
         }}
-        className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
+        className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
       >
         <Plus size={18} />
         Sales
       </button>
     </div>
   ); 
-
+ 
   const tableColumns = [
     { key: 'namaSales', label: 'Nama Sales' },
     { key: 'email', label: 'Email' },
@@ -224,7 +110,7 @@ export const SalesPage = () => {
               setModalMode('detail');
               setIsModalOpen(true);
             }}
-            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors"
           >
             <Eye size={16} /> Detail
           </button>
@@ -234,20 +120,28 @@ export const SalesPage = () => {
     }
   };
 
-  const isAllSales = salesName === 'Semua Sales';
-  const filteredSalesData = salesData.filter((s: any) => {
-    if (area !== 'Semua Area' && s.area !== area) return false;
-    if (status !== 'Semua Status' && s.status !== status) return false;
-    if (supervisor !== 'Semua Supervisor' && s.supervisor !== supervisor) return false;
-    return true;
+  const parseIndonesianDate = (dateStr: string) => {
+    const months = {
+      'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5,
+      'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11
+    };
+    const parts = dateStr.split(' ');
+    if (parts.length !== 3) return 0;
+    const [day, monthStr, year] = parts;
+    return new Date(parseInt(year), (months as any)[monthStr] || 0, parseInt(day)).getTime();
+  };
+
+  const sortedSalesData = [...salesAdminTableData].sort((a, b) => {
+    return parseIndonesianDate(b.tanggalBergabung) - parseIndonesianDate(a.tanggalBergabung);
   });
 
-  const selectedSalesData = (!isAllSales ? salesData.find(s => s.namaSales === salesName) : null) as any;
+  const isAllSales = salesName === 'Semua Sales';
+  const selectedSalesData = (sortedSalesData.find(s => s.namaSales === salesName) || sortedSalesData[0]) as any;
 
   useEffect(() => {
     if (!isAllSales && selectedSalesData) {
       setEditNamaSales(selectedSalesData.namaSales || '');
-      setEditUsername(selectedSalesData.username || '');
+      setEditUsername(selectedSalesData.email?.split('@')[0] || '');
       setEditEmail(selectedSalesData.email || '');
       setEditNomorHp(selectedSalesData.nomorHp || '');
       setEditAlamat(selectedSalesData.alamat || 'Jl. Jendral Sudirman No. 123');
@@ -263,13 +157,14 @@ export const SalesPage = () => {
   return (
     <>
       <MainLayout>
+      <LoadingOverlay isLoading={isLoading} />
         <Topbar title="Sales" subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB" actionButton={ActionButtons} />
 
         <div className="px-8 pb-10">
           
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 pt-4">
-            {kpis.map((kpi) => (
+            {salesAdminKpiData.map((kpi) => (
               <KpiCard key={kpi.id} {...kpi} />
             ))}
           </div>
@@ -281,15 +176,23 @@ export const SalesPage = () => {
                 <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                 <CustomSelect 
                   value={area} 
-                  onChange={setArea} 
-                  options={areaOptions} 
+                  onChange={(val) => {
+                  setArea(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
+                  options={['Semua Area', 'Cirebon', 'Bandung', 'Jakarta']} 
                 />
               </div>
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
                 <CustomSelect 
                   value={status} 
-                  onChange={setStatus} 
+                  onChange={(val) => {
+                  setStatus(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                   options={['Semua Status', 'Aktif', 'Tidak Aktif']} 
                 />
               </div>
@@ -297,16 +200,24 @@ export const SalesPage = () => {
                 <label className="block text-sm text-[#475569] font-medium mb-2">Supervisor</label>
                 <CustomSelect 
                   value={supervisor} 
-                  onChange={setSupervisor} 
-                  options={supervisorOptions} 
+                  onChange={(val) => {
+                  setSupervisor(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
+                  options={['Semua Supervisor', 'Hartono', 'Budi']} 
                 />
               </div>
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
                 <CustomSelect 
                   value={salesName} 
-                  onChange={setSalesName} 
-                  options={salesOptions} 
+                  onChange={(val) => {
+                  setSalesName(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
+                  options={['Semua Sales', 'Santoso', 'Heri']} 
                 />
               </div>
               
@@ -318,7 +229,7 @@ export const SalesPage = () => {
             <DataTable
               title="Tabel Sales"
               columns={tableColumns}
-              data={filteredSalesData}
+              data={sortedSalesData}
               renderCell={renderCell}
             />
           ) : (
@@ -385,38 +296,54 @@ export const SalesPage = () => {
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                   <CustomSelect 
-                    value={editArea} onChange={setEditArea} options={['Bandung', 'Jakarta', 'Cirebon', 'Kuningan']} 
+                    value={editArea} onChange={(val) => {
+                  setEditArea(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} options={['Bandung', 'Jakarta', 'Cirebon', 'Kuningan']} 
                     icon={<Map size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Role</label>
                   <CustomSelect 
-                    value={editRole} onChange={setEditRole} options={['Sales', 'Supervisor', 'Admin']} 
+                    value={editRole} onChange={(val) => {
+                  setEditRole(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} options={['Sales', 'Supervisor', 'Admin']} 
                     icon={<Briefcase size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Supervisor</label>
                   <CustomSelect 
-                    value={editSupervisor} onChange={setEditSupervisor} options={supervisorOptions.filter(opt => opt !== 'Semua Supervisor')} 
+                    value={editSupervisor} onChange={(val) => {
+                  setEditSupervisor(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} options={['Andi', 'Hartono', 'Budi']} 
                     icon={<Users size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
                   <CustomSelect 
-                    value={editStatus} onChange={setEditStatus} options={['Aktif', 'Tidak Aktif']} 
+                    value={editStatus} onChange={(val) => {
+                  setEditStatus(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} options={['Aktif', 'Tidak Aktif']} 
                     icon={<Info size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
               </div>
               <div className="flex items-center justify-center pt-8 gap-4">
-                <button onClick={handleDeleteClick} className="w-[160px] bg-[#ef4444] hover:bg-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                <button onClick={handleDeleteClick} className="w-[160px] bg-[#ef4444] hover:bg-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2">
                   <Trash2 size={18} />
                   Hapus
                 </button>
-                <button onClick={handleSimpanClick} className="w-[160px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                <button onClick={handleSimpanClick} className="w-[160px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2">
                   <Save size={18} />
                   Simpan
                 </button>
@@ -432,7 +359,10 @@ export const SalesPage = () => {
         onClose={() => setIsModalOpen(false)}
         mode={modalMode}
         data={selectedSales}
-        onSave={handleCreateOrUpdateModal}
+        onSave={(data) => {
+          console.log('Saved data:', data);
+          setIsModalOpen(false);
+        }}
       />
 
       <ExportModal 
@@ -450,13 +380,13 @@ export const SalesPage = () => {
             <div className="flex justify-center gap-4">
               <button 
                 onClick={() => setShowConfirm(false)}
-                className="w-[120px] bg-[#ef4444] hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition-colors cursor-pointer"
+                className="w-[120px] bg-[#ef4444] hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition-colors"
               >
                 Tidak
               </button>
               <button 
                 onClick={handleConfirmSimpan}
-                className="w-[120px] bg-[#52b788] hover:bg-[#40916c] text-white py-2.5 rounded-xl font-medium transition-colors cursor-pointer"
+                className="w-[120px] bg-[#52b788] hover:bg-[#40916c] text-white py-2.5 rounded-xl font-medium transition-colors"
               >
                 Simpan
               </button>
@@ -487,13 +417,13 @@ export const SalesPage = () => {
             <div className="flex justify-center gap-4">
               <button 
                 onClick={() => setShowDeleteConfirm(false)}
-                className="w-[120px] bg-gray-200 hover:bg-gray-300 text-gray-800 py-2.5 rounded-xl font-medium transition-colors cursor-pointer"
+                className="w-[120px] bg-gray-200 hover:bg-gray-300 text-gray-800 py-2.5 rounded-xl font-medium transition-colors"
               >
                 Tidak
               </button>
               <button 
                 onClick={handleConfirmDelete}
-                className="w-[120px] bg-[#ef4444] hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition-colors cursor-pointer"
+                className="w-[120px] bg-[#ef4444] hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition-colors"
               >
                 Hapus
               </button>

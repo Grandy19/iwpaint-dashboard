@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, MapPin, User, Users, Info, Briefcase, CheckCircle2, Trash2 } from 'lucide-react';
+import { X, Save, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, MapPin, User, Users, Info, Briefcase, CheckCircle2, Trash2, Tag } from 'lucide-react';
 import { CustomSelect } from './CustomSelect';
-import api from '../../utils/api';
 
 interface SalesModalProps {
   isOpen: boolean;
@@ -11,8 +10,7 @@ interface SalesModalProps {
   onSave?: (data: any) => void;
 }
 
-export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: modeInput, data, onSave }) => {
-  const mode = modeInput as any;
+export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode, data, onSave }) => {
   const [namaSales, setNamaSales] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -22,32 +20,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
   const [area, setArea] = useState('Bandung');
   const [role, setRole] = useState('Sales');
   const [supervisor, setSupervisor] = useState('Andi');
-  const [status, setStatus] = useState('Aktif');
   const [kodeSalesman, setKodeSalesman] = useState('');
-  const [salesmenList, setSalesmenList] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (isOpen) {
-      api.get('/salesmen')
-        .then(res => {
-          if (res.data && res.data.success) {
-            setSalesmenList(res.data.data);
-          }
-        })
-        .catch(err => console.error('Failed to load salesmen:', err));
-    }
-  }, [isOpen]);
-
-  const handleKodeSalesmanChange = (val: string) => {
-    const code = val.split(' - ')[0];
-    setKodeSalesman(code);
-  };
-
-  const getSelectedSalesmanValue = () => {
-    if (!kodeSalesman) return '';
-    const found = salesmenList.find(s => s.kode_salesman === kodeSalesman);
-    return found ? `${found.kode_salesman} - ${found.nama_salesman}` : kodeSalesman;
-  };
   
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -82,8 +55,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
         setArea(data.area || 'Bandung');
         setRole('Sales');
         setSupervisor(data.supervisor || 'Andi');
-        setStatus(data.status || 'Aktif');
-        setKodeSalesman(data.kodeSalesman || '');
+        setKodeSalesman(data.kodeSalesman || 'SLS-001');
       } else {
         setNamaSales('');
         setUsername('');
@@ -94,7 +66,6 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
         setArea('Bandung');
         setRole('Sales');
         setSupervisor('Andi');
-        setStatus('Aktif');
         setKodeSalesman('');
       }
       setShowPassword(false);
@@ -116,7 +87,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
     // Simulasikan delay simpan lalu tutup modal
     setTimeout(() => {
       if (onSave) {
-        onSave({ namaSales, username, email, nomorHp, password, area, role, supervisor, status, kodeSalesman });
+        onSave({ namaSales, username, email, nomorHp, password, area, role, supervisor, status });
       }
       setShowSuccess(false);
       onClose();
@@ -142,7 +113,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
     <>
       {/* Main Modal */}
       <div 
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px]"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4 sm:p-6 md:p-8"
         onClick={onClose}
       >
         <div 
@@ -162,115 +133,115 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
           </div>
 
           {mode === 'view_target' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 mb-8">
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Nama Sales</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Nama Sales</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <User size={18} />
+                    <User size={16} />
                   </div>
-                  <input type="text" value={data?.sales || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value={data?.sales || ''} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Area</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Map size={18} />
+                    <Map size={16} />
                   </div>
-                  <input type="text" value={data?.area || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value={data?.area || ''} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Supervisor</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Supervisor</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Users size={18} />
+                    <Users size={16} />
                   </div>
-                  <input type="text" value={data?.supervisor || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value={data?.supervisor || ''} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Periode</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <CheckCircle2 size={18} />
+                    <CheckCircle2 size={16} />
                   </div>
-                  <input type="text" value="Juli 2026" readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value="Juli 2026" readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Target Penjualan</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Target Penjualan</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Info size={18} />
+                    <Info size={16} />
                   </div>
-                  <input type="text" value={data?.target || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value={data?.target || ''} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Realisasi Penjualan</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Realisasi Penjualan</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Info size={18} />
+                    <Info size={16} />
                   </div>
-                  <input type="text" value={data?.realisasi || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value={data?.realisasi || ''} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Pencapaian Target</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Pencapaian Target</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Info size={18} />
+                    <Info size={16} />
                   </div>
-                  <input type="text" value={data?.pencapaian || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value={data?.pencapaian || ''} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Total Customer</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Total Customer</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Info size={18} />
+                    <Info size={16} />
                   </div>
-                  <input type="text" value={data?.totalCustomer || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value={data?.totalCustomer || ''} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Total Qty Penjualan</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Total Qty Penjualan</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Info size={18} />
+                    <Info size={16} />
                   </div>
-                  <input type="text" value={data?.totalQty || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value={data?.totalQty || ''} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Total Transaksi</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Total Transaksi</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Info size={18} />
+                    <Info size={16} />
                   </div>
-                  <input type="text" value={data?.totalTransaksi || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  <input type="text" value={data?.totalTransaksi || ''} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Status Target</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Status Target</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Info size={18} />
+                    <Info size={16} />
                   </div>
-                  <input type="text" value={data?.status || ''} readOnly className={`w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-medium focus:outline-none transition-colors ${data?.status === 'Tercapai' ? 'text-[#10b981]' : 'text-[#ef4444]'}`} />
+                  <input type="text" value={data?.status || ''} readOnly className={`w-full pl-10 pr-4 py-2.5 text-[14px] bg-gray-50 border border-gray-200 rounded-xl font-medium focus:outline-none transition-colors ${data?.status === 'Tercapai' ? 'text-[#10b981]' : 'text-[#ef4444]'}`} />
                 </div>
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 mb-8">
               {/* Nama Sales */}
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Nama Sales</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Nama Sales</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <User size={18} />
+                    <User size={16} />
                   </div>
                   <input 
                     type="text" 
@@ -278,17 +249,17 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                     onChange={(e) => setNamaSales(e.target.value)}
                     placeholder="Masukkan nama sales"
                     readOnly={mode === 'view_only'}
-                    className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
+                    className={`w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                   />
                 </div>
               </div>
 
               {/* Username */}
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Username</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Username</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <UserCircle size={18} />
+                    <UserCircle size={16} />
                   </div>
                   <input 
                     type="text" 
@@ -296,17 +267,35 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Masukkan username"
                     readOnly={mode === 'view_only'}
-                    className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
+                    className={`w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
+                  />
+                </div>
+              </div>
+
+              {/* Kode Salesman */}
+              <div>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Kode Salesman</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <Tag size={16} />
+                  </div>
+                  <input 
+                    type="text" 
+                    value={kodeSalesman}
+                    onChange={(e) => setKodeSalesman(e.target.value)}
+                    placeholder="Masukkan kode salesman"
+                    readOnly={mode === 'view_only'}
+                    className={`w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                   />
                 </div>
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Email</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Email</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Mail size={18} />
+                    <Mail size={16} />
                   </div>
                   <input 
                     type="email" 
@@ -314,17 +303,17 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Masukkan email"
                     readOnly={mode === 'view_only'}
-                    className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
+                    className={`w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                   />
                 </div>
               </div>
 
               {/* Nomor HP */}
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Nomor HP</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Nomor HP</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Phone size={18} />
+                    <Phone size={16} />
                   </div>
                   <input 
                     type="text" 
@@ -332,17 +321,17 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                     onChange={(e) => setNomorHp(e.target.value)}
                     placeholder="Masukkan nomor HP"
                     readOnly={mode === 'view_only'}
-                    className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
+                    className={`w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                   />
                 </div>
               </div>
 
               {/* Alamat */}
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Alamat</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Alamat</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <MapPin size={18} />
+                    <MapPin size={16} />
                   </div>
                   <input 
                     type="text" 
@@ -350,7 +339,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                     onChange={(e) => setAlamat(e.target.value)}
                     placeholder="Masukkan alamat lengkap"
                     readOnly={mode === 'view_only'}
-                    className={`w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
+                    className={`w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                   />
                 </div>
               </div>
@@ -358,10 +347,10 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
               {/* Password */}
               {mode !== 'view_only' && (
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Password</label>
+                  <label className="block text-[13px] text-[#475569] font-medium mb-2">Password</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                      <Lock size={18} />
+                      <Lock size={16} />
                     </div>
                     <input 
                       type={showPassword ? "text" : "password"} 
@@ -369,13 +358,13 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Masukkan password"
                       readOnly={mode === 'view_only'}
-                      className={`w-full pl-11 pr-12 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
+                      className={`w-full pl-10 pr-12 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors ${mode !== 'view_only' ? 'focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764]' : ''}`}
                     />
                     <div 
                       className={`absolute inset-y-0 right-0 pr-4 flex items-center ${mode === 'view_only' ? 'pointer-events-none' : 'cursor-pointer'} text-gray-400 hover:text-gray-600`}
                       onClick={() => { if(mode !== 'view_only') setShowPassword(!showPassword); }}
                     >
-                      {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                      {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
                     </div>
                   </div>
                 </div>
@@ -383,21 +372,21 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
 
               {/* Area */}
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Area</label>
                 {mode === 'view_only' ? (
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                      <Map size={18} />
+                      <Map size={16} />
                     </div>
-                    <input type="text" value={area} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                    <input type="text" value={area} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                   </div>
                 ) : (
                   <CustomSelect 
                     value={area}
                     onChange={setArea}
                     options={['Bandung', 'Jakarta', 'Cirebon', 'Kuningan']}
-                    icon={<Map size={18} />}
-                    triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
+                    icon={<Map size={16} />}
+                    triggerClassName="flex items-center justify-between w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
                     showSearch={false}
                   />
                 )}
@@ -405,21 +394,21 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
 
               {/* Role */}
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Role</label>
+                <label className="block text-[13px] text-[#475569] font-medium mb-2">Role</label>
                 {mode === 'view_only' ? (
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                      <Briefcase size={18} />
+                      <Briefcase size={16} />
                     </div>
-                    <input type="text" value={role} readOnly className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                    <input type="text" value={role} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                   </div>
                 ) : (
                   <CustomSelect 
                     value={role}
                     onChange={setRole}
                     options={['Sales', 'Supervisor', 'Admin']}
-                    icon={<Briefcase size={18} />}
-                    triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
+                    icon={<Briefcase size={16} />}
+                    triggerClassName="flex items-center justify-between w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
                     showSearch={false}
                   />
                 )}
@@ -428,29 +417,14 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
               {/* Supervisor */}
               {mode !== 'view_only' && (
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Supervisor</label>
+                  <label className="block text-[13px] text-[#475569] font-medium mb-2">Supervisor</label>
                   <CustomSelect 
                     value={supervisor}
                     onChange={setSupervisor}
                     options={['Andi', 'Hartono', 'Budi']}
-                    icon={<Users size={18} />}
-                    triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
+                    icon={<Users size={16} />}
+                    triggerClassName="flex items-center justify-between w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
                     showSearch={false}
-                  />
-                </div>
-              )}
-
-              {/* Kode Salesman */}
-              {mode !== 'view_only' && role.toLowerCase() === 'sales' && (
-                <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Kode Salesman</label>
-                  <CustomSelect 
-                    value={getSelectedSalesmanValue()}
-                    onChange={handleKodeSalesmanChange}
-                    options={salesmenList.map(s => `${s.kode_salesman} - ${s.nama_salesman}`)}
-                    icon={<User size={18} />}
-                    triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
-                    showSearch={true}
                   />
                 </div>
               )}
@@ -464,7 +438,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                   onClick={handleDeleteClick}
                   className="w-[160px] bg-[#ef4444] hover:bg-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
                 >
-                  <Trash2 size={18} />
+                  <Trash2 size={16} />
                   Hapus
                 </button>
               )}
@@ -472,7 +446,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                 onClick={handleSimpanClick}
                 className="w-[160px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
               >
-                <Save size={18} />
+                <Save size={16} />
                 Simpan
               </button>
             </div>

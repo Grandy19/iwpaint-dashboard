@@ -1,23 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../utils/api';
 
 type Role = 'admin' | 'sales' | 'supervisor' | 'distributor';
 
 interface User {
-  id?: number;
   email: string;
   role: Role;
-  name: string;
-  username: string;
-  area?: string;
-  supervisor_name?: string;
-  nomor_hp?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<User>;
+  login: (email: string, role: Role) => void;
   verifyOTP: () => void;
   logout: () => void;
 }
@@ -40,12 +33,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = async (email: string, password: string): Promise<User> => {
-    const response = await api.post('/auth/login', { email, password });
-    const newUser = response.data.user;
+  const login = (email: string, role: Role) => {
+    const newUser = { email, role };
     setUser(newUser);
     localStorage.setItem('iwpaint_user', JSON.stringify(newUser));
-    return newUser;
   };
 
   const verifyOTP = () => {

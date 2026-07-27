@@ -34,7 +34,7 @@ export const LoginPage = () => {
     }
   }, [error]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -49,20 +49,34 @@ export const LoginPage = () => {
 
     setIsLoading(true);
 
-    try {
-      await login(email, password);
+    setTimeout(() => {
+      
+      if (password !== 'password123') {
+        setIsLoading(false);
+        setError('Kredensial tidak valid. Silakan coba lagi.');
+        return;
+      }
+
+      let role: any = null;
+      if (email === 'admin@iwpaint.com') role = 'admin';
+      else if (email === 'sales@iwpaint.com') role = 'sales';
+      else if (email === 'supervisor@iwpaint.com') role = 'supervisor';
+      else if (email === 'distributor@iwpaint.com') role = 'distributor';
+      else {
+        setIsLoading(false);
+        setError('Akun tidak terdaftar dalam sistem.');
+        return;
+      }
 
       // Trigger exit animation
       setIsExiting(true);
       
       setTimeout(() => {
+        login(email, role);
         navigate('/authenticator');
       }, 600); // Wait for exit animation to complete
-    } catch (err: any) {
-      setIsLoading(false);
-      const errMsg = err.response?.data?.message || 'Gagal terhubung ke server. Silakan coba lagi.';
-      setError(errMsg);
-    }
+
+    }, 800);
   };
 
   return (

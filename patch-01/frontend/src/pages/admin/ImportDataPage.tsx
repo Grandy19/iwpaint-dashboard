@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
+
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Download, CheckCircle, CheckCircle2, XCircle, FileText, Search, Filter, Eye, Upload } from 'lucide-react';
@@ -13,6 +15,7 @@ import { kpiData } from '../../mock/dashboard';
 export const ImportDataPage = () => {
   const navigate = useNavigate();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [exportFileName, setExportFileName] = useState('');
   
@@ -85,6 +88,7 @@ export const ImportDataPage = () => {
 
   return (
     <MainLayout>
+      <LoadingOverlay isLoading={isLoading} />
       <Topbar 
         title="Riwayat Import" 
         subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB"
@@ -109,7 +113,11 @@ export const ImportDataPage = () => {
                 <div className="flex-1">
                   <CustomSelect 
                     value={startDate} 
-                    onChange={setStartDate} 
+                    onChange={(val) => {
+                  setStartDate(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                     options={['01 Juli 2026', '01 Juni 2026']} 
                   />
                 </div>
@@ -117,7 +125,11 @@ export const ImportDataPage = () => {
                 <div className="flex-1">
                   <CustomSelect 
                     value={endDate} 
-                    onChange={setEndDate} 
+                    onChange={(val) => {
+                  setEndDate(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                     options={['30 Juni 2026', '31 Juli 2026']} 
                   />
                 </div>
@@ -128,7 +140,11 @@ export const ImportDataPage = () => {
               <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
               <CustomSelect 
                 value={status} 
-                onChange={setStatus} 
+                onChange={(val) => {
+                  setStatus(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} 
                 options={['Berhasil', 'Gagal', 'Semua Status']} 
               />
             </div>

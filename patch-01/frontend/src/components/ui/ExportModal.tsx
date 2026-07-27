@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { RefreshCw, FileText, CheckCircle2 } from 'lucide-react';
-import html2pdf from 'html2pdf.js';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -17,34 +16,16 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, fileN
     }
   }, [isOpen]);
 
-  const handleExport = async () => {
+  const handleExport = () => {
     setStep(2);
-    try {
-      const element = document.getElementById('export-content');
-      if (element) {
-        const opt = {
-          margin:       0.2,
-          filename:     fileName,
-          image:        { type: 'jpeg' as const, quality: 0.98 },
-          html2canvas:  { scale: 2, useCORS: true },
-          jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' as const }
-        };
-
-        const generatePdf = typeof html2pdf === 'function' ? html2pdf : (html2pdf as any).default;
-        await generatePdf().set(opt).from(element).save();
-
-        setStep(3);
-        setTimeout(() => {
-          onClose();
-        }, 1500);
-      } else {
-        alert("Export content not found");
+    // Simulate processing
+    setTimeout(() => {
+      setStep(3);
+      // Auto close success alert
+      setTimeout(() => {
         onClose();
-      }
-    } catch (error: any) {
-      alert("Export failed: " + (error?.message || String(error)));
-      onClose();
-    }
+      }, 1500);
+    }, 2000);
   };
 
   if (!isOpen) return null;

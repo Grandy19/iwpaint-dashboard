@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
+
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Upload, Filter, Eye, CheckCircle2, XCircle, Plus, User, UserCircle, Mail, Phone, Lock, EyeOff, Map, Briefcase, Info, Users, Save, MapPin, ChevronDown, Search, Trash2, X } from 'lucide-react';
@@ -8,7 +10,7 @@ import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
 import { ExportModal } from '../../components/ui/ExportModal';
 import { SupervisorModal } from '../../components/ui/SupervisorModal';
-import api from '../../utils/api';
+import { supervisorKpiData, supervisorTableData } from '../../mock/supervisor';
 
 interface SalesOption {
   value: string;
@@ -16,21 +18,24 @@ interface SalesOption {
   subLabel?: string;
 }
 
+const salesOptions: SalesOption[] = [
+  { value: 'fransiskus', label: 'Fransiskus', subLabel: 'Bandung' },
+  { value: 'deni', label: 'Deni', subLabel: 'Bandung' },
+  { value: 'eko', label: 'Eko', subLabel: 'Jakarta' },
+  { value: 'budi', label: 'Budi', subLabel: 'Cirebon' },
+  { value: 'siti', label: 'Siti', subLabel: 'Kuningan' },
+  { value: 'agus', label: 'Agus', subLabel: 'Jakarta' },
+];
+
 export const SupervisorPage = () => {
   const [area, setArea] = useState('Semua Area');
+  const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState('Semua Status');
   const [supervisor, setSupervisor] = useState('Semua Supervisor');
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isSupervisorModalOpen, setIsSupervisorModalOpen] = useState(false);
   const [selectedSupervisor, setSelectedSupervisor] = useState<any>(null);
-
-  // Dynamic lists
-  const [supervisorsData, setSupervisorsData] = useState<any[]>([]);
-  const [kpis, setKpis] = useState<any[]>([]);
-  const [salesOptions, setSalesOptions] = useState<SalesOption[]>([]);
-  const [areaOptions, setAreaOptions] = useState<string[]>(['Semua Area']);
-  const [supervisorOptions, setSupervisorOptions] = useState<string[]>(['Semua Supervisor']);
 
   // Form states
   const [editNamaSupervisor, setEditNamaSupervisor] = useState('');
@@ -55,130 +60,17 @@ export const SupervisorPage = () => {
   const [tempSelectedSales, setTempSelectedSales] = useState<string[]>([]);
   const [salesSearchQuery, setSalesSearchQuery] = useState('');
 
-  const loadData = async () => {
-    try {
-      // Fetch supervisors
-      const supervisorRes = await api.get('/users?role=supervisor');
-      const allSupervisors = supervisorRes.data.data;
-      setSupervisorsData(allSupervisors);
-
-      // Fetch all sales for assignment options
-      const salesRes = await api.get('/users?role=sales');
-      const allSales = salesRes.data.data;
-      setSalesOptions(allSales.map((s: any) => ({
-        value: s.namaSales,
-        label: s.namaSales,
-        subLabel: s.area
-      })));
-
-      // Populate filters
-      const uniqueAreas = Array.from(new Set(allSupervisors.map((s: any) => s.area).filter(Boolean))) as string[];
-      setAreaOptions(['Semua Area', ...uniqueAreas]);
-      setSupervisorOptions(['Semua Supervisor', ...allSupervisors.map((s: any) => s.namaSupervisor)]);
-
-      // Calculate KPIs
-      const totalCount = allSupervisors.length;
-      const activeCount = allSupervisors.filter((s: any) => s.status === 'Aktif').length;
-      const inactiveCount = totalCount - activeCount;
-
-      setKpis([
-        {
-          id: 1,
-          title: 'Total Supervisor',
-          value: `${totalCount} Supervisor`,
-          description: 'Total supervisor yang terdaftar pada sistem',
-          icon: Users,
-          iconColor: 'text-[#10b981]',
-          iconBg: 'bg-[#dcfce7]',
-        },
-        {
-          id: 2,
-          title: 'Supervisor Aktif',
-          value: `${activeCount} Supervisor`,
-          description: 'Supervisor dengan status aktif',
-          icon: CheckCircle2,
-          iconColor: 'text-[#10b981]',
-          iconBg: 'bg-[#dcfce7]',
-        },
-        {
-          id: 3,
-          title: 'Supervisor Tidak Aktif',
-          value: `${inactiveCount} Supervisor`,
-          description: 'Supervisor dengan status tidak aktif',
-          icon: XCircle,
-          iconColor: 'text-[#ef4444]',
-          iconBg: 'bg-[#fee2e2]',
-        }
-      ]);
-
-    } catch (err) {
-      console.error('Failed to load supervisor data:', err);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const handleSimpanClick = () => setShowConfirm(true);
-
-  const handleConfirmSimpan = async () => {
+  const handleConfirmSimpan = () => {
     setShowConfirm(false);
-    try {
-      if (selectedSupervisorData) {
-        await api.put(`/users/${selectedSupervisorData.id}`, {
-          name: editNamaSupervisor,
-          username: editUsername,
-          email: editEmail,
-          nomorHp: editNomorHp,
-          alamat: editAlamat,
-          password: editPassword,
-          area: editArea,
-          status: editStatus,
-          salesList: editSelectedSales
-        });
-        setShowSuccess(true);
-        setTimeout(() => {
-          setShowSuccess(false);
-          loadData();
-        }, 1500);
-      }
-    } catch (err) {
-      console.error('Failed to update supervisor:', err);
-    }
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 1500);
   };
-
   const handleDeleteClick = () => setShowDeleteConfirm(true);
-
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     setShowDeleteConfirm(false);
-    try {
-      if (selectedSupervisorData) {
-        await api.delete(`/users/${selectedSupervisorData.id}`);
-        setShowDeleteSuccess(true);
-        setTimeout(() => {
-          setShowDeleteSuccess(false);
-          setSupervisor('Semua Supervisor');
-          loadData();
-        }, 1500);
-      }
-    } catch (err) {
-      console.error('Failed to delete supervisor:', err);
-    }
-  };
-
-  const handleCreateOrUpdateModal = async (formData: any) => {
-    try {
-      if (selectedSupervisor) {
-        await api.put(`/users/${selectedSupervisor.id}`, formData);
-      } else {
-        await api.post('/users', { ...formData, role: 'supervisor' });
-      }
-      setIsSupervisorModalOpen(false);
-      loadData();
-    } catch (err) {
-      console.error('Failed to save supervisor via modal:', err);
-    }
+    setShowDeleteSuccess(true);
+    setTimeout(() => setShowDeleteSuccess(false), 1500);
   };
 
   const handleOpenSalesModal = () => {
@@ -217,7 +109,7 @@ export const SupervisorPage = () => {
           setSelectedSupervisor(null);
           setIsSupervisorModalOpen(true);
         }}
-        className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
+        className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
       >
         <Plus size={18} />
         Supervisor
@@ -233,7 +125,7 @@ export const SupervisorPage = () => {
     { key: 'jumlahSales', label: 'Jumlah Sales' },
     { key: 'status', label: 'Status' },
     { key: 'tanggalBergabung', label: 'Tanggal Bergabung' },
-    { key: 'action', label: 'Detail' },
+    { key: 'detail', label: 'Detail' },
   ];
 
   const renderCell = (item: any, columnKey: string) => {
@@ -250,14 +142,14 @@ export const SupervisorPage = () => {
             <XCircle size={16} /> Tidak Aktif
           </span>
         );
-      case 'action':
+      case 'detail':
         return (
           <button 
             onClick={() => {
               setSelectedSupervisor(item);
               setIsSupervisorModalOpen(true);
             }}
-            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors"
           >
             <Eye size={16} /> Detail
           </button>
@@ -267,41 +159,48 @@ export const SupervisorPage = () => {
     }
   };
 
-  const isAllSupervisors = supervisor === 'Semua Supervisor';
-  const filteredSupervisorData = supervisorsData.filter((s: any) => {
-    if (area !== 'Semua Area' && s.area !== area) return false;
-    if (status !== 'Semua Status' && s.status !== status) return false;
-    return true;
-  });
-
-  const selectedSupervisorData = (!isAllSupervisors ? supervisorsData.find(s => s.namaSupervisor === supervisor) : null) as any;
+  const isAllSupervisor = supervisor === 'Semua Supervisor';
+  const selectedData = supervisorTableData.find(s => s.namaSupervisor === supervisor) || supervisorTableData[0];
 
   useEffect(() => {
-    if (!isAllSupervisors && selectedSupervisorData) {
-      setEditNamaSupervisor(selectedSupervisorData.namaSupervisor || '');
-      setEditUsername(selectedSupervisorData.username || '');
-      setEditEmail(selectedSupervisorData.email || '');
-      setEditNomorHp(selectedSupervisorData.nomorHp || '');
-      setEditAlamat(selectedSupervisorData.alamat || 'Jl. Moh Toha No. 12 Bandung');
-      setEditArea(selectedSupervisorData.area || 'Bandung');
-      setEditRole('Supervisor');
-      setEditSelectedSales(selectedSupervisorData.salesList || []);
-      setEditStatus(selectedSupervisorData.status || 'Aktif');
+    if (!isAllSupervisor && selectedData) {
+      setEditNamaSupervisor(selectedData.namaSupervisor || '');
+      setEditUsername(selectedData.email?.split('@')[0] || '');
+      setEditEmail(selectedData.email || '');
+      setEditNomorHp(selectedData.nomorHp || '');
+      setEditAlamat('Jl. Diponegoro No. 10'); // mock
       setEditPassword('**********');
+      setEditArea(selectedData.area || 'Bandung');
+      setEditRole('Supervisor');
+      setEditSelectedSales([]);
+      setEditStatus(selectedData.status || 'Aktif');
       setShowPassword(false);
     }
-  }, [selectedSupervisorData, isAllSupervisors]);
+  }, [selectedData, isAllSupervisor]);
+
+  let salesDisplayText = 'Pilih beberapa...';
+  if (editSelectedSales.length === 1) {
+    const opt = salesOptions.find(o => o.value === editSelectedSales[0]);
+    if (opt) salesDisplayText = opt.label;
+  } else if (editSelectedSales.length > 1) {
+    salesDisplayText = `${editSelectedSales.length} Terpilih`;
+  }
 
   return (
     <>
       <MainLayout>
-        <Topbar title="Supervisor" subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB" actionButton={ActionButtons} />
-
+      <LoadingOverlay isLoading={isLoading} />
+        <Topbar 
+          title="Supervisor" 
+          subtitle="Terakhir Diperbarui: Hari Ini, 10.45 WIB"
+          actionButton={ActionButtons}
+        />
+        
         <div className="px-8 pb-10">
           
-          {/* KPI Cards */}
+          {/* KPI Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 pt-4">
-            {kpis.map((kpi) => (
+            {supervisorKpiData.map((kpi) => (
               <KpiCard key={kpi.id} {...kpi} />
             ))}
           </div>
@@ -312,25 +211,37 @@ export const SupervisorPage = () => {
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                 <CustomSelect 
-                  value={area} 
-                  onChange={setArea} 
-                  options={areaOptions} 
+                  value={area}
+                  onChange={(val) => {
+                  setArea(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }}
+                  options={['Semua Area', 'Bandung', 'Jakarta', 'Cirebon', 'Kuningan']}
                 />
               </div>
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
                 <CustomSelect 
-                  value={status} 
-                  onChange={setStatus} 
-                  options={['Semua Status', 'Aktif', 'Tidak Aktif']} 
+                  value={status}
+                  onChange={(val) => {
+                  setStatus(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }}
+                  options={['Semua Status', 'Aktif', 'Tidak Aktif']}
                 />
               </div>
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Supervisor</label>
                 <CustomSelect 
-                  value={supervisor} 
-                  onChange={setSupervisor} 
-                  options={supervisorOptions} 
+                  value={supervisor}
+                  onChange={(val) => {
+                  setSupervisor(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }}
+                  options={['Semua Supervisor', 'Andi', 'Hariono', 'Deni', 'Rahmat', 'Dudu']}
                 />
               </div>
               
@@ -338,17 +249,17 @@ export const SupervisorPage = () => {
           </div>
 
           {/* Table Section */}
-          {isAllSupervisors ? (
+          {isAllSupervisor ? (
             <DataTable
               title="Tabel Supervisor"
               columns={tableColumns}
-              data={filteredSupervisorData}
+              data={supervisorTableData}
               renderCell={renderCell}
             />
           ) : (
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
               <h3 className="text-gray-600 text-[18px] font-medium mb-6">Informasi Supervisor</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 mb-8">
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Nama Supervisor</label>
                   <div className="relative">
@@ -409,55 +320,56 @@ export const SupervisorPage = () => {
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                   <CustomSelect 
-                    value={editArea} onChange={setEditArea} options={['Bandung', 'Jakarta', 'Cirebon', 'Kuningan']} 
+                    value={editArea} onChange={(val) => {
+                  setEditArea(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} options={['Bandung', 'Jakarta', 'Cirebon', 'Kuningan']} 
                     icon={<Map size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Role</label>
                   <CustomSelect 
-                    value={editRole} onChange={setEditRole} options={['Sales', 'Supervisor', 'Admin']} 
+                    value={editRole} onChange={(val) => {
+                  setEditRole(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} options={['Sales', 'Supervisor', 'Admin']} 
                     icon={<Briefcase size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
-                
-                <div className="col-span-2">
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Sales Terpilih</label>
+                <div>
+                  <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
                   <div 
                     onClick={handleOpenSalesModal}
-                    className="w-full flex items-center justify-between px-4 py-3 border border-gray-200 rounded-xl text-gray-800 cursor-pointer hover:border-gray-300 transition-colors bg-white select-none"
+                    className="relative flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer hover:border-[#3b0764] hover:ring-1 hover:ring-[#3b0764] transition-colors"
                   >
-                    <div className="flex flex-wrap gap-1.5 max-w-[90%]">
-                      {editSelectedSales.length === 0 ? (
-                        <span className="text-gray-400 text-[14px]">Pilih Sales...</span>
-                      ) : (
-                        editSelectedSales.map(item => (
-                          <span key={item} className="bg-purple-50 text-[#3b0764] border border-purple-200 px-2 py-0.5 rounded-md text-[13px] font-medium flex items-center gap-1">
-                            {item}
-                            <X size={12} className="hover:text-red-500 cursor-pointer" onClick={(e) => { e.stopPropagation(); setEditSelectedSales(editSelectedSales.filter(v => v !== item)); }} />
-                          </span>
-                        ))
-                      )}
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Users size={18} />
                     </div>
-                    <ChevronDown size={18} className="text-gray-400" />
+                    <span className="truncate">{salesDisplayText}</span>
+                    <ChevronDown size={16} className="text-gray-500" />
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
                   <CustomSelect 
-                    value={editStatus} onChange={setEditStatus} options={['Aktif', 'Tidak Aktif']} 
+                    value={editStatus} onChange={(val) => {
+                  setEditStatus(val);
+                  setIsLoading(true);
+                  setTimeout(() => setIsLoading(false), 500);
+                }} options={['Aktif', 'Tidak Aktif']} 
                     icon={<Info size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
               </div>
-              
-              <div className="flex items-center justify-center pt-8 gap-4">
-                <button onClick={handleDeleteClick} className="w-[160px] bg-[#ef4444] hover:bg-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer">
+              <div className="flex items-center justify-center pt-2 gap-4">
+                <button onClick={handleDeleteClick} className="w-[160px] bg-[#ef4444] hover:bg-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2">
                   <Trash2 size={18} />
                   Hapus
                 </button>
-                <button onClick={handleSimpanClick} className="w-[160px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                <button onClick={handleSimpanClick} className="w-[160px] bg-[#52b788] hover:bg-[#40916c] text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2">
                   <Save size={18} />
                   Simpan
                 </button>
@@ -468,73 +380,97 @@ export const SupervisorPage = () => {
         </div>
       </MainLayout>
 
-      {/* Sales Sub-selection Modal */}
-      {showSalesModal && (
-        <div className="fixed inset-0 z-[65] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
-          <div className="bg-white rounded-2xl w-[450px] p-6 shadow-xl relative border border-gray-100 flex flex-col max-h-[85vh]">
-            <button onClick={handleCloseSalesModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-              <X size={20} />
-            </button>
-            <h3 className="font-bold text-gray-900 text-[18px] mb-4">Pilih Sales</h3>
-            
-            <div className="relative mb-4">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input 
-                type="text" 
-                value={salesSearchQuery}
-                onChange={(e) => setSalesSearchQuery(e.target.value)}
-                placeholder="Cari Sales..." 
-                className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-[14px] focus:outline-none focus:border-[#3b0764]"
-              />
-            </div>
-            
-            <div className="flex-1 overflow-y-auto min-h-[250px] pr-2 space-y-1">
-              {filteredSalesOptions.map(opt => {
-                const isSelected = tempSelectedSales.includes(opt.value);
-                return (
-                  <div 
-                    key={opt.value}
-                    onClick={() => toggleSalesSelection(opt.value)}
-                    className={clsx(
-                      "flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-colors border",
-                      isSelected 
-                        ? "bg-purple-50/50 border-[#3b0764]/20 text-[#3b0764]" 
-                        : "border-transparent hover:bg-gray-50 text-gray-700"
-                    )}
-                  >
-                    <div>
-                      <p className="font-medium text-[14px]">{opt.label}</p>
-                      {opt.subLabel && <p className="text-[12px] text-gray-400 mt-0.5">{opt.subLabel}</p>}
-                    </div>
-                    <input 
-                      type="checkbox"
-                      checked={isSelected}
-                      readOnly
-                      className="w-4.5 h-4.5 rounded border-gray-300 text-[#3b0764] focus:ring-[#3b0764]"
-                    />
-                  </div>
-                );
-              })}
-            </div>
-            
-            
-          </div>
-        </div>
-      )}
-      
-      <SupervisorModal 
-        isOpen={isSupervisorModalOpen}
-        onClose={() => setIsSupervisorModalOpen(false)}
-        mode={selectedSupervisor ? 'detail' : 'edit'}
-        data={selectedSupervisor}
-        onSave={handleCreateOrUpdateModal}
-      />
-
       <ExportModal 
         isOpen={isExportModalOpen} 
         onClose={() => setIsExportModalOpen(false)} 
         fileName="Data_Supervisor.xlsx" 
       />
+      
+      <SupervisorModal 
+        isOpen={isSupervisorModalOpen}
+        onClose={() => setIsSupervisorModalOpen(false)}
+        data={selectedSupervisor}
+      />
+
+      {/* Sub-Modal Pemilihan Sales */}
+      {showSalesModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-[2px]" onClick={handleCloseSalesModal}>
+          <div className="bg-white rounded-2xl w-[450px] shadow-2xl relative flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-900">Pilih Sales</h3>
+              <button onClick={handleCloseSalesModal} className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-full transition-colors">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="px-6 py-3 border-b border-gray-100 bg-gray-50/50">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search size={16} className="text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#3b0764] focus:border-[#3b0764]"
+                  placeholder="Cari nama atau area sales..."
+                  value={salesSearchQuery}
+                  onChange={(e) => setSalesSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="overflow-y-auto max-h-[300px] p-2">
+              {filteredSalesOptions.length > 0 ? (
+                filteredSalesOptions.map((option, index) => {
+                  const isSelected = tempSelectedSales.includes(option.value);
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center px-4 py-3 mx-2 my-1 rounded-lg hover:bg-[#fcf8ff] cursor-pointer transition-colors"
+                      onClick={() => toggleSalesSelection(option.value)}
+                    >
+                      <div className="flex-shrink-0 mr-4">
+                        <div className={clsx(
+                          "w-5 h-5 rounded-[4px] border flex items-center justify-center transition-colors",
+                          isSelected ? "bg-[#3b0764] border-[#3b0764]" : "border-gray-300 bg-white"
+                        )}>
+                          {isSelected && (
+                            <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1 flex items-center justify-between min-w-0">
+                        <span className={clsx("text-sm truncate", isSelected ? "text-[#3b0764] font-medium" : "text-gray-800 font-medium")}>
+                          {option.label}
+                        </span>
+                        {option.subLabel && (
+                          <div className="flex items-center pl-4 ml-auto">
+                            <span className="text-xs text-gray-500 whitespace-nowrap">
+                              {option.subLabel}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="px-4 py-8 text-sm text-gray-500 text-center">
+                  Tidak ada sales ditemukan
+                </div>
+              )}
+            </div>
+            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3 bg-gray-50/30 rounded-b-2xl">
+              <button onClick={handleCloseSalesModal} className="px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                Batal
+              </button>
+              <button onClick={handleSaveSalesModal} className="bg-[#52b788] hover:bg-[#40916c] text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm">
+                <Save size={16} />
+                Simpan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Confirm Modal */}
       {showConfirm && (
@@ -543,16 +479,10 @@ export const SupervisorPage = () => {
             <h3 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Simpan</h3>
             <p className="text-gray-600 mb-8">Apakah Anda ingin menyimpan data tersebut?</p>
             <div className="flex justify-center gap-4">
-              <button 
-                onClick={() => setShowConfirm(false)}
-                className="w-[120px] bg-[#ef4444] hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition-colors cursor-pointer"
-              >
+              <button onClick={() => setShowConfirm(false)} className="w-[120px] bg-[#ef4444] hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition-colors">
                 Tidak
               </button>
-              <button 
-                onClick={handleConfirmSimpan}
-                className="w-[120px] bg-[#52b788] hover:bg-[#40916c] text-white py-2.5 rounded-xl font-medium transition-colors cursor-pointer"
-              >
+              <button onClick={handleConfirmSimpan} className="w-[120px] bg-[#52b788] hover:bg-[#40916c] text-white py-2.5 rounded-xl font-medium transition-colors">
                 Simpan
               </button>
             </div>
@@ -580,16 +510,10 @@ export const SupervisorPage = () => {
             <h3 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Hapus</h3>
             <p className="text-gray-600 mb-8">Apakah Anda ingin menghapus user tersebut?</p>
             <div className="flex justify-center gap-4">
-              <button 
-                onClick={() => setShowDeleteConfirm(false)}
-                className="w-[120px] bg-gray-200 hover:bg-gray-300 text-gray-800 py-2.5 rounded-xl font-medium transition-colors cursor-pointer"
-              >
+              <button onClick={() => setShowDeleteConfirm(false)} className="w-[120px] bg-gray-200 hover:bg-gray-300 text-gray-800 py-2.5 rounded-xl font-medium transition-colors">
                 Tidak
               </button>
-              <button 
-                onClick={handleConfirmDelete}
-                className="w-[120px] bg-[#ef4444] hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition-colors cursor-pointer"
-              >
+              <button onClick={handleConfirmDelete} className="w-[120px] bg-[#ef4444] hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition-colors">
                 Hapus
               </button>
             </div>
