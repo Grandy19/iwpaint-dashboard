@@ -16,11 +16,11 @@ export const ImportDataPage = () => {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [exportFileName, setExportFileName] = useState('');
   
-  const [startDate, setStartDate] = useState('2026-07-01');
+  const [startDate, setStartDate] = useState('2026-01-01');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [activeTab, setActiveTab] = useState<'upload' | 'history'>('upload');
-  const [endDate, setEndDate] = useState('2026-06-30');
+  const [endDate, setEndDate] = useState('2026-12-30');
   const [status, setStatus] = useState('Berhasil');
   const [searchQuery, setSearchQuery] = useState('');
 

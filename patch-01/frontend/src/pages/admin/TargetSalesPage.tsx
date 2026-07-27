@@ -16,8 +16,8 @@ export const TargetSalesPage = () => {
   const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
   const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
 
-  const [startDate, setStartDate] = useState('2026-07-01');
-  const [endDate, setEndDate] = useState('2026-06-30');
+  const [startDate, setStartDate] = useState('2026-01-01');
+  const [endDate, setEndDate] = useState('2026-12-30');
   const [area, setArea] = useState('Semua Area');
   const [salesName, setSalesName] = useState('Semua Sales');
 

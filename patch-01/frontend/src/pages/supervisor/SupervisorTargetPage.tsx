@@ -13,8 +13,8 @@ import api from '../../utils/api';
 
 export const SupervisorTargetPage = () => {
   const { user } = useAuth();
-  const [periodeAwal, setPeriodeAwal] = useState('2026-07-01');
-  const [periodeAkhir, setPeriodeAkhir] = useState('2026-06-30');
+  const [periodeAwal, setPeriodeAwal] = useState('2026-01-01');
+  const [periodeAkhir, setPeriodeAkhir] = useState('2026-12-30');
   const [sales, setSales] = useState('Semua Sales');
   const [appliedSales, setAppliedSales] = useState('Semua Sales');
   
