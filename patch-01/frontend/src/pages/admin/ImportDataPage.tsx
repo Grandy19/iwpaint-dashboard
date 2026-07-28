@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import api from '../../utils/api';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
 import { Download, CheckCircle, CheckCircle2, XCircle, FileText, Search, Filter, Eye, Upload } from 'lucide-react';
@@ -24,23 +25,26 @@ export const ImportDataPage = () => {
   const [status, setStatus] = useState('Berhasil');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const historyData = [
-    { id: 1, name: 'Penjualan_Juli.xlsx', date: '13 Jul 2026 09:30', rows: '2.450', status: 'success' },
-    { id: 2, name: 'Penjualan_Juni.xlsx', date: '27 Juni 2026 10:30', rows: '2.450', status: 'failed' },
-    { id: 3, name: 'Penjualan_Mei.xlsx', date: '10 Mei 2026 11:30', rows: '2.680', status: 'success' },
-    { id: 4, name: 'Penjualan_April.xlsx', date: '29 April 2026 09:00', rows: '2.510', status: 'success' },
-    { id: 5, name: 'Penjualan_Maret.xlsx', date: '23 Maret 2026 08:30', rows: '2.680', status: 'success' },
-    { id: 6, name: 'Penjualan_Februari.xlsx', date: '14 Feb 2026 14:15', rows: '2.100', status: 'success' },
-    { id: 7, name: 'Penjualan_Januari.xlsx', date: '30 Jan 2026 10:00', rows: '2.890', status: 'success' },
-    { id: 8, name: 'Penjualan_Desember.xlsx', date: '28 Des 2025 15:45', rows: '3.120', status: 'success' },
-    { id: 9, name: 'Penjualan_November.xlsx', date: '15 Nov 2025 09:20', rows: '2.750', status: 'failed' },
-    { id: 10, name: 'Penjualan_Oktober.xlsx', date: '22 Okt 2025 11:10', rows: '2.430', status: 'success' },
-    { id: 11, name: 'Penjualan_September.xlsx', date: '05 Sep 2025 13:30', rows: '2.660', status: 'success' },
-    { id: 12, name: 'Penjualan_Agustus.xlsx', date: '18 Ags 2025 16:00', rows: '2.800', status: 'success' },
-    { id: 13, name: 'Penjualan_Juli_2025.xlsx', date: '02 Jul 2025 10:45', rows: '2.950', status: 'success' },
-    { id: 14, name: 'Penjualan_Juni_2025.xlsx', date: '25 Jun 2025 08:50', rows: '2.340', status: 'failed' },
-    { id: 15, name: 'Penjualan_Mei_2025.xlsx', date: '12 Mei 2025 14:20', rows: '2.610', status: 'success' },
-  ];
+  const [historyData, setHistoryData] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const res = await api.get('/import-history');
+        const data = res.data.data.map((item: any) => ({
+          id: item.id,
+          name: item.file_name,
+          date: new Date(item.uploaded_at).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+          rows: Number(item.processed_rows).toLocaleString('id-ID'),
+          status: item.status === 'success' ? 'success' : 'failed'
+        }));
+        setHistoryData(data);
+      } catch (err) {
+        console.error("Gagal memuat riwayat import:", err);
+      }
+    };
+    fetchHistory();
+  }, []);
 
   const ActionButtons = (
     <button 
