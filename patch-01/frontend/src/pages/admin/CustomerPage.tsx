@@ -11,8 +11,9 @@ import { CustomerModal } from '../../components/ui/CustomerModal';
 import api from '../../utils/api';
 
 export const CustomerPage = () => {
+  const [periodeAwal, setPeriodeAwal] = useState('2026-01-01');
+  const [periodeAkhir, setPeriodeAkhir] = useState('2026-12-30');
   const [area, setArea] = useState('Semua Area');
-  const [status, setStatus] = useState('Semua Status');
   const [salesName, setSalesName] = useState('Semua Sales');
   const [customerName, setCustomerName] = useState('Semua Customer');
 
@@ -32,7 +33,11 @@ export const CustomerPage = () => {
 
   const loadData = async () => {
     try {
-      const customersRes = await api.get('/customers');
+      const params: any = {};
+      if (periodeAwal) params.periodeAwal = periodeAwal;
+      if (periodeAkhir) params.periodeAkhir = periodeAkhir;
+
+      const customersRes = await api.get('/customers', { params });
       const allCustomers = customersRes.data.data;
       setCustomersData(allCustomers);
 
@@ -99,11 +104,11 @@ export const CustomerPage = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [periodeAwal, periodeAkhir]);
 
   useEffect(() => {
     loadTransactions();
-  }, [customerName, salesName, area]);
+  }, [customerName, salesName, area, periodeAwal, periodeAkhir]);
 
   const isAllCustomers = customerName === 'Semua Customer';
   const selectedCustomerData = (!isAllCustomers ? customersData.find(c => c.namaCustomer === customerName) : null) as any;
@@ -192,21 +197,35 @@ export const CustomerPage = () => {
           
           {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
+              <div className="col-span-1 md:col-span-2">
+                <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <input 
+                      type="date" 
+                      value={periodeAwal} 
+                      onChange={(e) => setPeriodeAwal(e.target.value)} 
+                      className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    />
+                  </div>
+                  <span className="text-gray-400 font-bold">-</span>
+                  <div className="flex-1">
+                    <input 
+                      type="date" 
+                      value={periodeAkhir} 
+                      onChange={(e) => setPeriodeAkhir(e.target.value)} 
+                      className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    />
+                  </div>
+                </div>
+              </div>
               <div className="col-span-1">
                 <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
                 <CustomSelect 
                   value={area} 
                   onChange={setArea} 
                   options={areaOptions} 
-                />
-              </div>
-              <div className="col-span-1">
-                <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
-                <CustomSelect 
-                  value={status} 
-                  onChange={setStatus} 
-                  options={['Semua Status', 'Aktif', 'Tidak Aktif']} 
                 />
               </div>
               <div className="col-span-1">
