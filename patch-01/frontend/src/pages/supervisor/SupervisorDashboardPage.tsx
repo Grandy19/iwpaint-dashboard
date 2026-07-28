@@ -126,12 +126,12 @@ export const SupervisorDashboardPage = () => {
         {
           id: 4,
           title: 'Pencapaian Target Tim',
-          value: `${ringkasanData.percentage}%`,
+          value: `${Math.min(ringkasanData.percentage || 0, 100)}%`,
           description: 'Persentase pencapaian target seluruh tim',
           icon: Flag,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
-          progress: ringkasanData.percentage > 100 ? 100 : ringkasanData.percentage,
+          progress: Math.min(ringkasanData.percentage || 0, 100) > 100 ? 100 : Math.min(ringkasanData.percentage || 0, 100),
         }
       ]);
 

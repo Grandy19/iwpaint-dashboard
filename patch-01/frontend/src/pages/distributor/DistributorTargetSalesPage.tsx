@@ -88,7 +88,7 @@ export const DistributorTargetSalesPage = () => {
       });
 
       const tableRows = Object.values(areasGroup).map((a: any) => {
-        const percentage = a.totalTargetVal > 0 ? Math.round((a.totalRealisasiVal / a.totalTargetVal) * 100) : 0;
+        const percentage = a.totalTargetVal > 0 ? Math.min(Math.round((a.totalRealisasiVal / a.totalTargetVal) * 100), 100) : 0;
         return {
           area: a.area,
           target: a.totalTargetVal >= 1e6 ? `Rp ${(a.totalTargetVal / 1e6).toFixed(1)} Jt` : `Rp ${a.totalTargetVal.toLocaleString('id-ID')}`,
@@ -103,9 +103,9 @@ export const DistributorTargetSalesPage = () => {
           realisasi_deco: `Rp ${(a.realisasi_deco / 1e6).toFixed(1)} Jt`,
           realisasi_auto: `Rp ${(a.realisasi_auto / 1e6).toFixed(1)} Jt`,
           realisasi_ind: `Rp ${(a.realisasi_ind / 1e6).toFixed(1)} Jt`,
-          percentageDeco: a.target_deco > 0 ? Math.round((a.realisasi_deco / a.target_deco) * 100) : 0,
-          percentageAuto: a.target_auto > 0 ? Math.round((a.realisasi_auto / a.target_auto) * 100) : 0,
-          percentageInd: a.target_ind > 0 ? Math.round((a.realisasi_ind / a.target_ind) * 100) : 0,
+          percentageDeco: a.target_deco > 0 ? Math.min(Math.round((a.realisasi_deco / a.target_deco) * 100), 100) : 0,
+          percentageAuto: a.target_auto > 0 ? Math.min(Math.round((a.realisasi_auto / a.target_auto) * 100), 100) : 0,
+          percentageInd: a.target_ind > 0 ? Math.min(Math.round((a.realisasi_ind / a.target_ind) * 100), 100) : 0,
         };
       });
       setTargetsList(tableRows);
@@ -123,10 +123,10 @@ export const DistributorTargetSalesPage = () => {
 
       const totalTargetVal = myTargets.reduce((acc: number, t: any) => acc + t.raw_target_deco + t.raw_target_auto + t.raw_target_ind, 0);
       const totalRealisasiVal = myTargets.reduce((acc: number, t: any) => acc + (t.realisasi_deco + t.realisasi_auto + t.realisasi_ind), 0);
-      const globalPercentage = totalTargetVal > 0 ? Math.round((totalRealisasiVal / totalTargetVal) * 100) : 0;
+      const globalPercentage = totalTargetVal > 0 ? Math.min(Math.round((totalRealisasiVal / totalTargetVal) * 100), 100) : 0;
       
       const achievedAreas = Object.values(areasGroup).filter((a: any) => {
-        const p = a.totalTargetVal > 0 ? Math.round((a.totalRealisasiVal / a.totalTargetVal) * 100) : 0;
+        const p = a.totalTargetVal > 0 ? Math.min(Math.round((a.totalRealisasiVal / a.totalTargetVal) * 100), 100) : 0;
         return p >= 100;
       }).length;
 
@@ -183,7 +183,7 @@ export const DistributorTargetSalesPage = () => {
           id: 'decorative',
           title: 'Decorative',
           icon: PaintRoller,
-          percentage: totalDecoTarget > 0 ? Math.round((totalDecoRealisasi / totalDecoTarget) * 100) : 0,
+          percentage: totalDecoTarget > 0 ? Math.min(Math.round((totalDecoRealisasi / totalDecoTarget) * 100), 100) : 0,
           realisasi: `Rp ${Number(totalDecoRealisasi / 1e6).toFixed(1)} Jt`,
           target: `Rp ${Number(totalDecoTarget / 1e6).toFixed(1)} Jt`
         },
@@ -191,7 +191,7 @@ export const DistributorTargetSalesPage = () => {
           id: 'automotive',
           title: 'Automotive',
           icon: Wrench,
-          percentage: totalAutoTarget > 0 ? Math.round((totalAutoRealisasi / totalAutoTarget) * 100) : 0,
+          percentage: totalAutoTarget > 0 ? Math.min(Math.round((totalAutoRealisasi / totalAutoTarget) * 100), 100) : 0,
           realisasi: `Rp ${Number(totalAutoRealisasi / 1e6).toFixed(1)} Jt`,
           target: `Rp ${Number(totalAutoTarget / 1e6).toFixed(1)} Jt`
         },
@@ -199,7 +199,7 @@ export const DistributorTargetSalesPage = () => {
           id: 'industri',
           title: 'Industri',
           icon: Factory,
-          percentage: totalIndTarget > 0 ? Math.round((totalIndRealisasi / totalIndTarget) * 100) : 0,
+          percentage: totalIndTarget > 0 ? Math.min(Math.round((totalIndRealisasi / totalIndTarget) * 100), 100) : 0,
           realisasi: `Rp ${Number(totalIndRealisasi / 1e6).toFixed(1)} Jt`,
           target: `Rp ${Number(totalIndTarget / 1e6).toFixed(1)} Jt`
         }

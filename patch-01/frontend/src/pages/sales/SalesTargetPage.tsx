@@ -34,7 +34,7 @@ export const SalesTargetPage = () => {
       // Generate KPIs based on perfData safely
       const rawTarget = perfData.raw_target || 0;
       const rawRealisasi = perfData.raw_realisasi || 0;
-      const percentage = rawTarget > 0 ? Math.round((rawRealisasi / rawTarget) * 100) : 0;
+      const percentage = rawTarget > 0 ? Math.min(Math.round((rawRealisasi / rawTarget) * 100), 100) : 0;
       const sisa = rawTarget - rawRealisasi;
       const finalSisa = sisa > 0 ? sisa : 0;
 
@@ -95,7 +95,7 @@ export const SalesTargetPage = () => {
             id: 'decorative',
             title: 'Decorative',
             icon: PaintRoller,
-            percentage: myTargets.raw_target_deco > 0 ? Math.round((myTargets.realisasi_deco / myTargets.raw_target_deco) * 100) : 0,
+            percentage: myTargets.raw_target_deco > 0 ? Math.min(Math.round((myTargets.realisasi_deco / myTargets.raw_target_deco) * 100), 100) : 0,
             realisasi: `Rp ${Number(myTargets.realisasi_deco / 1e6).toFixed(1)} Jt`,
             target: `Rp ${Number(myTargets.raw_target_deco / 1e6).toFixed(1)} Jt`
           },
@@ -103,7 +103,7 @@ export const SalesTargetPage = () => {
             id: 'automotive',
             title: 'Automotive',
             icon: Wrench,
-            percentage: myTargets.raw_target_auto > 0 ? Math.round((myTargets.realisasi_auto / myTargets.raw_target_auto) * 100) : 0,
+            percentage: myTargets.raw_target_auto > 0 ? Math.min(Math.round((myTargets.realisasi_auto / myTargets.raw_target_auto) * 100), 100) : 0,
             realisasi: `Rp ${Number(myTargets.realisasi_auto / 1e6).toFixed(1)} Jt`,
             target: `Rp ${Number(myTargets.raw_target_auto / 1e6).toFixed(1)} Jt`
           },
@@ -111,7 +111,7 @@ export const SalesTargetPage = () => {
             id: 'industri',
             title: 'Industri',
             icon: Factory,
-            percentage: myTargets.raw_target_ind > 0 ? Math.round((myTargets.realisasi_ind / myTargets.raw_target_ind) * 100) : 0,
+            percentage: myTargets.raw_target_ind > 0 ? Math.min(Math.round((myTargets.realisasi_ind / myTargets.raw_target_ind) * 100), 100) : 0,
             realisasi: `Rp ${Number(myTargets.realisasi_ind / 1e6).toFixed(1)} Jt`,
             target: `Rp ${Number(myTargets.raw_target_ind / 1e6).toFixed(1)} Jt`
           }

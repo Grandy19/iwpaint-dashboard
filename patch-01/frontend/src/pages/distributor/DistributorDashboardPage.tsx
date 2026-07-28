@@ -104,12 +104,12 @@ export const DistributorDashboardPage = () => {
         {
           id: 4,
           title: 'Pencapaian Target Area',
-          value: `${targetPerfRes.data.percentage || 0}%`,
+          value: `${Math.min(targetPerfRes.data.percentage || 0, 100)}%`,
           description: 'Persentase pencapaian target area',
           icon: Flag,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
-          progress: targetPerfRes.data.percentage > 100 ? 100 : (targetPerfRes.data.percentage || 0),
+          progress: targetPerfRes.data.percentage > 100 ? 100 : (Math.min(targetPerfRes.data.percentage || 0, 100)),
         }
       ]);
 
@@ -155,7 +155,7 @@ export const DistributorDashboardPage = () => {
       const tableRows = Object.values(supervisorsGroup).map((s: any) => {
         const totalTarget = s.totalTargetVal;
         const totalRealisasi = s.totalRealisasiVal;
-        const percentage = totalTarget > 0 ? Math.round((totalRealisasi / totalTarget) * 100) : 0;
+        const percentage = totalTarget > 0 ? Math.min(Math.round((totalRealisasi / totalTarget) * 100), 100) : 0;
         return {
           id: s.id,
           supervisor: s.supervisor,
@@ -182,7 +182,7 @@ export const DistributorDashboardPage = () => {
           id: 'decorative',
           title: 'Decorative',
           icon: PaintRoller,
-          percentage: totalDecoTarget > 0 ? Math.round((totalDecoRealisasi / totalDecoTarget) * 100) : 0,
+          percentage: totalDecoTarget > 0 ? Math.min(Math.round((totalDecoRealisasi / totalDecoTarget) * 100), 100) : 0,
           realisasi: `Rp ${Number(totalDecoRealisasi / 1e6).toFixed(1)} Jt`,
           target: `Rp ${Number(totalDecoTarget / 1e6).toFixed(1)} Jt`
         },
@@ -190,7 +190,7 @@ export const DistributorDashboardPage = () => {
           id: 'automotive',
           title: 'Automotive',
           icon: Wrench,
-          percentage: totalAutoTarget > 0 ? Math.round((totalAutoRealisasi / totalAutoTarget) * 100) : 0,
+          percentage: totalAutoTarget > 0 ? Math.min(Math.round((totalAutoRealisasi / totalAutoTarget) * 100), 100) : 0,
           realisasi: `Rp ${Number(totalAutoRealisasi / 1e6).toFixed(1)} Jt`,
           target: `Rp ${Number(totalAutoTarget / 1e6).toFixed(1)} Jt`
         },
@@ -198,7 +198,7 @@ export const DistributorDashboardPage = () => {
           id: 'industri',
           title: 'Industri',
           icon: Factory,
-          percentage: totalIndTarget > 0 ? Math.round((totalIndRealisasi / totalIndTarget) * 100) : 0,
+          percentage: totalIndTarget > 0 ? Math.min(Math.round((totalIndRealisasi / totalIndTarget) * 100), 100) : 0,
           realisasi: `Rp ${Number(totalIndRealisasi / 1e6).toFixed(1)} Jt`,
           target: `Rp ${Number(totalIndTarget / 1e6).toFixed(1)} Jt`
         }

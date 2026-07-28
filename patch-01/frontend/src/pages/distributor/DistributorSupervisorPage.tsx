@@ -84,12 +84,12 @@ export const DistributorSupervisorPage = () => {
         {
           id: 2,
           title: 'Pencapaian Target Supervisor',
-          value: `${targetPerf.percentage || 0}%`,
+          value: `${Math.min(targetPerf.percentage || 0, 100)}%`,
           description: 'Persentase pencapaian target',
           icon: Target,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
-          progress: targetPerf.percentage > 100 ? 100 : (targetPerf.percentage || 0),
+          progress: targetPerf.percentage > 100 ? 100 : (Math.min(targetPerf.percentage || 0, 100)),
         },
         {
           id: 3,
