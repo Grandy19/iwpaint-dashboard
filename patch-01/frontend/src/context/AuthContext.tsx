@@ -17,6 +17,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<User>;
   verifyOTP: () => void;
   logout: () => void;
@@ -27,6 +28,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('iwpaint_user');
@@ -38,6 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (storedAuth === 'true') {
       setIsAuthenticated(true);
     }
+    setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string): Promise<User> => {
@@ -61,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, verifyOTP, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, verifyOTP, logout }}>
       {children}
     </AuthContext.Provider>
   );
