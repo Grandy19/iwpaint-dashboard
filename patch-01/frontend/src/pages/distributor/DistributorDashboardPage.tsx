@@ -213,11 +213,13 @@ export const DistributorDashboardPage = () => {
       // Fetch Top Products
       const topProductsRes = await api.get('/sales/top-products', { params });
       const products = topProductsRes.data.data;
+      const maxVal = products.length > 0 ? Math.max(...products.map((p: any) => p.total_sales)) : 1;
       setTopProducts(products.map((p: any, idx: number) => ({
         id: idx + 1,
         name: p.nama_produk,
-        salesValue: p.total_sales,
-        qtyValue: p.total_qty || 0
+        value: p.total_sales,
+        max: maxVal,
+        label: p.total_sales >= 1e6 ? `Rp ${(p.total_sales / 1e6).toFixed(1)} Jt` : `Rp ${Number(p.total_sales).toLocaleString('id-ID')}`
       })));
 
       // Trend data is now handled by loadTrendData directly so it can respond to chart filter changes

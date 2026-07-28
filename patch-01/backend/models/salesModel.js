@@ -186,8 +186,7 @@ async function fetchSalesTopProducts(salesmen, filters = {}) {
   let query = `
     SELECT
       f.nama_barang AS nama_produk,
-      COALESCE(SUM(f.netto), 0) AS total_sales,
-      COALESCE(SUM(f.qty), 0) AS total_qty
+      COALESCE(SUM(f.netto), 0) AS total_sales
     FROM fact_sales f
     LEFT JOIN dim_products p ON (p.id = f.product_id OR p.kode_produk = f.kode_barang)
     WHERE f.nama_salesman IN (?)
