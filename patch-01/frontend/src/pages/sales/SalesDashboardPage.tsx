@@ -1,3 +1,4 @@
+import { formatDateIndo } from '../../utils/formatters';
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
@@ -270,7 +271,7 @@ export const SalesDashboardPage = () => {
           setJenisData={setChartJenisData}
           periode={chartPeriode}
           setPeriode={setChartPeriode}
-          filterAktifLabel="1 Juni 2026 - 30 Juni 2026"
+          filterAktifLabel={`${formatDateIndo(periodeAwal)} - ${formatDateIndo(periodeAkhir)}`}
         />
 
         {/* Top 10 Produk */}

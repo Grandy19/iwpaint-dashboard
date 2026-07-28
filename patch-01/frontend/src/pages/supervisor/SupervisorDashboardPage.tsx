@@ -1,3 +1,4 @@
+import { formatDateIndo } from '../../utils/formatters';
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
@@ -323,7 +324,8 @@ export const SupervisorDashboardPage = () => {
             setJenisData={setChartJenisData}
             periode={chartPeriode}
             setPeriode={setChartPeriode}
-          />
+            filterAktifLabel={`${formatDateIndo(periodeAwal)} - ${formatDateIndo(periodeAkhir)}`}
+        />
         </div>
 
         {/* Performance Table */}

@@ -1,3 +1,4 @@
+import { formatDateIndo } from '../../utils/formatters';
 import { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
@@ -454,7 +455,7 @@ export const DistributorCustomerPage = () => {
             setJenisData={setChartJenisData}
             periode={chartPeriode}
             setPeriode={setChartPeriode}
-            filterAktifLabel={`${periodeAwal} - ${periodeAkhir}`}
+            filterAktifLabel={`${formatDateIndo(periodeAwal)} - ${formatDateIndo(periodeAkhir)}`}
           />
         </div>
 

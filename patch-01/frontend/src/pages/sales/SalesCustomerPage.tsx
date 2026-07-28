@@ -1,3 +1,4 @@
+import { formatDateIndo } from '../../utils/formatters';
 import { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
@@ -395,7 +396,8 @@ export const SalesCustomerPage = () => {
             setJenisData={setChartJenisData}
             periode={chartPeriode}
             setPeriode={setChartPeriode}
-          />
+            filterAktifLabel={`${formatDateIndo(periodeAwal)} - ${formatDateIndo(periodeAkhir)}`}
+        />
         </div>
 
         {/* Top 10 Produk */}

@@ -19,3 +19,11 @@ export const formatShortNumber = (value: number) => {
   }
   return value.toLocaleString('id-ID');
 };
+
+export const formatDateIndo = (dateString: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return dateString;
+  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+};
