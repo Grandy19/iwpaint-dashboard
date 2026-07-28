@@ -143,32 +143,38 @@ export const SupervisorDashboardPage = () => {
       const totalIndTarget = salesRows.reduce((acc: number, s: any) => acc + s.raw_target_ind, 0);
       const totalIndRealisasi = salesRows.reduce((acc: number, s: any) => acc + s.realisasi_ind, 0);
 
-      setTargetRealisasi([
-        {
+      const allTargets = [];
+      if (kategoriProduk === 'Semua Kategori' || kategoriProduk === 'Decorative') {
+        allTargets.push({
           id: 'decorative',
           title: 'Decorative',
           icon: PaintRoller,
           percentage: totalDecoTarget > 0 ? Math.min(Math.round((totalDecoRealisasi / totalDecoTarget) * 100), 100) : 0,
           realisasi: `Rp ${Number(totalDecoRealisasi / 1e6).toFixed(1)} Jt`,
           target: `Rp ${Number(totalDecoTarget / 1e6).toFixed(1)} Jt`
-        },
-        {
+        });
+      }
+      if (kategoriProduk === 'Semua Kategori' || kategoriProduk === 'Automotive') {
+        allTargets.push({
           id: 'automotive',
           title: 'Automotive',
           icon: Wrench,
           percentage: totalAutoTarget > 0 ? Math.min(Math.round((totalAutoRealisasi / totalAutoTarget) * 100), 100) : 0,
           realisasi: `Rp ${Number(totalAutoRealisasi / 1e6).toFixed(1)} Jt`,
           target: `Rp ${Number(totalAutoTarget / 1e6).toFixed(1)} Jt`
-        },
-        {
+        });
+      }
+      if (kategoriProduk === 'Semua Kategori' || kategoriProduk === 'Industri') {
+        allTargets.push({
           id: 'industri',
           title: 'Industri',
           icon: Factory,
           percentage: totalIndTarget > 0 ? Math.min(Math.round((totalIndRealisasi / totalIndTarget) * 100), 100) : 0,
           realisasi: `Rp ${Number(totalIndRealisasi / 1e6).toFixed(1)} Jt`,
           target: `Rp ${Number(totalIndTarget / 1e6).toFixed(1)} Jt`
-        }
-      ]);
+        });
+      }
+      setTargetRealisasi(allTargets);
 
       // Fetch Top Products
       const topProductsRes = await api.get('/sales/top-products', { params });

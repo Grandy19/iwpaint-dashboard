@@ -104,32 +104,38 @@ export const SalesDashboardPage = () => {
       const targetRes = await api.get('/targets', { params: { salesman: salesmanName, tahun: targetYear, bulan_nama: targetMonthName, periodeAwal, periodeAkhir } });
       const myTargets = targetRes.data.data[0];
       if (myTargets) {
-        setTargetRealisasi([
-          {
+        const allTargets = [];
+        if (kategoriProduk === 'Semua Kategori' || kategoriProduk === 'Decorative') {
+          allTargets.push({
             id: 'decorative',
             title: 'Decorative',
             icon: PaintRoller,
             percentage: myTargets.raw_target_deco > 0 ? Math.min(Math.round((myTargets.realisasi_deco / myTargets.raw_target_deco) * 100), 100) : 0,
             realisasi: `Rp ${Number(myTargets.realisasi_deco / 1e6).toFixed(1)} Jt`,
             target: `Rp ${Number(myTargets.raw_target_deco / 1e6).toFixed(1)} Jt`
-          },
-          {
+          });
+        }
+        if (kategoriProduk === 'Semua Kategori' || kategoriProduk === 'Automotive') {
+          allTargets.push({
             id: 'automotive',
             title: 'Automotive',
             icon: Wrench,
             percentage: myTargets.raw_target_auto > 0 ? Math.min(Math.round((myTargets.realisasi_auto / myTargets.raw_target_auto) * 100), 100) : 0,
             realisasi: `Rp ${Number(myTargets.realisasi_auto / 1e6).toFixed(1)} Jt`,
             target: `Rp ${Number(myTargets.raw_target_auto / 1e6).toFixed(1)} Jt`
-          },
-          {
+          });
+        }
+        if (kategoriProduk === 'Semua Kategori' || kategoriProduk === 'Industri') {
+          allTargets.push({
             id: 'industri',
             title: 'Industri',
             icon: Factory,
             percentage: myTargets.raw_target_ind > 0 ? Math.min(Math.round((myTargets.realisasi_ind / myTargets.raw_target_ind) * 100), 100) : 0,
             realisasi: `Rp ${Number(myTargets.realisasi_ind / 1e6).toFixed(1)} Jt`,
             target: `Rp ${Number(myTargets.raw_target_ind / 1e6).toFixed(1)} Jt`
-          }
-        ]);
+          });
+        }
+        setTargetRealisasi(allTargets);
       } else {
          setTargetRealisasi([]);
       }
