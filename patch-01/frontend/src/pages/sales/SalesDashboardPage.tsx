@@ -11,6 +11,7 @@ import { CustomSelect } from '../../components/ui/CustomSelect';
 import { ChartCard } from '../../components/ui/ChartCard';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
+import { ExportModal } from '../../components/ui/ExportModal';
 
 export const SalesDashboardPage = () => {
   const { user } = useAuth();
@@ -26,6 +27,7 @@ export const SalesDashboardPage = () => {
   const [targetRealisasi, setTargetRealisasi] = useState<any[]>([]);
   const [topProducts, setTopProducts] = useState<any[]>([]);
   const [trendData, setTrendData] = useState<any[]>([]);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const isAll = kategoriProduk === 'Semua Kategori';
 
@@ -193,7 +195,8 @@ export const SalesDashboardPage = () => {
 
   const ActionButtons = (
     <button 
-      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+      onClick={() => setIsExportModalOpen(true)}
+      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
     >
       <Download size={18} />
       Export Data
@@ -207,8 +210,9 @@ export const SalesDashboardPage = () => {
   ];
 
   return (
-    <MainLayout sidebarItems={salesMenuItems}>
-      <Topbar title="Dashboard Sales" subtitle={`Selamat datang, ${user?.name || ''}`} actionButton={ActionButtons} />
+    <>
+      <MainLayout sidebarItems={salesMenuItems}>
+        <Topbar title="Dashboard Sales" subtitle={`Selamat datang, ${user?.name || ''}`} actionButton={ActionButtons} />
 
       <div className="px-8 pb-10">
         
@@ -284,7 +288,14 @@ export const SalesDashboardPage = () => {
         <TopProductsCard data={topProducts} title={topProductsTitle} />
 
       </div>
-    </MainLayout>
+      </MainLayout>
+
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        fileName="dashboard-sales.pdf"
+      />
+    </>
   );
 };
 

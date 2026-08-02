@@ -8,6 +8,7 @@ import { DataTable } from '../../components/common/DataTable';
 import { SupervisorModal } from '../../components/ui/SupervisorModal';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
+import { ExportModal } from '../../components/ui/ExportModal';
 
 export const DistributorSupervisorPage = () => {
   const { user } = useAuth();
@@ -18,6 +19,7 @@ export const DistributorSupervisorPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSupervisor, setSelectedSupervisor] = useState<any>(null);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // Dynamic states
   const [supervisorsList, setSupervisorsList] = useState<any[]>([]);
@@ -111,7 +113,10 @@ export const DistributorSupervisorPage = () => {
   }, [user, periodeAwal, periodeAkhir, area, supervisor]);
 
   const ActionButtons = (
-    <button className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+    <button 
+      onClick={() => setIsExportModalOpen(true)}
+      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
+    >
       <Download size={18} />
       Export Data
     </button>
@@ -173,8 +178,9 @@ export const DistributorSupervisorPage = () => {
   });
 
   return (
-    <MainLayout sidebarItems={distributorMenuItems}>
-      <Topbar title="Supervisor" subtitle="Pantau performa supervisor pada area distribusi yang dikelola." actionButton={ActionButtons} />
+    <>
+      <MainLayout sidebarItems={distributorMenuItems}>
+        <Topbar title="Supervisor" subtitle="Pantau performa supervisor pada area distribusi yang dikelola." actionButton={ActionButtons} />
 
       <div className="px-8 pb-10">
         
@@ -250,6 +256,12 @@ export const DistributorSupervisorPage = () => {
         mode="view_only"
         data={selectedSupervisor}
       />
-    </MainLayout>
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        fileName="supervisor-distributor.pdf"
+      />
+      </MainLayout>
+    </>
   );
 };

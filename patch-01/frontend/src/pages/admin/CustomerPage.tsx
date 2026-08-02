@@ -369,7 +369,7 @@ export const CustomerPage = () => {
       <ExportModal 
         isOpen={isExportModalOpen} 
         onClose={() => setIsExportModalOpen(false)} 
-        fileName="Data_Customer.xlsx" 
+        fileName="Data_Customer.pdf" 
       />
 
       <ImportModal 

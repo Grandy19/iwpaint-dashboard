@@ -10,6 +10,7 @@ import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
 import { AreaTargetModal } from '../../components/ui/AreaTargetModal';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
+import { ExportModal } from '../../components/ui/ExportModal';
 
 export const DistributorTargetSalesPage = () => {
   const { user } = useAuth();
@@ -24,6 +25,7 @@ export const DistributorTargetSalesPage = () => {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedArea, setSelectedArea] = useState<any>(null);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // Dynamic states
   const [targetsList, setTargetsList] = useState<any[]>([]);
@@ -37,7 +39,7 @@ export const DistributorTargetSalesPage = () => {
   const loadData = async () => {
     if (!user) return;
     try {
-      const myArea = 'Semua Area';
+      const myArea = user?.area || 'Semua Area';
       
       const dateObj = new Date(periodeAwal);
       const targetYear = dateObj.getFullYear() || 2026;
@@ -236,7 +238,10 @@ export const DistributorTargetSalesPage = () => {
   };
 
   const ActionButtons = (
-    <button className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+    <button 
+      onClick={() => setIsExportModalOpen(true)}
+      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
+    >
       <Download size={18} />
       Export Data
     </button>
@@ -310,8 +315,9 @@ export const DistributorTargetSalesPage = () => {
   });
 
   return (
-    <MainLayout sidebarItems={distributorMenuItems}>
-      <Topbar title="Target Penjualan" subtitle="Pantau pencapaian target penjualan seluruh area distribusi." actionButton={ActionButtons} />
+    <>
+      <MainLayout sidebarItems={distributorMenuItems}>
+        <Topbar title="Target Penjualan" subtitle="Pantau pencapaian target penjualan seluruh area distribusi." actionButton={ActionButtons} />
 
       <div className="px-8 pb-10">
         
@@ -413,6 +419,12 @@ export const DistributorTargetSalesPage = () => {
         onClose={() => setIsModalOpen(false)}
         data={selectedArea}
       />
-    </MainLayout>
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        fileName="target-distributor.pdf"
+      />
+      </MainLayout>
+    </>
   );
 };

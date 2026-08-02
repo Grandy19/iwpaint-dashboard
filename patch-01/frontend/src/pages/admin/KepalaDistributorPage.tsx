@@ -396,7 +396,7 @@ export const KepalaDistributorPage = () => {
       <ExportModal 
         isOpen={isExportModalOpen} 
         onClose={() => setIsExportModalOpen(false)} 
-        fileName="Data_Kepala_Distributor.xlsx" 
+        fileName="Data_Kepala_Distributor.pdf" 
       />
 
       {/* Confirm Modal */}

@@ -47,7 +47,7 @@ export const DistributorCustomerPage = () => {
   const loadData = async () => {
     if (!user) return;
     try {
-      const myArea = 'Semua Area';
+      const myArea = user?.area || 'Semua Area';
       const params: any = { area: myArea, periodeAwal, periodeAkhir };
       if (appliedArea !== 'Semua Area') params.area = appliedArea;
       if (appliedSales !== 'Semua Sales') params.salesName = appliedSales;
@@ -485,7 +485,7 @@ export const DistributorCustomerPage = () => {
       <ExportModal 
         isOpen={isExportModalOpen} 
         onClose={() => setIsExportModalOpen(false)} 
-        fileName="Data_Customer_Distributor.xlsx" 
+        fileName="Data_Customer_Distributor.pdf" 
       />
       <CustomerModal 
         isOpen={isCustomerModalOpen}

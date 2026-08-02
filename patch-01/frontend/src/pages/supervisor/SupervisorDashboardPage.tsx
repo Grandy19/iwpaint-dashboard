@@ -13,6 +13,7 @@ import { DataTable } from '../../components/common/DataTable';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
 import clsx from 'clsx';
+import { ExportModal } from '../../components/ui/ExportModal';
 
 export const SupervisorDashboardPage = () => {
   const { user } = useAuth();
@@ -26,6 +27,7 @@ export const SupervisorDashboardPage = () => {
   const [kpis, setKpis] = useState<any[]>([]);
   const [ringkasanTarget, setRingkasanTarget] = useState<any>({ percentage: 0, targetGlobal: 'Rp 0 Jt', realisasi: 'Rp 0 Jt', selisih: 'Rp 0 Jt' });
   const [targetRealisasi, setTargetRealisasi] = useState<any[]>([]);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [topProducts, setTopProducts] = useState<any[]>([]);
   const [trendData, setTrendData] = useState<any[]>([]);
   const [salesTableData, setSalesTableData] = useState<any[]>([]);
@@ -203,7 +205,8 @@ export const SupervisorDashboardPage = () => {
 
   const ActionButtons = (
     <button 
-      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+      onClick={() => setIsExportModalOpen(true)}
+      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
     >
       <Download size={18} />
       Export Data
@@ -260,8 +263,9 @@ export const SupervisorDashboardPage = () => {
   };
 
   return (
-    <MainLayout sidebarItems={supervisorMenuItems}>
-      <Topbar title="Dashboard Supervisor" subtitle={`Selamat datang, ${user?.name || ''}`} actionButton={ActionButtons} />
+    <>
+      <MainLayout sidebarItems={supervisorMenuItems}>
+        <Topbar title="Dashboard Supervisor" subtitle={`Selamat datang, ${user?.name || ''}`} actionButton={ActionButtons} />
 
       <div className="px-8 pb-10">
         
@@ -348,6 +352,13 @@ export const SupervisorDashboardPage = () => {
         <TopProductsCard data={topProducts} title="Top 10 Produk Terlaris Tim" />
 
       </div>
-    </MainLayout>
+      </MainLayout>
+
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        fileName="dashboard-supervisor.pdf"
+      />
+    </>
   );
 };

@@ -7,11 +7,13 @@ import { ProgressCard } from '../../components/common/ProgressCard';
 import { DataTable } from '../../components/common/DataTable';
 import { ImportModal } from '../../components/ui/ImportModal';
 import { TargetSalesModal } from '../../components/ui/TargetSalesModal';
+import { ExportModal } from '../../components/ui/ExportModal';
 import api from '../../utils/api';
 
 export const DashboardPage = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isTargetModalOpen, setIsTargetModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const [kpis, setKpis] = useState<any[]>([]);
   const [progress, setProgress] = useState<any>(null);
@@ -169,13 +171,22 @@ export const DashboardPage = () => {
   };
 
   const ActionButtons = (
-    <button 
-      onClick={() => setIsImportModalOpen(true)}
-      className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-    >
-      <Download size={18} />
-      Import Data
-    </button>
+    <div className="flex gap-4">
+      <button 
+        onClick={() => setIsExportModalOpen(true)}
+        className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
+      >
+        <Download size={18} />
+        Export Data
+      </button>
+      <button 
+        onClick={() => setIsImportModalOpen(true)}
+        className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
+      >
+        <Download size={18} />
+        Import Data
+      </button>
+    </div>
   );
 
   const renderHistoryCell = (item: any, columnKey: string) => {
@@ -302,6 +313,11 @@ export const DashboardPage = () => {
         data={null}
         onSave={handleSaveModal}
         salesList={salesOptions.filter(s => s !== 'Semua Sales')}
+      />
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        fileName="dashboard-admin.pdf"
       />
     </>
   );

@@ -8,9 +8,11 @@ import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
 import { DataTable } from '../../components/common/DataTable';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
+import { ExportModal } from '../../components/ui/ExportModal';
 
 export const SalesTargetPage = () => {
   const { user } = useAuth();
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [kpiData, setKpiData] = useState<any[]>([]);
   const [ringkasanTarget, setRingkasanTarget] = useState<any>({ percentage: 0, targetGlobal: 'Rp 0 Jt', realisasi: 'Rp 0 Jt', selisih: 'Rp 0 Jt' });
   const [targetRealisasi, setTargetRealisasi] = useState<any[]>([]);
@@ -134,7 +136,8 @@ export const SalesTargetPage = () => {
 
   const ActionButtons = (
     <button 
-      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+      onClick={() => setIsExportModalOpen(true)}
+      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
     >
       <Download size={18} />
       Export Data
@@ -175,12 +178,13 @@ export const SalesTargetPage = () => {
   ];
 
   return (
-    <MainLayout sidebarItems={salesMenuItems}>
-      <Topbar 
-        title="Target Penjualan" 
-        subtitle="Pantau pencapaian target penjualan Anda pada bulan ini." 
-        actionButton={ActionButtons} 
-      />
+    <>
+      <MainLayout sidebarItems={salesMenuItems}>
+        <Topbar 
+          title="Target Penjualan" 
+          subtitle="Pantau pencapaian target penjualan Anda pada bulan ini." 
+          actionButton={ActionButtons} 
+        />
 
       <div className="px-8 pb-10">
         
@@ -215,6 +219,12 @@ export const SalesTargetPage = () => {
         />
 
       </div>
-    </MainLayout>
+      </MainLayout>
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        fileName="target-sales.pdf"
+      />
+    </>
   );
 };
