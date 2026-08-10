@@ -157,8 +157,13 @@ export const SalesDashboardPage = () => {
       })));
 
       // Fetch Trend moved to separate useEffect
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to load sales dashboard:', err);
+      if (err.response) {
+        setKpiData([{ id: 999, title: 'ERROR', value: `${err.response.status} ${JSON.stringify(err.response.data)}`, description: err.config.url }]);
+      } else {
+        setKpiData([{ id: 999, title: 'ERROR', value: err.message, description: 'Network Error' }]);
+      }
     }
   };
 
