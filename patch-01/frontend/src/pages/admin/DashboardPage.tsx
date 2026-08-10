@@ -30,21 +30,31 @@ export const DashboardPage = () => {
       const monthNamesInd = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
       const targetMonthName = monthNamesInd[now.getMonth()];
 
-      const [txRes, targetsRes, historyRes, salesUsersRes, customersRes] = await Promise.all([
-        api.get('/dashboard/total-transactions').catch(() => ({ data: { total_transactions: 0 } })),
+      const [salesRes, targetsRes, historyRes, salesUsersRes, customersRes] = await Promise.all([
+        api.get('/dashboard/total-sales').catch(() => ({ data: { total_sales: 0 } })),
         api.get('/targets', { params: { tahun: targetYear, bulan_nama: targetMonthName } }).catch(() => ({ data: { data: [] } })),
         api.get('/import-history').catch(() => ({ data: { data: [] } })),
         api.get('/users?role=sales').catch(() => ({ data: { data: [] } })),
         api.get('/customers', { params: { area: 'Semua Area' } }).catch(() => ({ data: { data: [] } }))
       ]);
 
-      const totalTxVal = txRes.data?.total_transactions || 0;
+      const totalSalesRp = salesRes.data?.total_sales || 0;
       const historyItems = historyRes.data?.data || [];
       const totalFiles = historyItems.length;
       const successFiles = historyItems.filter((h: any) => h.status === 'success').length;
       const failedFiles = historyItems.filter((h: any) => h.status !== 'success').length;
       const totalSalesCount = salesUsersRes.data?.data?.length || 0;
       const totalCustomersCount = customersRes.data?.data?.length || 0;
+
+      const formatCurrency = (val: number) => {
+        if (val >= 1000000000) {
+          return `Rp ${(val / 1000000000).toFixed(1).replace('.', ',')} M`;
+        }
+        if (val >= 1000000) {
+          return `Rp ${(val / 1000000).toFixed(1).replace('.', ',')} Jt`;
+        }
+        return `Rp ${val.toLocaleString('id-ID')}`;
+      };
 
       setKpis([
         {
@@ -60,7 +70,7 @@ export const DashboardPage = () => {
           id: 2,
           title: 'File Berhasil',
           value: `${successFiles} File`,
-          description: 'Status Sukses',
+          description: 'Status Berhasil',
           icon: CheckCircle2,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
@@ -94,9 +104,9 @@ export const DashboardPage = () => {
         },
         {
           id: 6,
-          title: 'Total Transaksi',
-          value: `${Number(totalTxVal).toLocaleString('id-ID')} Transaksi`,
-          description: 'Total Transaksi Keseluruhan',
+          title: 'Total Penjualan (Rp)',
+          value: formatCurrency(Number(totalSalesRp)),
+          description: 'Total Penjualan Keseluruhan',
           icon: Wallet,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',

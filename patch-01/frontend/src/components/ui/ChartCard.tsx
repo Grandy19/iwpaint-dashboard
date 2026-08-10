@@ -138,10 +138,10 @@ export const ChartCard: React.FC<ChartCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+    <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-8 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/40">
       {/* Header & Filter */}
       <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-        <h3 className="text-gray-700 text-[18px] font-semibold tracking-tight">{title}</h3>
+        <h3 className="text-slate-500 text-[13px] font-bold tracking-wider uppercase">{title}</h3>
         <div className="flex flex-wrap items-center gap-3">
           {filterAktifLabel && (
             <div className="flex items-center gap-2">

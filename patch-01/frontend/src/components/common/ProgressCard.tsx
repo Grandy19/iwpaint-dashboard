@@ -23,14 +23,14 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
   const percentage = total > 0 ? Math.min(Math.max((current / total) * 100, 0), 100) : 0;
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+    <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-8 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/40 hover:-translate-y-1">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#dcfce7] flex items-center justify-center text-[#10b981]">
             <Target size={20} />
           </div>
-          <span className="text-gray-600 text-[18px] font-medium">{title}</span>
+          <span className="text-slate-500 text-[13px] font-bold tracking-wider uppercase">{title}</span>
         </div>
         <div className="font-bold text-gray-800 text-[18px]">
           {current}/{total}
@@ -46,27 +46,29 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
       </div>
 
       {/* Footer */}
-      <div className="flex justify-between items-center text-sm">
+      <div className="flex justify-between items-center mt-auto pt-2 border-t border-slate-50">
         <div className="flex items-center gap-6">
-          <div>
-            <span className="text-gray-500 mr-1">{completedLabel}</span>
+          <div className="text-[13px] text-slate-400 font-medium leading-relaxed">
+            <span className="mr-1">{completedLabel}</span>
             <span className="font-bold text-[#10b981]">{current}</span>
-            <span className="text-gray-800 ml-1">{unit}</span>
+            <span className="ml-1">{unit}</span>
           </div>
-          <div className="w-px h-6 bg-gray-200"></div>
-          <div>
-            <span className="text-gray-500 mr-1">{pendingLabel}</span>
+          <div className="w-px h-4 bg-gray-200"></div>
+          <div className="text-[13px] text-slate-400 font-medium leading-relaxed">
+            <span className="mr-1">{pendingLabel}</span>
             <span className="font-bold text-[#ef4444]">{total - current}</span>
-            <span className="text-gray-800 ml-1">{unit}</span>
+            <span className="ml-1">{unit}</span>
           </div>
         </div>
-        <button 
-          onClick={onAction}
-          className="bg-[#52b788] hover:bg-[#40916c] text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2"
-        >
-          <Plus size={16} />
-          Target
-        </button>
+        {onAction && (
+          <button 
+            onClick={onAction}
+            className="bg-[#52b788] hover:bg-[#40916c] text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2"
+          >
+            <Plus size={16} />
+            Target
+          </button>
+        )}
       </div>
     </div>
   );

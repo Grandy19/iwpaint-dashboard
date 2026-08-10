@@ -277,7 +277,7 @@ export const DistributorCustomerPage = () => {
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
           <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
-            <div className="lg:col-span-2">
+            <div className="w-[280px] lg:w-[400px] flex-none">
               <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
@@ -285,7 +285,7 @@ export const DistributorCustomerPage = () => {
                     type="date" 
                     value={periodeAwal} 
                     onChange={(e) => setPeriodeAwal(e.target.value)} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                   />
                 </div>
                 <span className="text-gray-400 font-bold">-</span>
@@ -294,13 +294,16 @@ export const DistributorCustomerPage = () => {
                     type="date" 
                     value={periodeAkhir} 
                     onChange={(e) => setPeriodeAkhir(e.target.value)} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                   />
                 </div>
               </div>
             </div>
 
-            <div>
+            {/* Modern Divider */}
+            <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
+
+            <div className="flex-1 min-w-[160px]">
               <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
               <CustomSelect 
                 value={area} 
@@ -309,7 +312,7 @@ export const DistributorCustomerPage = () => {
               />
             </div>
 
-            <div>
+            <div className="flex-1 min-w-[160px]">
               <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Sales</label>
               <CustomSelect 
                 value={sales} 
@@ -319,7 +322,7 @@ export const DistributorCustomerPage = () => {
               />
             </div>
             
-            <div>
+            <div className="flex-1 min-w-[200px]">
               <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Customer</label>
               <CustomSelect 
                 value={customer} 
@@ -328,8 +331,6 @@ export const DistributorCustomerPage = () => {
                 showSearch={true}
               />
             </div>
-            
-            
           </div>
         </div>
 

@@ -256,9 +256,9 @@ export const KepalaDistributorPage = () => {
           </div>
 
           {/* Filter Section */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
             <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
-              <div className="flex-1">
+              <div className="flex-1 min-w-[160px]">
                 <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
                 <CustomSelect 
                   value={area} 
@@ -266,7 +266,7 @@ export const KepalaDistributorPage = () => {
                   options={areaOptions} 
                 />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-[160px]">
                 <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Status</label>
                 <CustomSelect 
                   value={status} 
@@ -274,7 +274,7 @@ export const KepalaDistributorPage = () => {
                   options={['Semua Status', 'Aktif', 'Tidak Aktif']} 
                 />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-[200px]">
                 <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Kepala Distributor</label>
                 <CustomSelect 
                   value={kepalaDistributor} 

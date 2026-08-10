@@ -196,16 +196,16 @@ export const CustomerPage = () => {
           
           {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
-              <div className="col-span-1 md:col-span-2">
-                <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
+            <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
+              <div className="w-[280px] lg:w-[400px] flex-none">
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
                     <input 
                       type="date" 
                       value={periodeAwal} 
                       onChange={(e) => setPeriodeAwal(e.target.value)} 
-                      className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                      className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                     />
                   </div>
                   <span className="text-gray-400 font-bold">-</span>
@@ -214,36 +214,41 @@ export const CustomerPage = () => {
                       type="date" 
                       value={periodeAkhir} 
                       onChange={(e) => setPeriodeAkhir(e.target.value)} 
-                      className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                      className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                     />
                   </div>
                 </div>
               </div>
-              <div className="col-span-1">
-                <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
+              
+              {/* Modern Divider */}
+              <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
+
+              <div className="flex-1 min-w-[160px]">
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
                 <CustomSelect 
                   value={area} 
                   onChange={setArea} 
                   options={areaOptions} 
                 />
               </div>
-              <div className="col-span-1">
-                <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
+
+              <div className="flex-1 min-w-[160px]">
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Sales</label>
                 <CustomSelect 
                   value={salesName} 
                   onChange={setSalesName} 
                   options={salesOptions} 
                 />
               </div>
-              <div className="col-span-1">
-                <label className="block text-sm text-[#475569] font-medium mb-2">Customer</label>
+
+              <div className="flex-1 min-w-[160px]">
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Customer</label>
                 <CustomSelect 
                   value={customerName} 
                   onChange={setCustomerName} 
                   options={customerOptions} 
                 />
               </div>
-              
             </div>
           </div>
 

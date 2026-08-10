@@ -18,15 +18,15 @@ interface TargetRealisasiCardProps {
 
 export const TargetRealisasiCard: React.FC<TargetRealisasiCardProps> = ({ data, onEdit, title = "Target vs Realisasi Bulan Ini" }) => {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-gray-600 text-[18px] font-medium">{title}</h3>
+    <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/40">
+      <div className="flex justify-between items-center mb-6 px-1">
+        <h3 className="text-slate-500 text-[13px] font-bold tracking-wider uppercase">{title}</h3>
         {onEdit && (
           <button 
             onClick={onEdit}
-            className="text-gray-600 hover:text-gray-900 transition-colors"
+            className="text-slate-400 hover:text-blue-500 bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition-colors"
           >
-            <Edit3 size={18} strokeWidth={2.5} />
+            <Edit3 size={16} strokeWidth={2.5} />
           </button>
         )}
       </div>
@@ -34,33 +34,40 @@ export const TargetRealisasiCard: React.FC<TargetRealisasiCardProps> = ({ data, 
       <div className="flex flex-col gap-4">
         {data.map((item) => {
           const Icon = item.icon;
+          const pct = Math.min(Math.max(item.percentage || 0, 0), 100);
           return (
-            <div key={item.id} className="border border-gray-100 rounded-xl p-5">
+            <div key={item.id} className="group border border-slate-100 rounded-2xl p-5 hover:border-blue-100 hover:bg-blue-50/30 transition-colors duration-300">
               
               <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#f0f9ff] flex items-center justify-center text-[#0ea5e9]">
-                    <Icon size={20} />
+                <div className="flex items-center gap-3.5">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100/50 flex items-center justify-center text-blue-500 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                    <Icon size={22} strokeWidth={1.75} />
                   </div>
-                  <span className="font-bold text-gray-800 text-sm">{item.title}</span>
+                  <span className="font-bold text-slate-700 text-[15px]">{item.title}</span>
                 </div>
-                <span className="font-bold text-gray-800">{Math.min(Math.max(item.percentage || 0, 0), 100)}%</span>
+                <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500 text-lg tracking-tight">
+                  {pct}%
+                </span>
               </div>
 
-              <div className="w-full h-2.5 bg-[#e0f2fe] rounded-full mb-4">
+              <div className="w-full h-2 bg-slate-100 rounded-full mb-4 overflow-hidden">
                 <div 
-                  className="h-2.5 bg-[#0ea5e9] rounded-full" 
-                  style={{ width: `${Math.min(item.percentage, 100)}%` }}
+                  className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full relative transition-all duration-1000 ease-out" 
+                  style={{ width: `${pct}%` }}
                 ></div>
               </div>
 
-              <div className="flex items-center gap-6 text-sm text-gray-500">
-                <div className="w-[140px]">
-                  <span className="font-medium">Realisasi :</span> {item.realisasi}
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] text-slate-500 bg-white/50 rounded-xl p-3 border border-slate-50">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
+                  <span className="font-medium text-slate-400">Realisasi:</span> 
+                  <span className="font-bold text-slate-700">{item.realisasi}</span>
                 </div>
-                <div className="w-px h-4 bg-gray-300"></div>
-                <div>
-                  <span className="font-medium">Target :</span> {item.target}
+                <div className="hidden sm:block w-px h-4 bg-slate-200"></div>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
+                  <span className="font-medium text-slate-400">Target:</span> 
+                  <span className="font-bold text-slate-700">{item.target}</span>
                 </div>
               </div>
 

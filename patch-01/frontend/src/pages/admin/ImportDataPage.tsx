@@ -128,11 +128,11 @@ export const ImportDataPage = () => {
         </div>
 
         {/* Filter Section */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-            <div className="col-span-1 md:col-span-2">
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
+          <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
+            <div className="w-[280px] lg:w-[400px] flex-none">
               <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <input 
                     type="date" 
@@ -142,10 +142,10 @@ export const ImportDataPage = () => {
                       setIsLoading(true);
                       setTimeout(() => setIsLoading(false), 500);
                     }} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b0764] focus:border-transparent h-[42px] text-gray-700" 
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors" 
                   />
                 </div>
-                <span className="text-gray-500 font-bold">-</span>
+                <span className="text-gray-400 font-bold">-</span>
                 <div className="flex-1">
                   <input 
                     type="date" 
@@ -155,13 +155,16 @@ export const ImportDataPage = () => {
                       setIsLoading(true);
                       setTimeout(() => setIsLoading(false), 500);
                     }} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b0764] focus:border-transparent h-[42px] text-gray-700" 
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors" 
                   />
                 </div>
               </div>
             </div>
             
-            <div className="flex-1">
+            {/* Modern Divider */}
+            <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
+
+            <div className="flex-1 min-w-[160px]">
               <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Status</label>
               <CustomSelect 
                 value={status} 
@@ -170,7 +173,7 @@ export const ImportDataPage = () => {
               />
             </div>
 
-            <div className="flex-1">
+            <div className="flex-1 min-w-[200px]">
               <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Cari Nama File</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -178,14 +181,13 @@ export const ImportDataPage = () => {
                 </div>
                 <input
                   type="text"
-                  className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b0764] focus:border-transparent placeholder-gray-400 h-[42px]"
+                  className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#3b0764] focus:border-transparent placeholder-gray-400 h-[42px] transition-colors"
                   placeholder="Cari Nama File ..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
-            
           </div>
         </div>
 

@@ -373,15 +373,15 @@ export const DistributorDashboardPage = () => {
             {/* Modern Divider */}
             <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
             
-            <div className="col-span-2">
+            <div className="flex-1 min-w-[200px]">
               <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Kategori Produk</label>
               <CustomSelect 
                 value={kategoriProduk} 
                 onChange={setKategoriProduk} 
                 options={['Semua Kategori', 'Decorative', 'Automotive', 'Industri']} 
+                showSearch={true}
               />
             </div>
-            
             
           </div>
         </div>

@@ -25,17 +25,17 @@ export const DataTable: React.FC<DataTableProps> = ({
   minWidth = 'min-w-full'
 }) => {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-      {title ? <h3 className="text-gray-600 text-[18px] font-medium mb-6">{title}</h3> : null}
+    <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-8 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/40">
+      {title ? <h3 className="text-slate-500 text-[13px] font-bold tracking-wider uppercase mb-6">{title}</h3> : null}
       <div className="overflow-y-auto overflow-x-auto max-h-[300px] custom-scroll">
         <table className={`w-full text-sm text-left ${tableLayout === 'auto' ? '' : 'table-fixed'} ${minWidth}`}>
-          <thead className="bg-[#fafafa] border-y border-gray-100 sticky top-0 z-10">
+          <thead className="bg-slate-50 border-y border-slate-100 sticky top-0 z-10">
             <tr>
-              <th className="py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap w-[60px] min-w-[60px]">No</th>
+              <th className="py-4 px-6 text-[11px] uppercase tracking-widest text-slate-500 font-bold whitespace-nowrap w-[60px] min-w-[60px]">No</th>
               {columns.map((col) => (
                 <th 
                   key={col.key} 
-                  className={`py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap ${
+                  className={`py-4 px-6 text-[11px] uppercase tracking-widest text-slate-500 font-bold whitespace-nowrap ${
                     col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
                   } ${col.className || ''}`}
                 >

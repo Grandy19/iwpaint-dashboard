@@ -207,7 +207,7 @@ export const DistributorSalesPage = () => {
             {/* Modern Divider */}
             <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
 
-            <div className="flex-1">
+            <div className="flex-1 min-w-[160px]">
               <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Supervisor</label>
               <CustomSelect 
                 value={supervisor} 
@@ -216,7 +216,7 @@ export const DistributorSalesPage = () => {
               />
             </div>
             
-            <div className="flex-1">
+            <div className="flex-1 min-w-[160px]">
               <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Sales</label>
               <CustomSelect 
                 value={sales} 
@@ -225,8 +225,6 @@ export const DistributorSalesPage = () => {
                 showSearch={true}
               />
             </div>
-            
-            
           </div>
         </div>
 

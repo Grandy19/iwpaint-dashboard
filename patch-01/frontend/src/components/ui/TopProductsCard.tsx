@@ -15,10 +15,10 @@ interface TopProductsCardProps {
 
 export const TopProductsCard: React.FC<TopProductsCardProps> = ({ data, title = "Top 10 Produk Terlaris Penjualan Customer" }) => {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+    <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-8 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/40">
       {/* Header */}
-      <div className="flex justify-between items-center border-b border-gray-100 pb-6 mb-8">
-        <h3 className="text-gray-600 text-[18px] font-medium">{title}</h3>
+      <div className="flex justify-between items-center border-b border-slate-100 pb-6 mb-8">
+        <h3 className="text-slate-500 text-[13px] font-bold tracking-wider uppercase">{title}</h3>
         <div className="text-right">
           <div className="text-sm text-gray-500 mb-1 font-medium">Total:</div>
           <div className="font-bold text-[#1e293b] text-[20px]">Rp 450 Jt</div>
