@@ -1,28 +1,15 @@
 const pool = require("../config/db");
 
-function mapKategori(kat) {
-  if (!kat || kat === "Semua Kategori") return null;
-  const k = String(kat).toUpperCase().trim();
-  if (k === "INDUSTRI" || k === "INDUSTRIAL") return "INDUSTRIAL";
-  return k; // DECORATIVE, AUTOMOTIVE
-}
-
 async function getSalesmenForFilter(salesman, supervisor, area) {
   if (salesman && salesman !== "Semua Sales") {
     return [salesman];
   }
 
-  let query = `
-    SELECT u.name, sp.area 
-    FROM users u
-    JOIN salesmen s ON s.salesman_id = u.user_id
-    LEFT JOIN supervisors sp ON sp.supervisor_id = s.supervisor_id
-    WHERE u.role = 'sales'
-  `;
+  let query = "SELECT name, area FROM users WHERE role = 'sales'";
   const params = [];
 
   if (supervisor && supervisor !== "Semua Supervisor") {
-    query += " AND s.supervisor_id = (SELECT user_id FROM users WHERE name = ? AND role = 'supervisor' LIMIT 1)";
+    query += " AND supervisor_name = ?";
     params.push(supervisor);
   }
 
@@ -52,17 +39,11 @@ async function getSalesmenForFilter(salesman, supervisor, area) {
 }
 
 async function fetchSalesmenList(supervisor, area) {
-  let query = `
-    SELECT u.name, sp.area 
-    FROM users u
-    JOIN salesmen s ON s.salesman_id = u.user_id
-    LEFT JOIN supervisors sp ON sp.supervisor_id = s.supervisor_id
-    WHERE u.role = 'sales'
-  `;
+  let query = "SELECT name FROM users WHERE role = 'sales'";
   const params = [];
 
   if (supervisor && supervisor !== "Semua Supervisor") {
-    query += " AND s.supervisor_id = (SELECT user_id FROM users WHERE name = ? AND role = 'supervisor' LIMIT 1)";
+    query += " AND supervisor_name = ?";
     params.push(supervisor);
   }
 
@@ -79,11 +60,11 @@ async function fetchSalesmenList(supervisor, area) {
     } else if (area === "Sumatera") {
       matchedAreas = ["Medan"];
     }
-    query += " AND sp.area IN (?)";
+    query += " AND area IN (?)";
     params.push(matchedAreas);
   }
 
-  query += " ORDER BY u.name ASC";
+  query += " ORDER BY name ASC";
   const [rows] = await pool.query(query, params);
   return rows.map(r => r.name);
 }
@@ -94,13 +75,10 @@ async function fetchSalesKpis(salesmen, filters = {}) {
       COALESCE(SUM(f.netto), 0) AS total_sales,
       COALESCE(SUM(f.qty * COALESCE(p.berat, 1.0)), 0) AS total_weight_kg,
       COUNT(DISTINCT f.nofaktur) AS total_transactions,
-      COUNT(DISTINCT c.nama_customer) AS total_customers
-    FROM sales_transactions f
-    LEFT JOIN products p ON p.product_id = f.product_id
-    LEFT JOIN customers c ON c.customer_id = f.customer_id
-    JOIN salesmen s ON s.salesman_id = f.salesman_id
-    JOIN users u ON u.user_id = s.salesman_id
-    WHERE u.name IN (?)
+      COUNT(DISTINCT f.namacustomer) AS total_customers
+    FROM fact_sales f
+    LEFT JOIN dim_products p ON (p.id = f.product_id OR p.kode_produk = f.kode_barang)
+    WHERE f.nama_salesman IN (?)
   `;
   const params = [salesmen];
 
@@ -112,10 +90,9 @@ async function fetchSalesKpis(salesmen, filters = {}) {
     query += " AND f.tanggal <= ?";
     params.push(filters.periodeAkhir);
   }
-  const cleanKategori = mapKategori(filters.kategori);
-  if (cleanKategori) {
+  if (filters.kategori) {
     query += " AND p.kategori = ?";
-    params.push(cleanKategori);
+    params.push(filters.kategori);
   }
 
   const [rows] = await pool.query(query, params);
@@ -127,11 +104,9 @@ async function fetchSalesContribution(salesmen, filters = {}) {
     SELECT
       COALESCE(p.kategori, 'UNKNOWN') AS kategori,
       COALESCE(SUM(f.netto), 0) AS total_sales
-    FROM sales_transactions f
-    LEFT JOIN products p ON p.product_id = f.product_id
-    JOIN salesmen s ON s.salesman_id = f.salesman_id
-    JOIN users u ON u.user_id = s.salesman_id
-    WHERE u.name IN (?)
+    FROM fact_sales f
+    LEFT JOIN dim_products p ON (p.id = f.product_id OR p.kode_produk = f.kode_barang)
+    WHERE f.nama_salesman IN (?)
   `;
   const params = [salesmen];
 
@@ -143,10 +118,9 @@ async function fetchSalesContribution(salesmen, filters = {}) {
     query += " AND f.tanggal <= ?";
     params.push(filters.periodeAkhir);
   }
-  const cleanKategori = mapKategori(filters.kategori);
-  if (cleanKategori) {
+  if (filters.kategori) {
     query += " AND p.kategori = ?";
-    params.push(cleanKategori);
+    params.push(filters.kategori);
   }
 
   query += " GROUP BY COALESCE(p.kategori, 'UNKNOWN') ORDER BY total_sales DESC";
@@ -179,12 +153,9 @@ async function fetchSalesTrend(salesmen, filters = {}) {
     SELECT
       ${dateSelect},
       ${valueSelect}
-    FROM sales_transactions f
-    LEFT JOIN products p ON p.product_id = f.product_id
-    LEFT JOIN customers c ON c.customer_id = f.customer_id
-    JOIN salesmen s ON s.salesman_id = f.salesman_id
-    JOIN users u ON u.user_id = s.salesman_id
-    WHERE u.name IN (?) AND f.tanggal IS NOT NULL
+    FROM fact_sales f
+    LEFT JOIN dim_products p ON (p.id = f.product_id OR p.kode_produk = f.kode_barang)
+    WHERE f.nama_salesman IN (?) AND f.tanggal IS NOT NULL
   `;
   const params = [salesmen];
 
@@ -196,13 +167,12 @@ async function fetchSalesTrend(salesmen, filters = {}) {
     query += " AND f.tanggal <= ?";
     params.push(filters.periodeAkhir);
   }
-  const cleanKategori = mapKategori(filters.kategori);
-  if (cleanKategori) {
+  if (filters.kategori) {
     query += " AND p.kategori = ?";
-    params.push(cleanKategori);
+    params.push(filters.kategori);
   }
   if (filters.customerName) {
-    query += " AND c.nama_customer = ?";
+    query += " AND f.namacustomer = ?";
     params.push(filters.customerName);
   }
 
@@ -215,14 +185,11 @@ async function fetchSalesTrend(salesmen, filters = {}) {
 async function fetchSalesTopProducts(salesmen, filters = {}) {
   let query = `
     SELECT
-      p.nama_produk AS nama_produk,
+      f.nama_barang AS nama_produk,
       COALESCE(SUM(f.netto), 0) AS total_sales
-    FROM sales_transactions f
-    LEFT JOIN products p ON p.product_id = f.product_id
-    LEFT JOIN customers c ON c.customer_id = f.customer_id
-    JOIN salesmen s ON s.salesman_id = f.salesman_id
-    JOIN users u ON u.user_id = s.salesman_id
-    WHERE u.name IN (?)
+    FROM fact_sales f
+    LEFT JOIN dim_products p ON (p.id = f.product_id OR p.kode_produk = f.kode_barang)
+    WHERE f.nama_salesman IN (?)
   `;
   const params = [salesmen];
 
@@ -234,17 +201,16 @@ async function fetchSalesTopProducts(salesmen, filters = {}) {
     query += " AND f.tanggal <= ?";
     params.push(filters.periodeAkhir);
   }
-  const cleanKategori = mapKategori(filters.kategori);
-  if (cleanKategori) {
+  if (filters.kategori) {
     query += " AND p.kategori = ?";
-    params.push(cleanKategori);
+    params.push(filters.kategori);
   }
   if (filters.customerName) {
-    query += " AND c.nama_customer = ?";
+    query += " AND f.namacustomer = ?";
     params.push(filters.customerName);
   }
 
-  query += " GROUP BY p.product_id, p.nama_produk ORDER BY total_sales DESC LIMIT 10";
+  query += " GROUP BY f.nama_barang ORDER BY total_sales DESC LIMIT 10";
   
   const [rows] = await pool.query(query, params);
   return rows;
@@ -253,14 +219,12 @@ async function fetchSalesTopProducts(salesmen, filters = {}) {
 async function fetchSalesTopSalesmen(salesmen, filters = {}) {
   let query = `
     SELECT
-      s.kode_salesman,
-      u.name AS nama_salesman,
+      f.kode_salesman,
+      f.nama_salesman,
       COALESCE(SUM(f.netto), 0) AS total_sales
-    FROM sales_transactions f
-    LEFT JOIN products p ON p.product_id = f.product_id
-    JOIN salesmen s ON s.salesman_id = f.salesman_id
-    JOIN users u ON u.user_id = s.salesman_id
-    WHERE u.name IN (?)
+    FROM fact_sales f
+    LEFT JOIN dim_products p ON (p.id = f.product_id OR p.kode_produk = f.kode_barang)
+    WHERE f.nama_salesman IN (?)
   `;
   const params = [salesmen];
 
@@ -272,13 +236,12 @@ async function fetchSalesTopSalesmen(salesmen, filters = {}) {
     query += " AND f.tanggal <= ?";
     params.push(filters.periodeAkhir);
   }
-  const cleanKategori = mapKategori(filters.kategori);
-  if (cleanKategori) {
+  if (filters.kategori) {
     query += " AND p.kategori = ?";
-    params.push(cleanKategori);
+    params.push(filters.kategori);
   }
 
-  query += " GROUP BY s.kode_salesman, u.name ORDER BY total_sales DESC LIMIT 10";
+  query += " GROUP BY f.kode_salesman, f.nama_salesman ORDER BY total_sales DESC LIMIT 10";
   
   const [rows] = await pool.query(query, params);
   return rows;
@@ -289,17 +252,14 @@ async function fetchSalesTransactions(salesmen, filters = {}) {
     SELECT
       DATE_FORMAT(f.tanggal, '%Y-%m-%d') AS tanggal_formatted,
       f.nofaktur,
-      c.nama_customer AS customer,
-      p.nama_produk AS produk,
+      f.namacustomer AS customer,
+      f.nama_barang AS produk,
       f.qty,
-      p.satuan_kecil AS satuan,
+      f.satuan_kecil AS satuan,
       f.netto AS total_penjualan
-    FROM sales_transactions f
-    LEFT JOIN products p ON p.product_id = f.product_id
-    LEFT JOIN customers c ON c.customer_id = f.customer_id
-    JOIN salesmen s ON s.salesman_id = f.salesman_id
-    JOIN users u ON u.user_id = s.salesman_id
-    WHERE u.name IN (?)
+    FROM fact_sales f
+    LEFT JOIN dim_products p ON (p.id = f.product_id OR p.kode_produk = f.kode_barang)
+    WHERE f.nama_salesman IN (?)
   `;
   const params = [salesmen];
 
@@ -311,10 +271,9 @@ async function fetchSalesTransactions(salesmen, filters = {}) {
     query += " AND f.tanggal <= ?";
     params.push(filters.periodeAkhir);
   }
-  const cleanKategori = mapKategori(filters.kategori);
-  if (cleanKategori) {
+  if (filters.kategori) {
     query += " AND p.kategori = ?";
-    params.push(cleanKategori);
+    params.push(filters.kategori);
   }
 
   query += " ORDER BY f.tanggal DESC, f.nofaktur DESC LIMIT 100";

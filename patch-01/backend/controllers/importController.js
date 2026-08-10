@@ -278,10 +278,9 @@ async function handleImportFile(req, res, next) {
         const kodeSuplier = getValue(data, ["kode_suplier", "kode_supplier", "kodesupplier", "vendor_code", "kode_vendor"]);
         const namaSuplier = getValue(data, ["nama_suplier", "nama_supplier", "namasupplier", "vendor_name", "nama_vendor"]);
 
-        const ensuredSalesman = await model.getOrCreateSalesman(conn, kodeSalesman, namaSalesman);
-        const ensuredGudang = await model.getOrCreateWarehouse(conn, kodeGudang, namaGudang);
-        const ensuredSupplier = await model.getOrCreateSupplier(conn, kodeSuplier, namaSuplier);
-        const ensuredCustomer = await model.getOrCreateCustomer(conn, kodecustomer, namacustomer, alamatcustomer, ensuredSalesman);
+        const ensuredSalesman = await model.ensureDimLookup(conn, "dim_salesman", "kode_salesman", kodeSalesman, "nama_salesman", namaSalesman);
+        const ensuredGudang = await model.ensureDimLookup(conn, "dim_gudang", "kode_gudang", kodeGudang, "nama_gudang", namaGudang);
+        const ensuredSupplier = await model.ensureDimLookup(conn, "dim_supplier", "kode_supplier", kodeSuplier, "nama_supplier", namaSuplier);
 
         const productId = await model.getOrCreateProduct(conn, namaProduk, kodeProduk);
 
@@ -299,25 +298,24 @@ async function handleImportFile(req, res, next) {
         const pdiscountitem2 = toNumber(getValue(data, ["pdiscountitem2", "p_discount_item2"]), 0);
         const pdiscountitem3 = toNumber(getValue(data, ["pdiscountitem3", "p_discount_item3"]), 0);
         const discountitem = toNumber(getValue(data, ["discountitem", "discount_item"]), 0);
+        const satuanKecil = getValue(data, ["satuan_kecil", "satuan", "satuan_kecil"]);
         const keterangan = getValue(data, ["keterangan", "notes", "remark"]);
 
         if (tanggal && (quantity > 0 || netto > 0)) {
           const result = await model.insertSalesRow(conn, {
             uploadLogId, jenis, nofaktur, tanggal, noso, tutupso, jatuh_tempo,
-            customerId: ensuredCustomer,
-            salesmanId: ensuredSalesman,
-            warehouseId: ensuredGudang,
-            productId,
-            supplierId: ensuredSupplier,
-            quantity, hargajual, pdiscountitem, pdiscountitem2, pdiscountitem3, discountitem,
-            netto, keterangan
+            kodecustomer, namacustomer, alamatcustomer,
+            ensuredSalesman, kodeSalesman, namaSalesman, ensuredGudang, kodeGudang, namaGudang,
+            kodeProduk, namaProduk, productId,
+            quantity, hargajual, satuanKecil, pdiscountitem, pdiscountitem2, pdiscountitem3, discountitem,
+            netto, keterangan, ensuredSupplier, kodeSuplier, namaSuplier
           });
 
           try {
             const insertId = result && (result.insertId || (result[0] && result[0].insertId));
-            console.log(`Inserted sales_transactions row id=${insertId || "unknown"} nofaktur=${nofaktur || ""} qty=${quantity} netto=${netto}`);
+            console.log(`Inserted fact_sales row id=${insertId || "unknown"} nofaktur=${nofaktur || ""} qty=${quantity} netto=${netto}`);
           } catch (e) {
-            console.log("sales_transactions insert executed (no insertId available).");
+            console.log("fact_sales insert executed (no insertId available).");
           }
 
           processedRows += 1;

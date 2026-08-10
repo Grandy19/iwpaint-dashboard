@@ -12,17 +12,11 @@ async function getSalesmenForFilter(req) {
     return [salesman];
   }
 
-  let query = `
-    SELECT u.name, sp.area 
-    FROM users u
-    JOIN salesmen s ON s.salesman_id = u.user_id
-    LEFT JOIN supervisors sp ON sp.supervisor_id = s.supervisor_id
-    WHERE u.role = 'sales'
-  `;
+  let query = "SELECT name, area FROM users WHERE role = 'sales'";
   const params = [];
 
   if (supervisor && supervisor !== "Semua Supervisor") {
-    query += " AND s.supervisor_id = (SELECT user_id FROM users WHERE name = ? AND role = 'supervisor' LIMIT 1)";
+    query += " AND supervisor_name = ?";
     params.push(supervisor);
   }
 

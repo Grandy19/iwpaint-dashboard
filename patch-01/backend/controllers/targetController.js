@@ -24,42 +24,18 @@ async function getTargets(req, res, next) {
     const { tahun = 2026, bulan_nama = "Juli", salesman, supervisor, area, periodeAwal, periodeAkhir } = req.query;
     const monthNum = monthNameToNum(bulan_nama);
 
-    // Get all sales users with their area & supervisor joining child tables
-    let usersQuery = `
-      SELECT 
-        u.user_id AS id, 
-        u.name, 
-        sp.area, 
-        sp_u.name AS supervisor_name, 
-        s.kode_salesman 
-      FROM users u
-      JOIN salesmen s ON s.salesman_id = u.user_id
-      LEFT JOIN supervisors sp ON sp.supervisor_id = s.supervisor_id
-      LEFT JOIN users sp_u ON sp_u.user_id = sp.supervisor_id
-      WHERE u.role = 'sales'
-    `;
+    // Get all sales users with their area & supervisor
+    let usersQuery = "SELECT name, area, supervisor_name, kode_salesman FROM users WHERE role = 'sales'";
     const usersParams = [];
     if (salesman && salesman !== "Semua Sales") {
-      usersQuery += " AND u.name = ?";
+      usersQuery += " AND name = ?";
       usersParams.push(salesman);
     } else if (supervisor && supervisor !== "Semua Supervisor") {
-      usersQuery += " AND s.supervisor_id = (SELECT user_id FROM users WHERE name = ? AND role = 'supervisor' LIMIT 1)";
+      usersQuery += " AND supervisor_name = ?";
       usersParams.push(supervisor);
     } else if (area && area !== "Semua Area") {
-      let matchedAreas = [area];
-      if (area === "Jawa Barat") {
-        matchedAreas = ["Bandung", "Cirebon", "Kuningan", "Tasikmalaya", "Garut", "Bogor"];
-      } else if (area === "DKI Jakarta") {
-        matchedAreas = ["Jakarta"];
-      } else if (area === "Jawa Tengah") {
-        matchedAreas = ["Semarang"];
-      } else if (area === "Jawa Timur") {
-        matchedAreas = ["Surabaya"];
-      } else if (area === "Sumatera") {
-        matchedAreas = ["Medan"];
-      }
-      usersQuery += " AND sp.area IN (?)";
-      usersParams.push(matchedAreas);
+      usersQuery += " AND area = ?";
+      usersParams.push(area);
     }
     const [salesUsers] = await pool.query(usersQuery, usersParams);
 
@@ -72,37 +48,39 @@ async function getTargets(req, res, next) {
       let targetInd = 0;
       let real = { realisasi_deco: 0, realisasi_auto: 0, realisasi_ind: 0 };
 
-      let targetQuery = "";
-      let targetParams = [];
+      if (user.kode_salesman) {
+        let targetQuery = "";
+        let targetParams = [];
 
-      if (periodeAwal && periodeAkhir) {
-        const monthCase = `CASE LOWER(bulan_nama) WHEN 'januari' THEN '01' WHEN 'februari' THEN '02' WHEN 'maret' THEN '03' WHEN 'april' THEN '04' WHEN 'mei' THEN '05' WHEN 'juni' THEN '06' WHEN 'juli' THEN '07' WHEN 'agustus' THEN '08' WHEN 'september' THEN '09' WHEN 'oktober' THEN '10' WHEN 'november' THEN '11' WHEN 'desember' THEN '12' END`;
-        targetQuery = `SELECT SUM(target_deco) as target_deco, SUM(target_auto) as target_auto, SUM(target_ind) as target_ind FROM salesman_targets WHERE salesman_id = ? AND DATE(CONCAT(tahun, '-', ${monthCase}, '-01')) BETWEEN DATE(CONCAT(LEFT(?, 7), '-01')) AND DATE(CONCAT(LEFT(?, 7), '-01'))`;
-        targetParams = [user.id, periodeAwal, periodeAkhir];
-      } else {
-        targetQuery = "SELECT * FROM salesman_targets WHERE salesman_id = ? AND tahun = ? AND bulan_nama = ? LIMIT 1";
-        targetParams = [user.id, tahun, bulan_nama];
+        if (periodeAwal && periodeAkhir) {
+          const monthCase = `CASE LOWER(bulan_nama) WHEN 'januari' THEN '01' WHEN 'februari' THEN '02' WHEN 'maret' THEN '03' WHEN 'april' THEN '04' WHEN 'mei' THEN '05' WHEN 'juni' THEN '06' WHEN 'juli' THEN '07' WHEN 'agustus' THEN '08' WHEN 'september' THEN '09' WHEN 'oktober' THEN '10' WHEN 'november' THEN '11' WHEN 'desember' THEN '12' END`;
+          targetQuery = `SELECT SUM(target_deco) as target_deco, SUM(target_auto) as target_auto, SUM(target_ind) as target_ind FROM fact_targets WHERE kode_salesman = ? AND DATE(CONCAT(tahun, '-', ${monthCase}, '-01')) BETWEEN DATE(CONCAT(LEFT(?, 7), '-01')) AND DATE(CONCAT(LEFT(?, 7), '-01'))`;
+          targetParams = [user.kode_salesman, periodeAwal, periodeAkhir];
+        } else {
+          targetQuery = "SELECT * FROM fact_targets WHERE kode_salesman = ? AND tahun = ? AND bulan_nama = ? LIMIT 1";
+          targetParams = [user.kode_salesman, tahun, bulan_nama];
+        }
+
+        const [targetRows] = await pool.query(targetQuery, targetParams);
+        if (targetRows.length > 0 && (targetRows[0].target_deco != null || targetRows[0].tahun)) {
+          target = targetRows[0];
+          targetDeco = Number(target.target_deco || 0);
+          targetAuto = Number(target.target_auto || 0);
+          targetInd = Number(target.target_ind || 0);
+        }
       }
 
-      const [targetRows] = await pool.query(targetQuery, targetParams);
-      if (targetRows.length > 0 && (targetRows[0].target_deco != null || targetRows[0].tahun)) {
-        target = targetRows[0];
-        targetDeco = Number(target.target_deco || 0);
-        targetAuto = Number(target.target_auto || 0);
-        targetInd = Number(target.target_ind || 0);
-      }
-
-      // Get realisasi from sales_transactions
+      // Get realisasi from fact_sales
       let realQuery = `SELECT 
          COALESCE(SUM(CASE WHEN UPPER(TRIM(p.kategori)) = 'DECORATIVE' THEN f.netto ELSE 0 END), 0) AS realisasi_deco,
          COALESCE(SUM(CASE WHEN UPPER(TRIM(p.kategori)) = 'AUTOMOTIVE' THEN f.netto ELSE 0 END), 0) AS realisasi_auto,
          COALESCE(SUM(CASE WHEN UPPER(TRIM(p.kategori)) = 'INDUSTRIAL' THEN f.netto ELSE 0 END), 0) AS realisasi_ind,
          COUNT(DISTINCT f.nofaktur) AS total_transaksi,
          COALESCE(SUM(f.qty * COALESCE(p.berat, 1.0)), 0) AS total_qty
-       FROM sales_transactions f
-       LEFT JOIN products p ON p.product_id = f.product_id
-       WHERE f.salesman_id = ?`;
-      let realParams = [user.id];
+       FROM fact_sales f
+       LEFT JOIN dim_products p ON (p.id = f.product_id OR p.kode_produk = f.kode_barang)
+       WHERE f.nama_salesman = ?`;
+      let realParams = [user.name];
 
       if (periodeAwal && periodeAkhir) {
         realQuery += ` AND f.tanggal BETWEEN ? AND ?`;
@@ -126,7 +104,7 @@ async function getTargets(req, res, next) {
       const percentage = Math.min(rawPercentage, 100);
 
       resultData.push({
-        id: target ? (target.target_id || target.id) : Math.random(),
+        id: target ? target.id : Math.random(),
         sales: user.name,
         kodeSalesman: user.kode_salesman,
         area: user.area || "-",
@@ -164,22 +142,22 @@ async function saveTarget(req, res, next) {
       return res.status(400).json({ message: "Nama sales wajib diisi." });
     }
 
-    // Look up the sales user_id
-    const [userRows] = await pool.query("SELECT user_id FROM users WHERE name = ? AND role = 'sales' LIMIT 1", [sales]);
-    if (userRows.length === 0) {
-      return res.status(400).json({ message: `Sales '${sales}' tidak ditemukan.` });
+    // Look up the sales user to get their kode_salesman
+    const [userRows] = await pool.query("SELECT kode_salesman FROM users WHERE name = ? AND role = 'sales' LIMIT 1", [sales]);
+    if (userRows.length === 0 || !userRows[0].kode_salesman) {
+      return res.status(400).json({ message: `Sales '${sales}' tidak memiliki kode_salesman yang terhubung.` });
     }
 
-    const salesmanId = userRows[0].user_id;
+    const kodeSalesman = userRows[0].kode_salesman;
 
     await pool.query(
-      `INSERT INTO salesman_targets (salesman_id, tahun, bulan_nama, target_deco, target_auto, target_ind) 
+      `INSERT INTO fact_targets (kode_salesman, tahun, bulan_nama, target_deco, target_auto, target_ind) 
        VALUES (?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE 
          target_deco = VALUES(target_deco), 
          target_auto = VALUES(target_auto), 
          target_ind = VALUES(target_ind)`,
-      [salesmanId, tahun, bulan_nama, decorative, automotive, industri]
+      [kodeSalesman, tahun, bulan_nama, decorative, automotive, industri]
     );
 
     res.json({ message: "Target berhasil disimpan" });
@@ -193,42 +171,24 @@ async function getTargetPerformance(req, res, next) {
     const { tahun = 2026, bulan_nama = "Juli", salesman, supervisor, area, periodeAwal, periodeAkhir } = req.query;
     const monthNum = monthNameToNum(bulan_nama);
 
-    let salesQuery = `
-      SELECT u.user_id 
-      FROM users u 
-      JOIN salesmen s ON s.salesman_id = u.user_id
-      LEFT JOIN supervisors sp ON sp.supervisor_id = s.supervisor_id
-      WHERE u.role = 'sales'
-    `;
+    let salesQuery = "SELECT name, area, kode_salesman FROM users WHERE role = 'sales'";
     const salesParams = [];
 
     if (salesman && salesman !== "Semua Sales") {
-      salesQuery += " AND u.name = ?";
+      salesQuery += " AND name = ?";
       salesParams.push(salesman);
     } else if (supervisor && supervisor !== "Semua Supervisor") {
-      salesQuery += " AND s.supervisor_id = (SELECT user_id FROM users WHERE name = ? AND role = 'supervisor' LIMIT 1)";
+      salesQuery += " AND supervisor_name = ?";
       salesParams.push(supervisor);
     } else if (area && area !== "Semua Area") {
-      let matchedAreas = [area];
-      if (area === "Jawa Barat") {
-        matchedAreas = ["Bandung", "Cirebon", "Kuningan", "Tasikmalaya", "Garut", "Bogor"];
-      } else if (area === "DKI Jakarta") {
-        matchedAreas = ["Jakarta"];
-      } else if (area === "Jawa Tengah") {
-        matchedAreas = ["Semarang"];
-      } else if (area === "Jawa Timur") {
-        matchedAreas = ["Surabaya"];
-      } else if (area === "Sumatera") {
-        matchedAreas = ["Medan"];
-      }
-      salesQuery += " AND sp.area IN (?)";
-      salesParams.push(matchedAreas);
+      salesQuery += " AND area = ?";
+      salesParams.push(area);
     }
 
     const [salesUsers] = await pool.query(salesQuery, salesParams);
-    const salesmanIds = salesUsers.map(u => u.user_id);
+    const salesmanNames = salesUsers.map(u => u.name);
 
-    if (salesmanIds.length === 0) {
+    if (salesmanNames.length === 0) {
       return res.json({
         percentage: 0,
         targetGlobal: "Rp 0 Jt",
@@ -239,38 +199,40 @@ async function getTargetPerformance(req, res, next) {
       });
     }
 
+    // Get combined targets using inner join on users
     let targetRows, realisasiRows;
 
     if (periodeAwal && periodeAkhir) {
       const monthCase = `CASE LOWER(t.bulan_nama) WHEN 'januari' THEN '01' WHEN 'februari' THEN '02' WHEN 'maret' THEN '03' WHEN 'april' THEN '04' WHEN 'mei' THEN '05' WHEN 'juni' THEN '06' WHEN 'juli' THEN '07' WHEN 'agustus' THEN '08' WHEN 'september' THEN '09' WHEN 'oktober' THEN '10' WHEN 'november' THEN '11' WHEN 'desember' THEN '12' END`;
       [targetRows] = await pool.query(
         `SELECT SUM(t.target_deco + t.target_auto + t.target_ind) AS total_target 
-         FROM salesman_targets t 
-         WHERE t.salesman_id IN (?) 
+         FROM fact_targets t 
+         INNER JOIN users u ON u.kode_salesman = t.kode_salesman 
+         WHERE u.name IN (?) 
            AND DATE(CONCAT(t.tahun, '-', ${monthCase}, '-01')) BETWEEN DATE(CONCAT(LEFT(?, 7), '-01')) AND DATE(CONCAT(LEFT(?, 7), '-01'))`,
-        [salesmanIds, periodeAwal, periodeAkhir]
+        [salesmanNames, periodeAwal, periodeAkhir]
       );
 
       [realisasiRows] = await pool.query(
         `SELECT SUM(f.netto) AS total_realisasi
-         FROM sales_transactions f
-         WHERE f.salesman_id IN (?) 
+         FROM fact_sales f
+         WHERE f.nama_salesman IN (?) 
            AND f.tanggal BETWEEN ? AND ?`,
-        [salesmanIds, periodeAwal, periodeAkhir]
+        [salesmanNames, periodeAwal, periodeAkhir]
       );
     } else {
       [targetRows] = await pool.query(
-        "SELECT SUM(t.target_deco + t.target_auto + t.target_ind) AS total_target FROM salesman_targets t WHERE t.salesman_id IN (?) AND t.tahun = ? AND t.bulan_nama = ?",
-        [salesmanIds, tahun, bulan_nama]
+        "SELECT SUM(t.target_deco + t.target_auto + t.target_ind) AS total_target FROM fact_targets t INNER JOIN users u ON u.kode_salesman = t.kode_salesman WHERE u.name IN (?) AND t.tahun = ? AND t.bulan_nama = ?",
+        [salesmanNames, tahun, bulan_nama]
       );
 
       [realisasiRows] = await pool.query(
         `SELECT SUM(f.netto) AS total_realisasi
-         FROM sales_transactions f
-         WHERE f.salesman_id IN (?) 
+         FROM fact_sales f
+         WHERE f.nama_salesman IN (?) 
            AND YEAR(f.tanggal) = ? 
            AND MONTH(f.tanggal) = ?`,
-        [salesmanIds, tahun, monthNum]
+        [salesmanNames, tahun, monthNum]
       );
     }
 
@@ -300,19 +262,13 @@ async function getTargetHistory(req, res, next) {
       return res.status(400).json({ error: "salesman or supervisor is required" });
     }
 
-    let usersQuery = `
-      SELECT u.user_id 
-      FROM users u
-      JOIN salesmen s ON s.salesman_id = u.user_id
-      LEFT JOIN supervisors sp ON sp.supervisor_id = s.supervisor_id
-      WHERE u.role = 'sales'
-    `;
+    let usersQuery = "SELECT name, kode_salesman FROM users WHERE role = 'sales'";
     let usersParams = [];
     if (salesman && salesman !== "Semua Sales") {
-      usersQuery += " AND u.name = ?";
+      usersQuery += " AND name = ?";
       usersParams.push(salesman);
     } else if (supervisor) {
-      usersQuery += " AND s.supervisor_id = (SELECT user_id FROM users WHERE name = ? AND role = 'supervisor' LIMIT 1)";
+      usersQuery += " AND supervisor_name = ?";
       usersParams.push(supervisor);
     }
 
@@ -321,12 +277,17 @@ async function getTargetHistory(req, res, next) {
       return res.json({ data: [] });
     }
 
-    const salesmanIds = users.map(u => u.user_id);
+    const kodeSalesmen = users.map(u => u.kode_salesman).filter(Boolean);
+    const userNames = users.map(u => u.name);
+    
+    if (kodeSalesmen.length === 0) {
+      return res.json({ data: [] });
+    }
 
     const [targets] = await pool.query(
       `SELECT tahun, bulan_nama, SUM(target_deco) as target_deco, SUM(target_auto) as target_auto, SUM(target_ind) as target_ind 
-       FROM salesman_targets 
-       WHERE salesman_id IN (?) 
+       FROM fact_targets 
+       WHERE kode_salesman IN (?) 
        GROUP BY tahun, bulan_nama 
        ORDER BY tahun DESC, 
          CASE LOWER(bulan_nama) 
@@ -334,7 +295,7 @@ async function getTargetHistory(req, res, next) {
            WHEN 'mei' THEN 5 WHEN 'juni' THEN 6 WHEN 'juli' THEN 7 WHEN 'agustus' THEN 8 
            WHEN 'september' THEN 9 WHEN 'oktober' THEN 10 WHEN 'november' THEN 11 WHEN 'desember' THEN 12 
          END DESC`,
-      [salesmanIds]
+      [kodeSalesmen]
     );
 
     const historyData = [];
@@ -342,9 +303,9 @@ async function getTargetHistory(req, res, next) {
     for (const target of targets) {
       const monthNum = monthNameToNum(target.bulan_nama);
       const [realisasiRows] = await pool.query(
-        `SELECT SUM(netto) AS total_realisasi FROM sales_transactions 
-         WHERE salesman_id IN (?) AND YEAR(tanggal) = ? AND MONTH(tanggal) = ?`,
-        [salesmanIds, target.tahun, monthNum]
+        `SELECT SUM(netto) AS total_realisasi FROM fact_sales 
+         WHERE nama_salesman IN (?) AND YEAR(tanggal) = ? AND MONTH(tanggal) = ?`,
+        [userNames, target.tahun, monthNum]
       );
 
       const totalTarget = Number(target.target_deco) + Number(target.target_auto) + Number(target.target_ind);
