@@ -20,7 +20,7 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
   unit,
   onAction
 }) => {
-  const percentage = (current / total) * 100;
+  const percentage = total > 0 ? Math.min(Math.max((current / total) * 100, 0), 100) : 0;
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">

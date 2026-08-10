@@ -257,25 +257,25 @@ export const KepalaDistributorPage = () => {
 
           {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-              <div className="col-span-1">
-                <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
+            <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
+              <div className="flex-1">
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
                 <CustomSelect 
                   value={area} 
                   onChange={setArea} 
                   options={areaOptions} 
                 />
               </div>
-              <div className="col-span-1">
-                <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
+              <div className="flex-1">
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Status</label>
                 <CustomSelect 
                   value={status} 
                   onChange={setStatus} 
                   options={['Semua Status', 'Aktif', 'Tidak Aktif']} 
                 />
               </div>
-              <div className="col-span-1">
-                <label className="block text-sm text-[#475569] font-medium mb-2">Kepala Distributor</label>
+              <div className="flex-1">
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Kepala Distributor</label>
                 <CustomSelect 
                   value={kepalaDistributor} 
                   onChange={setKepalaDistributor} 
@@ -299,7 +299,7 @@ export const KepalaDistributorPage = () => {
               <h3 className="text-gray-600 text-[18px] font-medium mb-6">Informasi Kepala Distributor</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Nama Kepala Distributor</label>
+                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Nama Kepala Distributor</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <User size={18} />
@@ -308,7 +308,7 @@ export const KepalaDistributorPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Username</label>
+                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Username</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <UserCircle size={18} />
@@ -317,7 +317,7 @@ export const KepalaDistributorPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Email</label>
+                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Email</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <Mail size={18} />
@@ -326,7 +326,7 @@ export const KepalaDistributorPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Nomor HP</label>
+                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Nomor HP</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <Phone size={18} />
@@ -335,7 +335,7 @@ export const KepalaDistributorPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Alamat</label>
+                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Alamat</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <MapPin size={18} />
@@ -344,7 +344,7 @@ export const KepalaDistributorPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Password</label>
+                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Password</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <Lock size={18} />
@@ -356,14 +356,14 @@ export const KepalaDistributorPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
+                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
                   <CustomSelect 
                     value={editArea} onChange={setEditArea} options={['Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera', 'DKI Jakarta', 'Kalimantan', 'Sulawesi']} 
                     icon={<Map size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
+                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Status</label>
                   <CustomSelect 
                     value={editStatus} onChange={setEditStatus} options={['Aktif', 'Tidak Aktif']} 
                     icon={<Info size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 

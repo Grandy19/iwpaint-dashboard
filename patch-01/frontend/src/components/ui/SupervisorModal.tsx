@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, Briefcase, Info, Users, Save, CheckCircle2, MapPin, ChevronDown, Search, Trash2, Target, Tag, TrendingUp } from 'lucide-react';
+import { X, User, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, Briefcase, Info, Users, Save, CheckCircle2, XCircle, MapPin, ChevronDown, Search, Trash2, Target, Tag, TrendingUp } from 'lucide-react';
 import { CustomSelect } from './CustomSelect';
 import { DataTable } from '../common/DataTable';
 import { mockSupervisorSalesData } from '../../mock/distributorSupervisor';
@@ -170,35 +170,63 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
   );
 
   const salesTableColumns = mode === 'view_target' ? [
-    { key: 'namaSales', label: 'Sales' },
-    { key: 'target', label: 'Target' },
-    { key: 'realisasi', label: 'Realisasi' },
-    { key: 'pencapaian', label: 'Pencapaian' },
-    { key: 'status', label: 'Status' },
+    { key: 'namaSales', label: 'Sales', className: 'w-[22%]' },
+    { key: 'target', label: 'Target', className: 'w-[20%]' },
+    { key: 'realisasi', label: 'Realisasi', className: 'w-[20%]' },
+    { key: 'pencapaian', label: 'Pencapaian', className: 'w-[18%]' },
+    { key: 'status', label: 'Status', className: 'w-[20%]' },
   ] : [
-    { key: 'namaSales', label: 'Nama Sales' },
-    { key: 'area', label: 'Area' },
-    { key: 'customer', label: 'Customer' },
-    { key: 'target', label: 'Target' },
-    { key: 'realisasi', label: 'Realisasi' },
+    { key: 'namaSales', label: 'Nama Sales', className: 'w-[24%]' },
+    { key: 'area', label: 'Area', className: 'w-[18%]' },
+    { key: 'customer', label: 'Customer', className: 'w-[22%]' },
+    { key: 'target', label: 'Target', className: 'w-[18%]' },
+    { key: 'realisasi', label: 'Realisasi', className: 'w-[18%]' },
   ];
 
   const renderSalesTableCell = (item: any, columnKey: string) => {
-    if (mode === 'view_target' && columnKey === 'status') {
-      const isTercapai = item.status === 'Tercapai';
-      const isHampir = item.status === 'Hampir Tercapai';
-      return (
-        <span className={clsx(
-          "px-2 py-1 rounded-md text-xs font-medium",
-          isTercapai ? "bg-green-100 text-green-700" :
-          isHampir ? "bg-yellow-100 text-yellow-700" :
-          "bg-red-100 text-red-700"
-        )}>
-          {item.status}
-        </span>
-      );
+    switch (columnKey) {
+      case 'namaSales':
+        return <span className="text-gray-800 font-semibold truncate block" title={item.namaSales}>{item.namaSales}</span>;
+      case 'area':
+        return <span className="text-gray-600 whitespace-nowrap">{item.area}</span>;
+      case 'customer':
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.customer}</span>;
+      case 'target':
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.target}</span>;
+      case 'realisasi':
+        return <span className="text-gray-800 font-semibold whitespace-nowrap">{item.realisasi}</span>;
+      case 'pencapaian': {
+        const pctNum = parseFloat(item.pencapaian) || 0;
+        const isReached = pctNum >= 100 || item.status === 'Tercapai';
+        return (
+          <div className="flex items-center gap-2">
+            <span className={`font-semibold text-sm min-w-[42px] ${isReached ? 'text-emerald-600' : 'text-blue-600'}`}>
+              {item.pencapaian}
+            </span>
+            <div className="w-16 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+              <div 
+                className={`h-full rounded-full ${isReached ? 'bg-emerald-500' : 'bg-blue-500'}`}
+                style={{ width: `${Math.min(pctNum, 100)}%` }}
+              />
+            </div>
+          </div>
+        );
+      }
+      case 'status': {
+        const isTercapai = item.status === 'Tercapai';
+        return isTercapai ? (
+          <span className="flex items-center gap-1.5 text-[#10b981] font-medium whitespace-nowrap">
+            <CheckCircle2 size={16} /> Tercapai
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5 text-[#ef4444] font-medium whitespace-nowrap">
+            <XCircle size={16} /> Belum Tercapai
+          </span>
+        );
+      }
+      default:
+        return item[columnKey];
     }
-    return item[columnKey];
   };
 
   if (!isOpen) return null;

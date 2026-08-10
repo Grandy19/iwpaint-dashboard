@@ -5,9 +5,10 @@ import api from '../../utils/api';
 interface ImportModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose }) => {
+export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [fileName, setFileName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -49,6 +50,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose }) => 
         },
       });
       setStep(3);
+      onSuccess?.();
       setTimeout(() => {
         handleClose();
       }, 1500);

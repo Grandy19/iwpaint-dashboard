@@ -141,25 +141,64 @@ export const SalesTargetPage = () => {
     </button>
   );
 
+  const formatShortCurrency = (val: any) => {
+    if (val === null || val === undefined || val === '') return 'Rp 0';
+    if (typeof val === 'string') {
+      return val.replace('.', ',');
+    }
+    const num = Number(val) || 0;
+    if (num >= 1e9) {
+      return `Rp ${(num / 1e9).toFixed(1).replace(/\.0$/, '').replace('.', ',')} M`;
+    }
+    if (num >= 1e6) {
+      return `Rp ${(num / 1e6).toFixed(1).replace(/\.0$/, '').replace('.', ',')} Jt`;
+    }
+    if (num >= 1e3) {
+      return `Rp ${(num / 1e3).toFixed(1).replace(/\.0$/, '').replace('.', ',')} Rb`;
+    }
+    return `Rp ${num.toLocaleString('id-ID')}`;
+  };
+
   const historyColumns = [
-    { key: 'periode', label: 'Periode', className: 'w-[15%]' },
+    { key: 'periode', label: 'Periode', className: 'w-[22%]' },
     { key: 'target', label: 'Target', className: 'w-[20%]' },
     { key: 'realisasi', label: 'Realisasi', className: 'w-[20%]' },
-    { key: 'pencapaian', label: 'Pencapaian', className: 'w-[20%]' },
-    { key: 'status', label: 'Status', className: 'w-[25%]' },
+    { key: 'pencapaian', label: 'Pencapaian', className: 'w-[18%]' },
+    { key: 'status', label: 'Status', className: 'w-[20%]' },
   ];
 
   const renderHistoryCell = (item: any, columnKey: string) => {
     switch (columnKey) {
       case 'periode':
-        return <span className="text-gray-700 font-medium">{item.periode}</span>;
+        return <span className="text-gray-800 font-semibold truncate block" title={item.periode}>{item.periode}</span>;
+      case 'target':
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{formatShortCurrency(item.target)}</span>;
+      case 'realisasi':
+        return <span className="text-gray-800 font-semibold whitespace-nowrap">{formatShortCurrency(item.realisasi)}</span>;
+      case 'pencapaian': {
+        const pctNum = parseFloat(item.pencapaian) || 0;
+        const isReached = pctNum >= 100 || item.status === 'Tercapai';
+        return (
+          <div className="flex items-center gap-2">
+            <span className={`font-semibold text-sm min-w-[42px] ${isReached ? 'text-emerald-600' : 'text-blue-600'}`}>
+              {item.pencapaian}
+            </span>
+            <div className="w-16 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+              <div 
+                className={`h-full rounded-full ${isReached ? 'bg-emerald-500' : 'bg-blue-500'}`}
+                style={{ width: `${Math.min(pctNum, 100)}%` }}
+              />
+            </div>
+          </div>
+        );
+      }
       case 'status':
         return item.status === 'Tercapai' ? (
-          <span className="flex items-center gap-1.5 text-[#10b981] font-medium">
+          <span className="flex items-center gap-1.5 text-[#10b981] font-medium whitespace-nowrap">
             <CheckCircle2 size={16} /> Tercapai
           </span>
         ) : (
-          <span className="flex items-center gap-1.5 text-[#ef4444] font-medium">
+          <span className="flex items-center gap-1.5 text-[#ef4444] font-medium whitespace-nowrap">
             <XCircle size={16} /> Belum Tercapai
           </span>
         );

@@ -51,6 +51,16 @@ export const SalesDashboardPage = () => {
       const kpisRes = await api.get('/sales/kpis', { params });
       const kpis = kpisRes.data;
 
+      // Resolve target year & month dynamically
+      const dateObj = new Date(periodeAwal);
+      const targetYear = dateObj.getFullYear() || 2026;
+      const monthNamesInd = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      const targetMonthName = monthNamesInd[dateObj.getMonth()] || "Juli";
+
+      // Fetch targets performance summary
+      const targetPerfRes = await api.get('/targets/performance', { params: { salesman: salesmanName, tahun: targetYear, bulan_nama: targetMonthName, periodeAwal, periodeAkhir } });
+      setRingkasanTarget(targetPerfRes.data);
+
       setKpiData([
         {
           id: 1,
@@ -72,10 +82,10 @@ export const SalesDashboardPage = () => {
         },
         {
           id: 3,
-          title: 'Total Transaksi',
-          value: `${kpis.total_transactions} Transaksi`,
-          description: 'Total transaksi periode terpilih',
-          icon: Wallet,
+          title: 'Pencapaian Target',
+          value: `${targetPerfRes.data.percentage}%`,
+          description: 'Persentase pencapaian target',
+          icon: Target,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
         },
@@ -90,15 +100,7 @@ export const SalesDashboardPage = () => {
         }
       ]);
 
-      // Resolve target year & month dynamically
-      const dateObj = new Date(periodeAwal);
-      const targetYear = dateObj.getFullYear() || 2026;
-      const monthNamesInd = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-      const targetMonthName = monthNamesInd[dateObj.getMonth()] || "Juli";
 
-      // Fetch targets performance summary
-      const targetPerfRes = await api.get('/targets/performance', { params: { salesman: salesmanName, tahun: targetYear, bulan_nama: targetMonthName, periodeAwal, periodeAkhir } });
-      setRingkasanTarget(targetPerfRes.data);
 
       // Fetch targets vs realisasi breakdown
       const targetRes = await api.get('/targets', { params: { salesman: salesmanName, tahun: targetYear, bulan_nama: targetMonthName, periodeAwal, periodeAkhir } });

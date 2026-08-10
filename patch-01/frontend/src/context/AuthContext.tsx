@@ -26,22 +26,18 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('iwpaint_user');
-    const storedAuth = localStorage.getItem('iwpaint_isAuthenticated');
-    
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const storedUser = localStorage.getItem('iwpaint_user');
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch {
+      return null;
     }
-    if (storedAuth === 'true') {
-      setIsAuthenticated(true);
-    }
-    setIsLoading(false);
-  }, []);
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem('iwpaint_isAuthenticated') === 'true';
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const login = async (email: string, password: string): Promise<User> => {
     const response = await api.post('/auth/login', { email, password });

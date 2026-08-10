@@ -267,16 +267,16 @@ export const SupervisorDashboardPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-            <div className="col-span-2">
-              <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
+          <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
+            <div className="w-[280px] lg:w-[400px] flex-none">
+              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <input 
                     type="date" 
                     value={periodeAwal} 
                     onChange={(e) => setPeriodeAwal(e.target.value)} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                   />
                 </div>
                 <span className="text-gray-400 font-bold">-</span>
@@ -285,14 +285,17 @@ export const SupervisorDashboardPage = () => {
                     type="date" 
                     value={periodeAkhir} 
                     onChange={(e) => setPeriodeAkhir(e.target.value)} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                   />
                 </div>
               </div>
             </div>
             
+            {/* Modern Divider */}
+            <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
+            
             <div className="col-span-2">
-              <label className="block text-sm text-[#475569] font-medium mb-2">Kategori Produk</label>
+              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Kategori Produk</label>
               <CustomSelect 
                 value={kategoriProduk} 
                 onChange={setKategoriProduk} 

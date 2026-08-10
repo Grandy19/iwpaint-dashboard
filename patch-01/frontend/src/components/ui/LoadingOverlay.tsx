@@ -1,4 +1,5 @@
 import React from 'react';
+import { DotsRing } from '../common/PageTransitionLoader';
 
 interface LoadingOverlayProps {
   isLoading: boolean;
@@ -9,10 +10,10 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ isLoading, messa
   if (!isLoading) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 backdrop-blur-[2px]">
-      <div className="flex flex-col items-center bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
-        <div className="w-12 h-12 border-4 border-gray-100 border-t-[#3b0764] rounded-full animate-spin"></div>
-        <p className="mt-4 text-gray-700 font-medium">{message}</p>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 backdrop-blur-[2px] animate-fadeIn transition-all">
+      <div className="flex flex-col items-center bg-white p-6 rounded-2xl shadow-xl border border-gray-100 min-w-[180px]">
+        <DotsRing size={48} count={10} color="#3b0764" />
+        <p className="mt-3 text-gray-700 font-medium text-sm">{message}</p>
       </div>
     </div>
   );

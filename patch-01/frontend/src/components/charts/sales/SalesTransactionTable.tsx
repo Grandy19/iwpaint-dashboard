@@ -19,27 +19,27 @@ export const SalesTransactionTable = () => {
       <h3 className="font-bold text-gray-900 mb-6 text-lg">Tabel Transaksi Sales</h3>
       <div className="overflow-y-auto custom-scroll pr-2 flex-1">
         <table className="w-full text-sm text-left">
-          <thead className="text-gray-400 border-b border-gray-100 sticky top-0 bg-white z-10 text-xs">
+          <thead className="bg-[#fafafa] border-y border-gray-100 sticky top-0 z-10">
             <tr>
-              <th className="pb-3 font-medium">Tanggal</th>
-              <th className="pb-3 font-medium">No. Faktur</th>
-              <th className="pb-3 font-medium">Customer</th>
-              <th className="pb-3 font-medium">Produk</th>
-              <th className="pb-3 font-medium">QTY</th>
-              <th className="pb-3 font-medium">Satuan</th>
-              <th className="pb-3 font-medium text-right">Total Penjualan</th>
+              <th className="py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap">Tanggal</th>
+              <th className="py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap">No. Faktur</th>
+              <th className="py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap">Customer</th>
+              <th className="py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap">Produk</th>
+              <th className="py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap">QTY</th>
+              <th className="py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap">Satuan</th>
+              <th className="py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap text-right">Total Penjualan</th>
             </tr>
           </thead>
           <tbody>
             {data.map((row, index) => (
-              <tr key={index} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
-                <td className="py-4 text-gray-600">{row.date}</td>
-                <td className="py-4 font-medium text-gray-900">{row.invoice}</td>
-                <td className="py-4 text-gray-600">{row.customer}</td>
-                <td className="py-4 text-gray-600">{row.product}</td>
-                <td className="py-4 text-gray-600">{row.qty}</td>
-                <td className="py-4 text-gray-600">{row.unit}</td>
-                <td className="py-4 text-right font-medium text-gray-900">{row.total}</td>
+              <tr key={index} className="border-b border-gray-50 last:border-0 hover:bg-[#f8f6fb] transition-colors duration-200">
+                <td className="py-4 px-6 text-sm text-gray-600 whitespace-nowrap">{row.date}</td>
+                <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap">{row.invoice}</td>
+                <td className="py-4 px-6 text-sm text-gray-600 whitespace-nowrap">{row.customer}</td>
+                <td className="py-4 px-6 text-sm text-gray-600 whitespace-nowrap">{row.product}</td>
+                <td className="py-4 px-6 text-sm text-gray-600 whitespace-nowrap">{row.qty}</td>
+                <td className="py-4 px-6 text-sm text-gray-600 whitespace-nowrap">{row.unit}</td>
+                <td className="py-4 px-6 text-sm text-gray-900 font-medium whitespace-nowrap text-right">{row.total}</td>
               </tr>
             ))}
           </tbody>

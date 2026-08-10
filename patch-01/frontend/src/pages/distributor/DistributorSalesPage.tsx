@@ -176,16 +176,16 @@ export const DistributorSalesPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-            <div className="col-span-2">
-              <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
+          <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
+            <div className="w-[280px] lg:w-[400px] flex-none">
+              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <input 
                     type="date" 
                     value={periodeAwal} 
                     onChange={(e) => setPeriodeAwal(e.target.value)} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                   />
                 </div>
                 <span className="text-gray-400 font-bold">-</span>
@@ -194,14 +194,17 @@ export const DistributorSalesPage = () => {
                     type="date" 
                     value={periodeAkhir} 
                     onChange={(e) => setPeriodeAkhir(e.target.value)} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                   />
                 </div>
               </div>
             </div>
+            
+            {/* Modern Divider */}
+            <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
 
-            <div className="col-span-1">
-              <label className="block text-sm text-[#475569] font-medium mb-2">Supervisor</label>
+            <div className="flex-1">
+              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Supervisor</label>
               <CustomSelect 
                 value={supervisor} 
                 onChange={setSupervisor} 
@@ -209,8 +212,8 @@ export const DistributorSalesPage = () => {
               />
             </div>
             
-            <div className="col-span-1">
-              <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
+            <div className="flex-1">
+              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Sales</label>
               <CustomSelect 
                 value={sales} 
                 onChange={setSales} 
@@ -243,7 +246,7 @@ export const DistributorSalesPage = () => {
             <h3 className="text-gray-600 text-[18px] font-medium mb-6 font-semibold">Informasi Detail Sales</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Nama Sales</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Nama Sales</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <User size={18} />
@@ -252,7 +255,7 @@ export const DistributorSalesPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Username</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Username</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <UserCircle size={18} />
@@ -261,7 +264,7 @@ export const DistributorSalesPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Email</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Email</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Mail size={18} />
@@ -270,7 +273,7 @@ export const DistributorSalesPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Nomor HP</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Nomor HP</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Phone size={18} />
@@ -279,7 +282,7 @@ export const DistributorSalesPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Alamat</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Alamat</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <MapPin size={18} />
@@ -288,7 +291,7 @@ export const DistributorSalesPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Map size={18} />
@@ -297,7 +300,7 @@ export const DistributorSalesPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Supervisor</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Supervisor</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Briefcase size={18} />
@@ -306,7 +309,7 @@ export const DistributorSalesPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Status</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Info size={18} />

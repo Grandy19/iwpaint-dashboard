@@ -15,7 +15,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, sidebarItems }
     <div className="flex min-h-screen bg-[#f8fafc]">
       <Sidebar items={sidebarItems} />
       <main id="export-content" className={clsx(
-        "flex-1 p-2 relative transition-all duration-300",
+        "flex-1 p-2 relative transition-all duration-300 animate-page-fade",
         isSidebarCollapsed ? "ml-20" : "ml-[260px]"
       )}>
         {children}

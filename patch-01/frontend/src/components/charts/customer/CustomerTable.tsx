@@ -19,23 +19,23 @@ export const CustomerTable = () => {
       <h3 className="font-bold text-gray-900 mb-6 text-lg">Top 10 Customer Berdasarkan Penjualan</h3>
       <div className="overflow-y-auto overflow-x-hidden max-h-[260px] custom-scroll pr-2 flex-1">
         <table className="w-full text-sm text-left">
-          <thead className="text-gray-500 border-b border-gray-100 sticky top-0 bg-white z-10">
+          <thead className="bg-[#fafafa] border-y border-gray-100 sticky top-0 z-10">
             <tr>
-              <th className="pb-3 font-normal">No.</th>
-              <th className="pb-3 font-normal">Kode Customer</th>
-              <th className="pb-3 font-normal">Customer</th>
-              <th className="pb-3 font-normal text-right">Penjualan</th>
+              <th className="py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap">No.</th>
+              <th className="py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap">Kode Customer</th>
+              <th className="py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap">Customer</th>
+              <th className="py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap text-right">Penjualan</th>
             </tr>
           </thead>
           <tbody>
             {data.map((item, index) => (
-              <tr key={index} className="border-b border-gray-50 last:border-0">
-                <td className="py-3 text-gray-600">{item.no}</td>
-                <td className="py-3 text-gray-500">
-                  <span className="bg-gray-100 px-3 py-1 rounded-full text-xs">{item.code}</span>
+              <tr key={index} className="border-b border-gray-50 last:border-0 hover:bg-[#f8f6fb] transition-colors duration-200">
+                <td className="py-4 px-6 text-sm text-gray-600 font-medium whitespace-nowrap">{item.no}</td>
+                <td className="py-4 px-6 text-sm whitespace-nowrap">
+                  <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-medium text-gray-700">{item.code}</span>
                 </td>
-                <td className="py-3 font-medium text-gray-900">{item.name}</td>
-                <td className="py-3 text-right">{item.sales}</td>
+                <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap">{item.name}</td>
+                <td className="py-4 px-6 text-sm text-gray-900 font-medium whitespace-nowrap text-right">{item.sales}</td>
               </tr>
             ))}
           </tbody>

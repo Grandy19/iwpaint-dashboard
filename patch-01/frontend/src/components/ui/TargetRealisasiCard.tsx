@@ -44,7 +44,7 @@ export const TargetRealisasiCard: React.FC<TargetRealisasiCardProps> = ({ data, 
                   </div>
                   <span className="font-bold text-gray-800 text-sm">{item.title}</span>
                 </div>
-                <span className="font-bold text-gray-800">{item.percentage}%</span>
+                <span className="font-bold text-gray-800">{Math.min(Math.max(item.percentage || 0, 0), 100)}%</span>
               </div>
 
               <div className="w-full h-2.5 bg-[#e0f2fe] rounded-full mb-4">

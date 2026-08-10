@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { CheckCircle2, XCircle, Eye, Download, Wallet, CreditCard, Scale, Target, FileText, Users, User } from 'lucide-react';
+import { CheckCircle2, XCircle, Eye, Download, Wallet, CreditCard, Scale, Target, FileText, Users, User, Upload } from 'lucide-react';
+import { DataTable } from '../../components/common/DataTable';
 import { KpiCard } from '../../components/common/KpiCard';
 import { ProgressCard } from '../../components/common/ProgressCard';
-import { DataTable } from '../../components/common/DataTable';
 import { ImportModal } from '../../components/ui/ImportModal';
 import { TargetSalesModal } from '../../components/ui/TargetSalesModal';
+import { ExportModal } from '../../components/ui/ExportModal';
 import api from '../../utils/api';
 
 export const DashboardPage = () => {
+  const navigate = useNavigate();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isTargetModalOpen, setIsTargetModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const [kpis, setKpis] = useState<any[]>([]);
   const [progress, setProgress] = useState<any>(null);
@@ -27,43 +31,43 @@ export const DashboardPage = () => {
       const targetMonthName = monthNamesInd[now.getMonth()];
 
       const [txRes, targetsRes, historyRes, salesUsersRes, customersRes] = await Promise.all([
-        api.get('/dashboard/total-transactions'),
-        api.get('/targets', { params: { tahun: targetYear, bulan_nama: targetMonthName } }),
-        api.get('/import-history'),
-        api.get('/users?role=sales'),
-        api.get('/customers', { params: { area: 'Semua Area' } })
+        api.get('/dashboard/total-transactions').catch(() => ({ data: { total_transactions: 0 } })),
+        api.get('/targets', { params: { tahun: targetYear, bulan_nama: targetMonthName } }).catch(() => ({ data: { data: [] } })),
+        api.get('/import-history').catch(() => ({ data: { data: [] } })),
+        api.get('/users?role=sales').catch(() => ({ data: { data: [] } })),
+        api.get('/customers', { params: { area: 'Semua Area' } }).catch(() => ({ data: { data: [] } }))
       ]);
 
-      const totalTxVal = txRes.data.total_transactions || 0;
-      const historyItems = historyRes.data.data || [];
+      const totalTxVal = txRes.data?.total_transactions || 0;
+      const historyItems = historyRes.data?.data || [];
       const totalFiles = historyItems.length;
       const successFiles = historyItems.filter((h: any) => h.status === 'success').length;
       const failedFiles = historyItems.filter((h: any) => h.status !== 'success').length;
-      const totalSalesCount = salesUsersRes.data.data.length || 0;
-      const totalCustomersCount = customersRes.data.data.length || 0;
+      const totalSalesCount = salesUsersRes.data?.data?.length || 0;
+      const totalCustomersCount = customersRes.data?.data?.length || 0;
 
       setKpis([
         {
           id: 1,
-          title: 'Total File Import',
+          title: 'Total File Diimpor',
           value: `${totalFiles} File`,
-          description: 'Jumlah seluruh file yang pernah diimport',
+          description: 'Total Berkas Masuk',
           icon: FileText,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
         },
         {
           id: 2,
-          title: 'Import Berhasil',
+          title: 'File Berhasil',
           value: `${successFiles} File`,
-          description: 'Jumlah file yang berhasil diproses',
+          description: 'Status Sukses',
           icon: CheckCircle2,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
         },
         {
           id: 3,
-          title: 'Import Gagal',
+          title: 'File Gagal',
           value: `${failedFiles} File`,
           description: 'Status Gagal',
           icon: XCircle,
@@ -99,7 +103,7 @@ export const DashboardPage = () => {
         }
       ]);
 
-      const myTargets = targetsRes.data.data;
+      const myTargets = targetsRes.data?.data || [];
       const totalSales = myTargets.length;
       const inputtedSales = myTargets.filter((t: any) => t.status === 'Sudah Input').length;
 
@@ -112,7 +116,7 @@ export const DashboardPage = () => {
         unit: "Sales"
       });
 
-      const historyData = historyRes.data.data.map((item: any) => ({
+      const historyData = historyItems.map((item: any) => ({
         id: item.id,
         name: item.file_name,
         date: new Date(item.uploaded_at).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
@@ -122,7 +126,7 @@ export const DashboardPage = () => {
       setHistoryImports(historyData);
 
       // Create activities from history
-      const activityData = historyRes.data.data.slice(0, 5).map((item: any) => ({
+      const activityData = historyItems.slice(0, 5).map((item: any) => ({
         id: item.id,
         date: new Date(item.uploaded_at).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
         type: 'Import Data',
@@ -133,7 +137,9 @@ export const DashboardPage = () => {
       }));
       setRecentActivities(activityData);
 
-      setSalesOptions(['Semua Sales', ...salesUsersRes.data.data.map((u: any) => u.namaSales)]);
+      if (salesUsersRes.data?.data) {
+        setSalesOptions(['Semua Sales', ...salesUsersRes.data.data.map((u: any) => u.namaSales || u.name || u.username)]);
+      }
 
     } catch (err) {
       console.error("Gagal memuat data dashboard:", err);
@@ -169,36 +175,48 @@ export const DashboardPage = () => {
   };
 
   const ActionButtons = (
-    <button 
-      onClick={() => setIsImportModalOpen(true)}
-      className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-    >
-      <Download size={18} />
-      Import Data
-    </button>
+    <div className="flex gap-4">
+      <button 
+        onClick={() => setIsExportModalOpen(true)}
+        className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
+      >
+        <Upload size={18} />
+        Export Data
+      </button>
+      <button 
+        onClick={() => setIsImportModalOpen(true)}
+        className="w-[160px] justify-center bg-[#3b0764] hover:bg-[#2e054e] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
+      >
+        <Download size={18} />
+        Import Data
+      </button>
+    </div>
   );
 
   const renderHistoryCell = (item: any, columnKey: string) => {
     switch (columnKey) {
       case 'name':
-        return <span className="text-gray-700 font-medium">{item.name}</span>;
+        return <span className="text-gray-800 font-semibold truncate block" title={item.name}>{item.name}</span>;
       case 'date':
-        return item.date;
+        return <span className="text-gray-600 whitespace-nowrap">{item.date}</span>;
       case 'rows':
-        return item.rows;
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.rows} Data</span>;
       case 'status':
-        return item.status === 'Berhasil' ? (
-          <span className="flex items-center gap-1.5 text-[#10b981] font-medium">
+        return item.status === 'Berhasil' || item.status === 'success' ? (
+          <span className="flex items-center gap-1.5 text-[#10b981] font-medium whitespace-nowrap">
             <CheckCircle2 size={16} /> Berhasil
           </span>
         ) : (
-          <span className="flex items-center gap-1.5 text-[#ef4444] font-medium">
+          <span className="flex items-center gap-1.5 text-[#ef4444] font-medium whitespace-nowrap">
             <XCircle size={16} /> Gagal
           </span>
         );
       case 'detail':
         return (
-          <button className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors">
+          <button 
+            onClick={() => navigate('/import')}
+            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors cursor-pointer whitespace-nowrap"
+          >
             <Eye size={16} /> Detail
           </button>
         );
@@ -210,23 +228,25 @@ export const DashboardPage = () => {
   const renderActivityCell = (item: any, columnKey: string) => {
     switch (columnKey) {
       case 'date':
-        return item.date;
+        return <span className="text-gray-600 whitespace-nowrap">{item.date}</span>;
       case 'type':
-        return item.type;
+        return <span className="text-gray-800 font-semibold whitespace-nowrap">{item.type}</span>;
       case 'description':
-        return item.description;
+        return <span className="text-gray-600 truncate block" title={item.description}>{item.description}</span>;
       case 'status':
-        return item.status === 'Berhasil' ? (
-          <span className="flex items-center gap-1.5 text-[#10b981] font-medium">
+        return item.status === 'Berhasil' || item.status === 'success' ? (
+          <span className="flex items-center gap-1.5 text-[#10b981] font-medium whitespace-nowrap">
             <CheckCircle2 size={16} /> Berhasil
           </span>
         ) : (
-          <span className="flex items-center gap-1.5 text-[#ef4444] font-medium">
+          <span className="flex items-center gap-1.5 text-[#ef4444] font-medium whitespace-nowrap">
             <XCircle size={16} /> Gagal
           </span>
         );
-      case 'user':
-        return item.user;
+      case 'role':
+        return <span className="text-gray-600 whitespace-nowrap">{item.role}</span>;
+      case 'username':
+        return <span className="text-gray-600 whitespace-nowrap">{item.username}</span>;
       default:
         return item[columnKey];
     }
@@ -257,11 +277,11 @@ export const DashboardPage = () => {
           <DataTable
             title="Tabel Riwayat Import"
             columns={[
-              { key: 'name', label: 'Nama File' },
-              { key: 'date', label: 'Tanggal Import' },
-              { key: 'rows', label: 'Jumlah Data' },
-              { key: 'status', label: 'Status' },
-              { key: 'detail', label: 'Detail' },
+              { key: 'name', label: 'Nama File', className: 'w-[30%]' },
+              { key: 'date', label: 'Tanggal Import', className: 'w-[26%]' },
+              { key: 'rows', label: 'Jumlah Data', className: 'w-[17%]' },
+              { key: 'status', label: 'Status', className: 'w-[17%]' },
+              { key: 'detail', label: 'Detail', className: 'w-[10%]' },
             ]}
             data={historyImports}
             renderCell={renderHistoryCell}
@@ -271,12 +291,12 @@ export const DashboardPage = () => {
           <DataTable
             title="Aktivitas Terbaru"
             columns={[
-              { key: 'date', label: 'Tanggal' },
-              { key: 'type', label: 'Jenis Aktivitas' },
-              { key: 'description', label: 'Deskripsi' },
-              { key: 'status', label: 'Status' },
-              { key: 'role', label: 'Role' },
-              { key: 'username', label: 'Username' },
+              { key: 'date', label: 'Tanggal', className: 'w-[16%]' },
+              { key: 'type', label: 'Jenis Aktivitas', className: 'w-[16%]' },
+              { key: 'description', label: 'Keterangan', className: 'w-[32%]' },
+              { key: 'status', label: 'Status', className: 'w-[14%]' },
+              { key: 'role', label: 'Role', className: 'w-[12%]' },
+              { key: 'username', label: 'Username', className: 'w-[10%]' },
             ]}
             data={recentActivities}
             renderCell={renderActivityCell}
@@ -302,6 +322,11 @@ export const DashboardPage = () => {
         data={null}
         onSave={handleSaveModal}
         salesList={salesOptions.filter(s => s !== 'Semua Sales')}
+      />
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        fileName="dashboard-admin.pdf"
       />
     </>
   );

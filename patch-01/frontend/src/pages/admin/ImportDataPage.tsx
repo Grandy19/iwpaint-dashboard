@@ -131,7 +131,7 @@ export const ImportDataPage = () => {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div className="col-span-1 md:col-span-2">
-              <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
+              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
               <div className="flex items-center gap-2">
                 <div className="flex-1">
                   <input 
@@ -161,8 +161,8 @@ export const ImportDataPage = () => {
               </div>
             </div>
             
-            <div className="col-span-1">
-              <label className="block text-sm text-[#475569] font-medium mb-2">Status</label>
+            <div className="flex-1">
+              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Status</label>
               <CustomSelect 
                 value={status} 
                 onChange={setStatus} 
@@ -170,8 +170,8 @@ export const ImportDataPage = () => {
               />
             </div>
 
-            <div className="col-span-1">
-              <label className="block text-sm text-[#475569] font-medium mb-2">Cari Nama File</label>
+            <div className="flex-1">
+              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Cari Nama File</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search size={16} className="text-gray-400" />

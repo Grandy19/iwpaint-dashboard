@@ -56,7 +56,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
     opt.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const defaultTriggerClass = "flex items-center justify-between w-full bg-white border border-gray-200 rounded-lg px-4 py-2 text-gray-900 cursor-pointer focus-within:ring-2 focus-within:ring-[#3b0764]";
+  const defaultTriggerClass = "flex items-center justify-between w-full h-[42px] bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors";
   const combinedTriggerClass = triggerClassName || defaultTriggerClass;
 
   return (
@@ -78,20 +78,20 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
       {/* Dropdown Menu */}
       {isOpen && (
         <div className={clsx(
-          "absolute z-50 w-full bg-white border border-gray-100 rounded-lg shadow-lg flex flex-col overflow-hidden",
+          "absolute z-50 w-full bg-white border border-gray-100 rounded-xl shadow-xl flex flex-col overflow-hidden",
           dropdownPosition === 'top' ? 'bottom-full mb-1' : 'top-full mt-1'
         )}>
           
           {/* Search Bar */}
           {showSearch && (
-            <div className="p-2 border-b border-gray-100 shrink-0">
+            <div className="p-2.5 border-b border-gray-100 shrink-0">
               <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search size={14} className="text-gray-400" />
               </div>
               <input
                 type="text"
-                className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#3b0764] focus:border-[#3b0764]"
+                className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#3b0764] focus:border-[#3b0764]"
                 placeholder="Cari..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -102,12 +102,12 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
           )}
 
           {/* Options List */}
-          <div className="overflow-y-auto max-h-60">
+          <div className="overflow-y-auto max-h-60 py-1">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
                 <div 
                   key={index}
-                  className={`px-4 py-2.5 text-sm cursor-pointer flex items-center justify-between hover:bg-[#f3e8ff] transition-colors ${value === option ? 'text-[#3b0764] font-medium bg-[#fcf8ff]' : 'text-gray-700'}`}
+                  className={`px-4 py-2.5 text-sm cursor-pointer flex items-center justify-between hover:bg-[#f3e8ff] transition-colors ${value === option ? 'text-[#3b0764] font-semibold bg-[#fcf8ff]' : 'text-gray-700'}`}
                   onClick={() => handleSelect(option)}
                 >
                   <span className="truncate">{option}</span>

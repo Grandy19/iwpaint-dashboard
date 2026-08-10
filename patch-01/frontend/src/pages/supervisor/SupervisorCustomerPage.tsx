@@ -271,16 +271,16 @@ export const SupervisorCustomerPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-6 items-end">
-            <div className="col-span-2">
-              <label className="block text-sm text-[#475569] font-medium mb-2">Periode</label>
+          <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
+            <div className="w-[280px] lg:w-[400px] flex-none">
+              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <input 
                     type="date" 
                     value={periodeAwal} 
                     onChange={(e) => setPeriodeAwal(e.target.value)} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                   />
                 </div>
                 <span className="text-gray-400 font-bold">-</span>
@@ -289,14 +289,17 @@ export const SupervisorCustomerPage = () => {
                     type="date" 
                     value={periodeAkhir} 
                     onChange={(e) => setPeriodeAkhir(e.target.value)} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                   />
                 </div>
               </div>
             </div>
+            
+            {/* Modern Divider */}
+            <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
 
             <div className="col-span-2">
-              <label className="block text-sm text-[#475569] font-medium mb-2">Sales</label>
+              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Sales</label>
               <CustomSelect 
                 value={sales} 
                 onChange={(val) => { setSales(val); setAppliedSales(val); }} 
@@ -306,7 +309,7 @@ export const SupervisorCustomerPage = () => {
             </div>
             
             <div className="col-span-2">
-              <label className="block text-sm text-[#475569] font-medium mb-2">Customer</label>
+              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Customer</label>
               <CustomSelect 
                 value={customer} 
                 onChange={(val) => { setCustomer(val); setAppliedCustomer(val); }} 
@@ -353,7 +356,7 @@ export const SupervisorCustomerPage = () => {
             <h3 className="text-gray-600 text-[18px] font-medium mb-6">Informasi Customer</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Nama Customer</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Nama Customer</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <User size={18} />
@@ -362,7 +365,7 @@ export const SupervisorCustomerPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Area</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Map size={18} />
@@ -371,7 +374,7 @@ export const SupervisorCustomerPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Sales yang Menangani</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Sales yang Menangani</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Users size={18} />
@@ -380,7 +383,7 @@ export const SupervisorCustomerPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Alamat</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Alamat</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <MapPin size={18} />
@@ -389,7 +392,7 @@ export const SupervisorCustomerPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Total Transaksi</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Total Transaksi</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Receipt size={18} />
@@ -398,7 +401,7 @@ export const SupervisorCustomerPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Total Penjualan</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Total Penjualan</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Wallet size={18} />
@@ -407,7 +410,7 @@ export const SupervisorCustomerPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Total QTY</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Total QTY</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Package size={18} />
@@ -416,7 +419,7 @@ export const SupervisorCustomerPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2">Transaksi Terakhir</label>
+                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Transaksi Terakhir</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <CalendarClock size={18} />

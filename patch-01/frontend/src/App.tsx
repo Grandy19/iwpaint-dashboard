@@ -28,10 +28,13 @@ import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { LoginPage } from './pages/auth/LoginPage';
 import { AuthenticatorPage } from './pages/auth/AuthenticatorPage';
+import { PageTransitionLoader } from './components/common/PageTransitionLoader';
+
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <PageTransitionLoader />
         <Routes>
           {/* Public Auth Routes */}
           <Route path="/login" element={<LoginPage />} />

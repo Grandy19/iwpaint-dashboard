@@ -16,6 +16,8 @@ export const RingkasanTargetCard: React.FC<RingkasanTargetCardProps> = ({
   selisih,
   title = "Ringkasan Keseluruhan Target"
 }) => {
+  const displayPercentage = Math.min(Math.max(percentage || 0, 0), 100);
+
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col h-full">
       <h3 className="text-gray-600 text-[18px] font-medium mb-6">{title}</h3>
@@ -24,10 +26,10 @@ export const RingkasanTargetCard: React.FC<RingkasanTargetCardProps> = ({
         <div className="relative w-40 h-40 mx-auto mb-8">
           <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
             <circle cx="50" cy="50" r="40" fill="none" stroke="#e0f2fe" strokeWidth="12" />
-            <circle cx="50" cy="50" r="40" fill="none" stroke="#0ea5e9" strokeWidth="12" strokeDasharray={`${percentage * 2.51} 251`} strokeLinecap="round" />
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#0ea5e9" strokeWidth="12" strokeDasharray={`${displayPercentage * 2.51} 251`} strokeLinecap="round" />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span className="text-[24px] font-bold text-[#0ea5e9]">{percentage}%</span>
+            <span className="text-[24px] font-bold text-[#0ea5e9]">{displayPercentage}%</span>
             <span className="text-xs text-gray-500 font-medium mt-1">Tercapai</span>
           </div>
         </div>

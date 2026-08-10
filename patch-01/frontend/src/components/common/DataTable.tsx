@@ -12,21 +12,32 @@ interface DataTableProps {
   columns: Column[];
   data: any[];
   renderCell: (item: any, columnKey: string) => React.ReactNode;
+  tableLayout?: 'auto' | 'fixed';
+  minWidth?: string;
 }
 
-export const DataTable: React.FC<DataTableProps> = ({ title, columns, data, renderCell }) => {
+export const DataTable: React.FC<DataTableProps> = ({ 
+  title, 
+  columns, 
+  data, 
+  renderCell,
+  tableLayout = 'fixed',
+  minWidth = 'min-w-full'
+}) => {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-      <h3 className="text-gray-600 text-[18px] font-medium mb-6">{title}</h3>
-      <div className="overflow-y-auto overflow-x-auto max-h-[300px] pr-2 custom-scroll">
-        <table className="w-full text-sm text-left">
-          <thead className="text-gray-400 border-b border-gray-100 sticky top-0 bg-white z-10">
+      {title ? <h3 className="text-gray-600 text-[18px] font-medium mb-6">{title}</h3> : null}
+      <div className="overflow-y-auto overflow-x-auto max-h-[300px] custom-scroll">
+        <table className={`w-full text-sm text-left ${tableLayout === 'auto' ? '' : 'table-fixed'} ${minWidth}`}>
+          <thead className="bg-[#fafafa] border-y border-gray-100 sticky top-0 z-10">
             <tr>
-              <th className="pb-4 font-medium whitespace-nowrap px-1 w-[50px]">No</th>
+              <th className="py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap w-[60px] min-w-[60px]">No</th>
               {columns.map((col) => (
                 <th 
                   key={col.key} 
-                  className={`pb-4 font-medium whitespace-nowrap px-1 ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''} ${col.className || ''}`}
+                  className={`py-4 px-6 text-xs uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap ${
+                    col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
+                  } ${col.className || ''}`}
                 >
                   {col.label}
                 </th>
@@ -34,24 +45,34 @@ export const DataTable: React.FC<DataTableProps> = ({ title, columns, data, rend
             </tr>
           </thead>
           <tbody>
-            {data.map((item, rowIndex) => (
-              <tr 
-                key={item.id || rowIndex} 
-                className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors"
-              >
-                <td className="py-4 px-1 text-gray-600 font-medium">
-                  {rowIndex + 1}
+            {data.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length + 1} className="py-8 text-center text-gray-400 font-normal">
+                  Tidak ada data yang tersedia
                 </td>
-                {columns.map((col) => (
-                  <td 
-                    key={col.key} 
-                    className={`py-4 px-1 text-gray-600 ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''} ${col.className || ''}`}
-                  >
-                    {renderCell(item, col.key)}
-                  </td>
-                ))}
               </tr>
-            ))}
+            ) : (
+              data.map((item, rowIndex) => (
+                <tr 
+                  key={item.id || rowIndex} 
+                  className="border-b border-gray-50 last:border-0 hover:bg-[#f8f6fb] transition-colors duration-200"
+                >
+                  <td className="py-4 px-6 text-sm text-gray-600 font-medium whitespace-nowrap w-[60px] min-w-[60px]">
+                    {rowIndex + 1}
+                  </td>
+                  {columns.map((col) => (
+                    <td 
+                      key={col.key} 
+                      className={`py-4 px-6 text-sm text-gray-600 ${
+                        col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
+                      } ${col.className || ''}`}
+                    >
+                      {renderCell(item, col.key)}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
