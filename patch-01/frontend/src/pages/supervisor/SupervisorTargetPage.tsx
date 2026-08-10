@@ -10,6 +10,7 @@ import { CustomSelect } from '../../components/ui/CustomSelect';
 import { SalesModal } from '../../components/ui/SalesModal';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
+import { ExportModal } from '../../components/ui/ExportModal';
 
 export const SupervisorTargetPage = () => {
   const { user } = useAuth();
@@ -20,6 +21,7 @@ export const SupervisorTargetPage = () => {
   
   const [showSalesModal, setShowSalesModal] = useState(false);
   const [selectedSalesData, setSelectedSalesData] = useState<any>(null);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // Dynamic states
   const [targetsList, setTargetsList] = useState<any[]>([]);
@@ -229,7 +231,8 @@ export const SupervisorTargetPage = () => {
 
   const ActionButtons = (
     <button 
-      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+      onClick={() => setIsExportModalOpen(true)}
+      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
     >
       <Download size={18} />
       Export Data
@@ -326,12 +329,13 @@ export const SupervisorTargetPage = () => {
   ];
 
   return (
-    <MainLayout sidebarItems={supervisorMenuItems}>
-      <Topbar 
-        title="Target Sales" 
-        subtitle="Pantau pencapaian target penjualan sales Anda pada bulan ini." 
-        actionButton={ActionButtons} 
-      />
+    <>
+      <MainLayout sidebarItems={supervisorMenuItems}>
+        <Topbar 
+          title="Target Sales" 
+          subtitle="Pantau pencapaian target penjualan sales Anda pada bulan ini." 
+          actionButton={ActionButtons} 
+        />
 
       <div className="px-8 pb-10">
         
@@ -425,6 +429,12 @@ export const SupervisorTargetPage = () => {
         mode="view_target"
         data={selectedSalesData}
       />
-    </MainLayout>
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        fileName="target-supervisor.pdf"
+      />
+      </MainLayout>
+    </>
   );
 };

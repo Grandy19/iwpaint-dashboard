@@ -14,6 +14,7 @@ import { SupervisorModal } from '../../components/ui/SupervisorModal';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
 import clsx from 'clsx';
+import { ExportModal } from '../../components/ui/ExportModal';
 
 export const DistributorDashboardPage = () => {
   const { user } = useAuth();
@@ -23,6 +24,7 @@ export const DistributorDashboardPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSupervisor, setSelectedSupervisor] = useState<any>(null);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const [chartJenisData, setChartJenisData] = useState('Total Penjualan');
   const [chartPeriode, setChartPeriode] = useState('2026-01-01');
@@ -42,7 +44,7 @@ export const DistributorDashboardPage = () => {
   const loadData = async () => {
     if (!user) return;
     try {
-      const myArea = 'Semua Area';
+      const myArea = user?.area || 'Semua Area';
       const params: any = { 
         area: myArea,
         periodeAwal,
@@ -59,7 +61,22 @@ export const DistributorDashboardPage = () => {
       // Load count of supervisors and active sales in this area
       const supervisorsRes = await api.get(`/users?role=supervisor`);
       const allSupervisors = supervisorsRes.data.data;
-      const areaSupervisors = myArea === 'Semua Area' ? allSupervisors : allSupervisors.filter((s: any) => s.area === myArea);
+      // Map regional area to supervisor cities
+      const targetAreaLower = myArea.toLowerCase();
+      let areaCities: string[] = [];
+      if (targetAreaLower.includes("jawa barat") || targetAreaLower === "jabar") {
+        areaCities = ["bandung", "cirebon", "kuningan", "tasikmalaya", "garut", "bogor"];
+      } else if (targetAreaLower.includes("jawa tengah") || targetAreaLower === "jateng") {
+        areaCities = ["semarang", "solo", "yogyakarta", "purwokerto", "tegal", "cilacap"];
+      } else if (targetAreaLower.includes("jawa timur") || targetAreaLower === "jatim") {
+        areaCities = ["surabaya", "malang", "kediri", "jember", "madiun", "banyuwangi"];
+      } else {
+        areaCities = [targetAreaLower];
+      }
+
+      const areaSupervisors = myArea === 'Semua Area' 
+        ? allSupervisors 
+        : allSupervisors.filter((s: any) => s.area && areaCities.includes(s.area.toLowerCase()));
 
       // Remove setKpis from here, it will be moved after targetPerfRes
 
@@ -263,7 +280,8 @@ export const DistributorDashboardPage = () => {
 
   const ActionButtons = (
     <button 
-      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+      onClick={() => setIsExportModalOpen(true)}
+      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
     >
       <Download size={18} />
       Export Data
@@ -320,8 +338,9 @@ export const DistributorDashboardPage = () => {
   };
 
   return (
-    <MainLayout sidebarItems={distributorMenuItems}>
-      <Topbar title="Dashboard Kepala Distributor" subtitle={`Selamat datang, ${user?.name || ''}`} actionButton={ActionButtons} />
+    <>
+      <MainLayout sidebarItems={distributorMenuItems}>
+        <Topbar title="Dashboard Kepala Distributor" subtitle={`Selamat datang, ${user?.name || ''}`} actionButton={ActionButtons} />
 
       <div className="px-8 pb-10">
         
@@ -416,6 +435,12 @@ export const DistributorDashboardPage = () => {
         mode="detail"
         data={selectedSupervisor}
       />
-    </MainLayout>
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        fileName="dashboard-distributor.pdf"
+      />
+      </MainLayout>
+    </>
   );
 };

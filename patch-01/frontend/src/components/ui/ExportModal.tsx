@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { RefreshCw, FileText, CheckCircle2 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { CheckCircle2 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
 interface ExportModalProps {
@@ -9,7 +9,8 @@ interface ExportModalProps {
 }
 
 export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, fileName }) => {
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 3>(1);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -18,30 +19,96 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, fileN
   }, [isOpen]);
 
   const handleExport = async () => {
-    setStep(2);
     try {
       const element = document.getElementById('export-content');
-      if (element) {
-        const opt = {
-          margin:       0.2,
-          filename:     fileName,
-          image:        { type: 'jpeg' as const, quality: 0.98 },
-          html2canvas:  { scale: 2, useCORS: true },
-          jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' as const }
-        };
-
-        const generatePdf = typeof html2pdf === 'function' ? html2pdf : (html2pdf as any).default;
-        await generatePdf().set(opt).from(element).save();
-
-        setStep(3);
-        setTimeout(() => {
-          onClose();
-        }, 1500);
-      } else {
+      if (!element) {
         alert("Export content not found");
         onClose();
+        return;
       }
+
+      // Hide the entire modal overlay so it doesn't appear in the PDF
+      if (overlayRef.current) overlayRef.current.style.display = 'none';
+
+      // Hide the sidebar completely during capture
+      const sidebar = document.querySelector('aside') || document.querySelector('nav');
+      const origSidebarDisplay = sidebar ? (sidebar as HTMLElement).style.display : '';
+      if (sidebar) (sidebar as HTMLElement).style.display = 'none';
+
+      // Save original styles
+      const origMarginLeft = element.style.marginLeft;
+      const origPadding = element.style.padding;
+
+      // Remove sidebar margin so content fills the full width
+      element.style.marginLeft = '0';
+      element.style.padding = '8px 24px';
+
+      // Hide topbar action buttons & settings/avatar for PDF
+      const header = element.querySelector('header');
+      const actionDiv = header?.querySelector(':scope > div:last-child') as HTMLElement | null;
+      const origActionDisplay = actionDiv?.style.display || '';
+      if (actionDiv) actionDiv.style.display = 'none';
+
+      // Remove sticky from header so it renders inline
+      const origHeaderPosition = header?.style.position || '';
+      const origHeaderBackdrop = header ? (header as HTMLElement).style.backdropFilter : '';
+      if (header) {
+        header.style.position = 'relative';
+        (header as HTMLElement).style.backdropFilter = 'none';
+      }
+
+      // Wait for reflow
+      await new Promise(r => setTimeout(r, 300));
+
+      // Capture at actual content width, then scale to fit A4 landscape
+      const contentWidth = element.scrollWidth;
+
+      const opt = {
+        margin:       [8, 8, 8, 8],  // mm margins
+        filename:     fileName,
+        image:        { type: 'jpeg' as const, quality: 0.92 },
+        html2canvas:  {
+          scale: 2,
+          useCORS: true,
+          windowWidth: contentWidth,
+          scrollY: 0,
+          scrollX: 0,
+          backgroundColor: '#f8fafc',
+          logging: false,
+        },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' as const },
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+      };
+
+      const generatePdf = typeof html2pdf === 'function' ? html2pdf : (html2pdf as any).default;
+      await generatePdf().set(opt).from(element).save();
+
+      // Restore original styles
+      element.style.marginLeft = origMarginLeft;
+      element.style.padding = origPadding;
+      if (actionDiv) actionDiv.style.display = origActionDisplay;
+      if (header) {
+        header.style.position = origHeaderPosition;
+        (header as HTMLElement).style.backdropFilter = origHeaderBackdrop;
+      }
+      if (sidebar) (sidebar as HTMLElement).style.display = origSidebarDisplay;
+
+      // Show the overlay again with success message
+      if (overlayRef.current) overlayRef.current.style.display = '';
+      setStep(3);
+      setTimeout(() => {
+        onClose();
+      }, 1500);
     } catch (error: any) {
+      // Restore on error
+      const element = document.getElementById('export-content');
+      if (element) {
+        element.style.marginLeft = '';
+        element.style.padding = '';
+      }
+      const sidebar = document.querySelector('aside') || document.querySelector('nav');
+      if (sidebar) (sidebar as HTMLElement).style.display = '';
+      if (overlayRef.current) overlayRef.current.style.display = '';
       alert("Export failed: " + (error?.message || String(error)));
       onClose();
     }
@@ -50,7 +117,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, fileN
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={step === 1 ? onClose : undefined}>
+    <div ref={overlayRef} className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={step === 1 ? onClose : undefined}>
       {step === 1 && (
         <div className="bg-white rounded-2xl w-[400px] p-8 shadow-xl relative text-center" onClick={(e) => e.stopPropagation()}>
           <h3 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Export</h3>
@@ -68,28 +135,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, fileN
             >
               Export
             </button>
-          </div>
-        </div>
-      )}
-
-      {step === 2 && (
-        <div className="bg-white rounded-2xl w-[500px] p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="font-bold text-gray-900 text-lg">Export Status</h3>
-            <div className="flex items-center gap-2 text-gray-500 text-sm">
-              <RefreshCw size={14} className="animate-spin" />
-              Memproses
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-[#f3e8ff] flex items-center justify-center text-[#9333ea] shrink-0">
-              <FileText size={24} />
-            </div>
-            <div>
-              <p className="font-medium text-gray-900">{fileName}</p>
-              <p className="text-sm text-gray-500 mt-1">Sedang mengerjakan ...</p>
-            </div>
           </div>
         </div>
       )}

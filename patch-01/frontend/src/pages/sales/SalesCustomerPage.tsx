@@ -421,7 +421,7 @@ export const SalesCustomerPage = () => {
       <ExportModal 
         isOpen={isExportModalOpen} 
         onClose={() => setIsExportModalOpen(false)} 
-        fileName="Data_Customer.xlsx" 
+        fileName="Data_Customer.pdf" 
       />
       <CustomerModal 
         isOpen={isCustomerModalOpen}

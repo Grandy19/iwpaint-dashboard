@@ -8,4 +8,9 @@ export default defineConfig({
     tailwindcss(),
     react()
   ],
+  resolve: {
+    alias: {
+      html2canvas: 'html2canvas-pro'
+    }
+  }
 })

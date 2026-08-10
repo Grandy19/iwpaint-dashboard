@@ -438,7 +438,7 @@ export const SalesPage = () => {
       <ExportModal 
         isOpen={isExportModalOpen} 
         onClose={() => setIsExportModalOpen(false)} 
-        fileName="Data_Sales.xlsx" 
+        fileName="Data_Sales.pdf" 
       />
 
       {/* Confirm Modal */}

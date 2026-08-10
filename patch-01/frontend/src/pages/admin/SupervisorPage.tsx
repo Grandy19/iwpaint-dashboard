@@ -533,7 +533,7 @@ export const SupervisorPage = () => {
       <ExportModal 
         isOpen={isExportModalOpen} 
         onClose={() => setIsExportModalOpen(false)} 
-        fileName="Data_Supervisor.xlsx" 
+        fileName="Data_Supervisor.pdf" 
       />
 
       {/* Confirm Modal */}

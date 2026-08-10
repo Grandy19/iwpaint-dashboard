@@ -8,6 +8,7 @@ import { CustomSelect } from '../../components/ui/CustomSelect';
 import { SalesModal } from '../../components/ui/SalesModal';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
+import { ExportModal } from '../../components/ui/ExportModal';
 
 export const DistributorSalesPage = () => {
   const { user } = useAuth();
@@ -19,6 +20,7 @@ export const DistributorSalesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSales, setSelectedSales] = useState<any>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // Dynamic states
   const [salesData, setSalesData] = useState<any[]>([]);
@@ -106,7 +108,8 @@ export const DistributorSalesPage = () => {
 
   const ActionButtons = (
     <button 
-      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+      onClick={() => setIsExportModalOpen(true)}
+      className="w-[160px] justify-center bg-[#52b788] hover:bg-[#40916c] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
     >
       <Download size={18} />
       Export Data
@@ -169,8 +172,9 @@ export const DistributorSalesPage = () => {
   });
 
   return (
-    <MainLayout sidebarItems={distributorMenuItems}>
-      <Topbar title="Sales Dikelola" subtitle={`Selamat datang, ${user?.name || ''}`} actionButton={ActionButtons} />
+    <>
+      <MainLayout sidebarItems={distributorMenuItems}>
+        <Topbar title="Sales Dikelola" subtitle={`Selamat datang, ${user?.name || ''}`} actionButton={ActionButtons} />
 
       <div className="px-8 pb-10">
         
@@ -328,6 +332,12 @@ export const DistributorSalesPage = () => {
         mode="view_only"
         data={selectedSales}
       />
-    </MainLayout>
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        fileName="sales-distributor.pdf"
+      />
+      </MainLayout>
+    </>
   );
 };

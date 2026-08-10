@@ -452,7 +452,7 @@ export const TargetSalesPage = () => {
       <ExportModal 
         isOpen={isExportModalOpen} 
         onClose={() => setIsExportModalOpen(false)} 
-        fileName="Data_Target_Sales.xlsx" 
+        fileName="Data_Target_Sales.pdf" 
       />
     </MainLayout>
   );
