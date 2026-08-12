@@ -1,4 +1,4 @@
-import { Banknote, Wallet, Users } from 'lucide-react';
+import { Banknote, Users } from 'lucide-react';
 
 export const supervisorCustomerKpiData = [
   {
@@ -15,7 +15,7 @@ export const supervisorCustomerKpiData = [
     title: 'Total Transaksi',
     value: '85.320 Transaksi',
     description: 'Total transaksi keseluruhan',
-    icon: Wallet,
+    icon: Banknote,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
   },

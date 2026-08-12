@@ -22,7 +22,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   progress
 }) => {
   return (
-    <div className="group relative bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/40 hover:-translate-y-1">
+    <div className="h-full group relative bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/40 hover:-translate-y-1">
       {/* Decorative subtle glow based on iconBg */}
       <div className={`absolute -right-6 -top-6 w-32 h-32 rounded-full ${iconBg} opacity-30 blur-3xl group-hover:opacity-50 transition-opacity duration-500 pointer-events-none`}></div>
       
@@ -34,7 +34,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
       </div>
       
       <div className="relative flex flex-col mb-2">
-        <div className={`flex items-baseline gap-3 ${progress !== undefined ? 'mb-4' : ''}`}>
+        <div className="flex items-baseline gap-3 mb-4">
           <h2 className="text-[28px] font-semibold text-slate-800 tracking-tight">{value}</h2>
           {percentageLabel && (
             <span className={`text-xs font-bold ${iconColor} ${iconBg} px-2.5 py-1 rounded-full flex items-center shadow-sm`}>
@@ -42,14 +42,14 @@ export const KpiCard: React.FC<KpiCardProps> = ({
             </span>
           )}
         </div>
-        {progress !== undefined && (
-          <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1">
+        <div className={`w-full h-1.5 rounded-full overflow-hidden mt-1 ${progress !== undefined ? 'bg-slate-100' : 'bg-transparent'}`}>
+          {progress !== undefined && (
             <div 
-              className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full relative transition-all duration-1000 ease-out"
+              className="h-full bg-[#2D9CDB] rounded-full relative transition-all duration-1000 ease-out"
               style={{ width: `${progress}%` }}
             ></div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       
       <div className="relative mt-auto pt-2 border-t border-slate-50">

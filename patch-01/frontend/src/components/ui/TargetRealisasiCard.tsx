@@ -45,14 +45,14 @@ export const TargetRealisasiCard: React.FC<TargetRealisasiCardProps> = ({ data, 
                   </div>
                   <span className="font-bold text-slate-700 text-[15px]">{item.title}</span>
                 </div>
-                <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500 text-lg tracking-tight">
+                <span className="font-bold text-[#2D9CDB] text-lg tracking-tight">
                   {pct}%
                 </span>
               </div>
 
               <div className="w-full h-2 bg-slate-100 rounded-full mb-4 overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full relative transition-all duration-1000 ease-out" 
+                  className="h-full bg-[#2D9CDB] rounded-full relative transition-all duration-1000 ease-out" 
                   style={{ width: `${pct}%` }}
                 ></div>
               </div>

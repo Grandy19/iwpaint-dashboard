@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { X, User, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, Info, Save, CheckCircle2, MapPin, Trash2, Tag } from 'lucide-react';
 import { CustomSelect } from './CustomSelect';
 
@@ -10,6 +11,17 @@ interface KepalaDistributorModalProps {
 }
 
 export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ isOpen, onClose, data, onSave }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   const [namaKepalaDistributor, setNamaKepalaDistributor] = useState('');
   const [email, setEmail] = useState('');
   const [alamat, setAlamat] = useState('');
@@ -88,10 +100,10 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
 
   if (!isOpen) return null;
 
-  return (
+  return ReactDOM.createPortal(
     <>
       <div 
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4 sm:p-6 md:p-8"
+        className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4 sm:p-6 md:p-8"
         onClick={onClose}
       >
         <div 
@@ -105,15 +117,15 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
             <X size={16} />
           </button>
           
-          <div className="mb-8">
-            <h3 className="text-gray-600 text-[18px] font-medium">
+          <div className="mb-8 border-b border-slate-100 pb-4">
+            <h3 className="text-slate-500 text-[13px] font-bold tracking-wider uppercase">
               {data ? 'Informasi Kepala Distributor' : 'Tambah Kepala Distributor'}
             </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 mb-8">
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Nama Kepala Distributor</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Nama Kepala Distributor</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <User size={16} />
@@ -129,7 +141,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
             </div>
 
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Username</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Username</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <UserCircle size={16} />
@@ -145,7 +157,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
             </div>
 
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Kode Distributor</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Kode Distributor</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <Tag size={16} />
@@ -161,7 +173,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
             </div>
 
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Email</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Email</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <Mail size={16} />
@@ -177,7 +189,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
             </div>
 
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Nomor HP</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Nomor HP</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <Phone size={16} />
@@ -193,7 +205,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
             </div>
 
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Alamat</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Alamat</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <MapPin size={16} />
@@ -209,7 +221,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
             </div>
 
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Password</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <Lock size={16} />
@@ -231,7 +243,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
             </div>
 
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Area</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Area</label>
               <CustomSelect 
                 value={area}
                 onChange={setArea}
@@ -266,7 +278,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
       </div>
 
       {showConfirm && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowConfirm(false)}>
+        <div className="fixed inset-0 z-[1010] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowConfirm(false)}>
           <div className="bg-white rounded-2xl w-[400px] p-8 shadow-xl relative text-center" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Simpan</h3>
             <p className="text-gray-600 mb-8">Apakah Anda ingin menyimpan data tersebut?</p>
@@ -290,7 +302,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
 
       {/* Success Alert Modal */}
       {showSuccess && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+        <div className="fixed inset-0 z-[1020] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
           <div className="bg-white rounded-2xl w-[350px] p-8 shadow-xl relative text-center">
             <div className="w-16 h-16 bg-green-100 text-[#52b788] rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 size={32} />
@@ -303,7 +315,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
 
       {/* Delete Confirm Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowDeleteConfirm(false)}>
+        <div className="fixed inset-0 z-[1010] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowDeleteConfirm(false)}>
           <div className="bg-white rounded-2xl w-[400px] p-8 shadow-xl relative text-center" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Hapus</h3>
             <p className="text-gray-600 mb-8">Apakah Anda ingin menghapus user tersebut?</p>
@@ -327,7 +339,7 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
 
       {/* Delete Success Alert Modal */}
       {showDeleteSuccess && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+        <div className="fixed inset-0 z-[1020] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
           <div className="bg-white rounded-2xl w-[350px] p-8 shadow-xl relative text-center">
             <div className="w-16 h-16 bg-green-100 text-[#52b788] rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 size={32} />
@@ -338,5 +350,5 @@ export const KepalaDistributorModal: React.FC<KepalaDistributorModalProps> = ({ 
         </div>
       )}
     </>
-  );
+  , document.body);
 };

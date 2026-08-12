@@ -2,7 +2,7 @@ import { formatDateIndo } from '../../utils/formatters';
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, Filter, LayoutDashboard, Users, Target, User, Eye, Wallet, Scale, CreditCard, PaintRoller, Wrench, Factory, Banknote, Package, Flag } from 'lucide-react';
+import { Download, Filter, LayoutDashboard, Users, Target, User, Eye, Banknote, Scale, CreditCard, PaintRoller, Wrench, Factory, Package, Flag } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
 import { RingkasanTargetCard } from '../../components/ui/RingkasanTargetCard';
@@ -100,7 +100,7 @@ export const SupervisorDashboardPage = () => {
       setKpis([
         {
           id: 1,
-          title: 'Total Penjualan Tim',
+          title: 'Total Penjualan Tim (Rp)',
           value: kpisVal.total_sales >= 1e9 ? `Rp ${(kpisVal.total_sales / 1e9).toFixed(1)} M` : `Rp ${(kpisVal.total_sales / 1e6).toFixed(1)} Jt`,
           description: 'Total penjualan seluruh tim pada periode aktif',
           icon: Banknote,
@@ -109,7 +109,7 @@ export const SupervisorDashboardPage = () => {
         },
         {
           id: 2,
-          title: 'Total Qty Penjualan',
+          title: 'Total Qty Penjualan (Kg)',
           value: `${Number(kpisVal.total_weight).toLocaleString('id-ID')} Kg`,
           description: 'Total kuantitas produk yang berhasil dijual',
           icon: Package,
@@ -127,7 +127,7 @@ export const SupervisorDashboardPage = () => {
         },
         {
           id: 4,
-          title: 'Pencapaian Target Tim',
+          title: 'Pencapaian Target Tim (%)',
           value: `${Math.min(ringkasanData.percentage || 0, 100)}%`,
           description: 'Persentase pencapaian target seluruh tim',
           icon: Flag,
@@ -221,11 +221,11 @@ export const SupervisorDashboardPage = () => {
   ];
 
   const tableColumns = [
-    { key: 'sales', label: 'Sales' },
-    { key: 'totalTarget', label: 'Target' },
-    { key: 'realisasi', label: 'Realisasi' },
-    { key: 'percentage', label: 'Pencapaian %' },
-    { key: 'detail', label: 'Detail' },
+    { key: 'sales', label: 'Sales', className: 'w-[25%]' },
+    { key: 'totalTarget', label: 'Target', className: 'w-[20%]' },
+    { key: 'realisasi', label: 'Realisasi', className: 'w-[20%]' },
+    { key: 'percentage', label: 'Pencapaian %', className: 'w-[23%]' },
+    { key: 'detail', label: 'Detail', align: 'center', className: 'w-[12%]' },
   ];
 
   const renderTableCell = (item: any, columnKey: string) => {
@@ -242,18 +242,26 @@ export const SupervisorDashboardPage = () => {
         if (rawReal === 0) return '0';
         return rawReal >= 1e9 ? `Rp ${(rawReal / 1e9).toFixed(1)} M` : (rawReal >= 1e6 ? `Rp ${(rawReal / 1e6).toFixed(1)} Jt` : `Rp ${rawReal.toLocaleString('id-ID')}`);
       }
-      case 'percentage':
+      case 'percentage': {
+        const perc = parseFloat(String(item.percentage).replace('%', '')) || 0;
+        const colorClass = perc >= 100 ? 'text-[#10b981]' : 'text-blue-600';
+        const barColor = perc >= 100 ? 'bg-[#10b981]' : 'bg-blue-600';
+        
         return (
-          <span className={clsx(
-            "font-semibold",
-            item.percentage >= 100 ? "text-[#10b981]" : "text-amber-500"
-          )}>
-            {item.percentage}%
-          </span>
+          <div className="flex items-center justify-start gap-3 w-full">
+            <span className={`font-bold w-[40px] text-left shrink-0 ${colorClass}`}>{perc}%</span>
+            <div className="w-[60px] h-2 bg-gray-100 rounded-full overflow-hidden shrink-0">
+              <div 
+                className={`h-full rounded-full transition-all duration-500 ${barColor}`} 
+                style={{ width: `${Math.min(perc, 100)}%` }}
+              />
+            </div>
+          </div>
         );
+      }
       case 'detail':
         return (
-          <button className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors cursor-pointer">
+          <button className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap">
             <Eye size={16} /> Detail
           </button>
         );
@@ -271,10 +279,10 @@ export const SupervisorDashboardPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
-            <div className="w-[280px] lg:w-[400px] flex-none">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
-              <div className="flex items-center gap-3">
+          <div className="flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 items-end">
+            <div className="w-full lg:w-[400px] flex-none">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Periode</label>
+              <div className="flex items-center justify-start gap-3 w-full">
                 <div className="flex-1">
                   <input 
                     type="date" 
@@ -296,16 +304,18 @@ export const SupervisorDashboardPage = () => {
             </div>
             
             {/* Modern Divider */}
-            <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
+            <div className="hidden lg:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px]"></div>
             
-            <div className="col-span-2">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Kategori Produk</label>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Kategori Produk</label>
               <CustomSelect 
                 value={kategoriProduk} 
                 onChange={setKategoriProduk} 
                 options={['Semua Kategori', 'Decorative', 'Automotive', 'Industri']} 
+                showSearch={true}
               />
             </div>
+            
             
             
           </div>

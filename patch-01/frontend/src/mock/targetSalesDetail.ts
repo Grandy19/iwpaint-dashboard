@@ -1,4 +1,4 @@
-import { Wallet, Package, Target, CreditCard, Users, PaintRoller, Wrench, Factory } from 'lucide-react';
+import { Banknote, Package, Target, CreditCard, Users, PaintRoller, Wrench, Factory } from 'lucide-react';
 
 export const salesDetailKpiData = [
   {
@@ -6,7 +6,7 @@ export const salesDetailKpiData = [
     title: 'Total Penjualan (Rp)',
     value: 'Rp 89,2 Jt',
     description: 'Total penjualan pada periode terpilih',
-    icon: Wallet,
+    icon: Banknote,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
     percentageLabel: '35.68%',

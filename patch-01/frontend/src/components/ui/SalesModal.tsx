@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { X, Save, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, MapPin, User, Users, Info, Briefcase, CheckCircle2, Trash2 } from 'lucide-react';
 import { CustomSelect } from './CustomSelect';
 import api from '../../utils/api';
@@ -12,6 +13,17 @@ interface SalesModalProps {
 }
 
 export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: modeInput, data, onSave }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   const mode = modeInput as any;
   const [namaSales, setNamaSales] = useState('');
   const [username, setUsername] = useState('');
@@ -138,11 +150,11 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
 
   if (!isOpen) return null;
 
-  return (
+  return ReactDOM.createPortal(
     <>
       {/* Main Modal */}
       <div 
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px]"
+        className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-[1px]"
         onClick={onClose}
       >
         <div 
@@ -155,8 +167,8 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
           >
             <X size={16} />
           </button>
-          <div className="mb-8">
-            <h3 className="text-gray-600 text-[18px] font-medium">
+          <div className="mb-8 border-b border-slate-100 pb-4">
+            <h3 className="text-slate-500 text-[13px] font-bold tracking-wider uppercase">
               {mode === 'create' ? 'Tambah Sales' : mode === 'view_target' ? 'Detail Performa Target Sales' : 'Informasi Sales'}
             </h3>
           </div>
@@ -164,7 +176,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
           {mode === 'view_target' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-8">
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Nama Sales</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Nama Sales</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <User size={16} />
@@ -173,7 +185,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Area</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Area</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Map size={16} />
@@ -182,7 +194,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Supervisor</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Supervisor</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Users size={16} />
@@ -191,7 +203,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Periode</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Periode</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <CheckCircle2 size={16} />
@@ -200,7 +212,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Target Penjualan</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Target Penjualan</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Info size={16} />
@@ -209,7 +221,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Realisasi Penjualan</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Realisasi Penjualan</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Info size={16} />
@@ -218,7 +230,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Pencapaian Target</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Pencapaian Target</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Info size={16} />
@@ -227,7 +239,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Total Customer</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Total Customer</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Info size={16} />
@@ -236,7 +248,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Total Qty Penjualan</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Total Qty Penjualan</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Info size={16} />
@@ -245,7 +257,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Total Transaksi</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Total Transaksi</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Info size={16} />
@@ -254,7 +266,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Status Target</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Status Target</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Info size={16} />
@@ -267,7 +279,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-8">
               {/* Nama Sales */}
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Nama Sales</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Nama Sales</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <User size={16} />
@@ -285,7 +297,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
 
               {/* Username */}
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Username</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Username</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <UserCircle size={16} />
@@ -303,7 +315,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
 
               {/* Email */}
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Email</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Email</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Mail size={16} />
@@ -321,7 +333,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
 
               {/* Nomor HP */}
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Nomor HP</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Nomor HP</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Phone size={16} />
@@ -339,7 +351,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
 
               {/* Alamat */}
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Alamat</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Alamat</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <MapPin size={16} />
@@ -358,7 +370,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
               {/* Password */}
               {mode !== 'view_only' && (
                 <div>
-                  <label className="block text-[13px] text-[#475569] font-medium mb-2">Password</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Password</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <Lock size={16} />
@@ -383,7 +395,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
 
               {/* Area */}
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Area</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Area</label>
                 {mode === 'view_only' ? (
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
@@ -405,7 +417,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
 
               {/* Role */}
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Role</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Role</label>
                 {mode === 'view_only' ? (
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
@@ -428,7 +440,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
               {/* Supervisor */}
               {mode !== 'view_only' && (
                 <div>
-                  <label className="block text-[13px] text-[#475569] font-medium mb-2">Supervisor</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Supervisor</label>
                   <CustomSelect 
                     value={supervisor}
                     onChange={setSupervisor}
@@ -443,7 +455,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
               {/* Kode Salesman */}
               {mode !== 'view_only' && role.toLowerCase() === 'sales' && (
                 <div>
-                  <label className="block text-[13px] text-[#475569] font-medium mb-2">Kode Salesman</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Kode Salesman</label>
                   <CustomSelect 
                     value={getSelectedSalesmanValue()}
                     onChange={handleKodeSalesmanChange}
@@ -482,7 +494,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
 
       {/* Confirm Modal */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowConfirm(false)}>
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowConfirm(false)}>
           <div className="bg-white rounded-2xl w-[400px] p-8 shadow-xl relative text-center" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Simpan</h3>
             <p className="text-gray-600 mb-8">Apakah Anda ingin menyimpan data tersebut?</p>
@@ -506,7 +518,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
 
       {/* Success Alert Modal */}
       {showSuccess && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+        <div className="fixed inset-0 z-[1010] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
           <div className="bg-white rounded-2xl w-[350px] p-8 shadow-xl relative text-center">
             <div className="w-16 h-16 bg-green-100 text-[#52b788] rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 size={32} />
@@ -519,7 +531,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
 
       {/* Delete Confirm Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowDeleteConfirm(false)}>
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowDeleteConfirm(false)}>
           <div className="bg-white rounded-2xl w-[400px] p-8 shadow-xl relative text-center" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Hapus</h3>
             <p className="text-gray-600 mb-8">Apakah Anda ingin menghapus user tersebut?</p>
@@ -543,7 +555,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
 
       {/* Delete Success Alert Modal */}
       {showDeleteSuccess && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+        <div className="fixed inset-0 z-[1010] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
           <div className="bg-white rounded-2xl w-[350px] p-8 shadow-xl relative text-center">
             <div className="w-16 h-16 bg-green-100 text-[#52b788] rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 size={32} />
@@ -554,5 +566,5 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
         </div>
       )}
     </>
-  );
+  , document.body);
 };

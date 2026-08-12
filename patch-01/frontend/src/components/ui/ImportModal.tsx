@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import { UploadCloud, X, FileText, CheckCircle2, RefreshCw, AlertCircle } from 'lucide-react';
 import api from '../../utils/api';
 
@@ -20,7 +21,13 @@ export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onSuc
       setStep(1);
       setFileName('');
       setErrorMsg('');
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -66,8 +73,8 @@ export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onSuc
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
       {step === 1 && (
         <div className="bg-white rounded-2xl w-[500px] p-8 relative border-2 border-dashed border-gray-300">
           <button 
@@ -144,5 +151,5 @@ export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onSuc
         </div>
       )}
     </div>
-  );
+  , document.body);
 };

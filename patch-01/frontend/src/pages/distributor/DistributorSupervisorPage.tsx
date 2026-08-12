@@ -76,7 +76,7 @@ export const DistributorSupervisorPage = () => {
       setKpis([
         {
           id: 1,
-          title: 'Total Penjualan Supervisor',
+          title: 'Total Penjualan (RP)',
           value: targetPerf.realisasi || 'Rp 0 Jt',
           description: 'Total realisasi penjualan supervisor',
           icon: Banknote,
@@ -85,7 +85,7 @@ export const DistributorSupervisorPage = () => {
         },
         {
           id: 2,
-          title: 'Pencapaian Target Supervisor',
+          title: 'Pencapaian Target (%)',
           value: `${Math.min(targetPerf.percentage || 0, 100)}%`,
           description: 'Persentase pencapaian target',
           icon: Target,
@@ -98,7 +98,7 @@ export const DistributorSupervisorPage = () => {
           title: 'Total Supervisor',
           value: `${filtered.length} Supervisor`,
           description: 'Total supervisor di regional Anda',
-          icon: Users,
+          icon: UserCheck,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
         }
@@ -123,13 +123,13 @@ export const DistributorSupervisorPage = () => {
   );
 
   const tableColumns = [
-    { key: 'namaSupervisor', label: 'Supervisor' },
-    { key: 'email', label: 'Email' },
-    { key: 'nomorHp', label: 'Nomor HP' },
-    { key: 'area', label: 'Area' },
-    { key: 'jumlahSales', label: 'Jumlah Sales' },
-    { key: 'status', label: 'Status' },
-    { key: 'detail', label: 'Detail', align: 'center' as const },
+    { key: 'namaSupervisor', label: 'Supervisor', className: 'w-[20%]' },
+    { key: 'email', label: 'Email', className: 'w-[22%]' },
+    { key: 'nomorHp', label: 'Nomor HP', className: 'w-[15%]' },
+    { key: 'area', label: 'Area', className: 'w-[12%]' },
+    { key: 'jumlahSales', label: 'Jumlah Sales', align: 'center', className: 'w-[12%]' },
+    { key: 'status', label: 'Status', align: 'center', className: 'w-[10%]' },
+    { key: 'detail', label: 'Detail', align: 'center', className: 'w-[9%]' },
   ];
 
   const renderTableCell = (item: any, columnKey: string) => {
@@ -138,14 +138,15 @@ export const DistributorSupervisorPage = () => {
         return <span className="text-gray-700 font-medium">{item.namaSupervisor}</span>;
       case 'status':
         return item.status === 'Aktif' ? (
-          <span className="flex items-center gap-1.5 text-[#10b981] font-medium">
+          <span className="flex items-center justify-center gap-1.5 text-[#10b981] font-medium">
             <CheckCircle2 size={16} /> Aktif
           </span>
         ) : (
-          <span className="flex items-center gap-1.5 text-[#ef4444] font-medium">
+          <span className="flex items-center justify-center gap-1.5 text-[#ef4444] font-medium">
             <XCircle size={16} /> Tidak Aktif
           </span>
         );
+
       case 'detail':
         return (
           <button 
@@ -153,8 +154,7 @@ export const DistributorSupervisorPage = () => {
               setSelectedSupervisor(item);
               setIsModalOpen(true);
             }}
-            className="flex items-center justify-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors w-full cursor-pointer"
-          >
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap">
             <Eye size={16} /> Detail
           </button>
         );
@@ -163,18 +163,60 @@ export const DistributorSupervisorPage = () => {
     }
   };
 
-  const distributorMenuItems = [
+    const distributorMenuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/distributor-dashboard' },
-    { name: 'Supervisor', icon: User, path: '/distributor-dashboard/supervisor' },
-    { name: 'Sales', icon: Users, path: '/distributor-dashboard/sales' },
+    { name: 'Sales', icon: User, path: '/distributor-dashboard/sales' },
+    { name: 'Supervisor', icon: UserCheck, path: '/distributor-dashboard/supervisor' },
     { name: 'Customer', icon: Users, path: '/distributor-dashboard/customer' },
-    { name: 'Target Sales', icon: Target, path: '/distributor-dashboard/target-sales' },
+    { name: 'Target Penjualan', icon: Target, path: '/distributor-dashboard/target-sales' },
   ];
 
   const filteredSupervisors = supervisorsList.filter((s: any) => {
     if (area !== 'Semua Area' && s.area !== area) return false;
     if (supervisor !== 'Semua Supervisor' && s.namaSupervisor !== supervisor) return false;
     return true;
+  });
+
+  const absensiColumns = [
+    { key: 'tanggal', label: 'Tanggal', className: 'w-[13%]' },
+    { key: 'namaSupervisor', label: 'Nama Supervisor', className: 'w-[20%]' },
+    { key: 'area', label: 'Area', className: 'w-[13%]' },
+    { key: 'loginPagi', label: 'Login Pagi', className: 'w-[13%]' },
+    { key: 'loginSore', label: 'Login Sore', className: 'w-[13%]' },
+    { key: 'aktivitasTerakhir', label: 'Aktivitas Terakhir', className: 'w-[14%]' },
+    { key: 'totalLoginHariIni', label: 'Total Login Hari Ini', align: 'center', className: 'w-[14%]' },
+  ];
+
+  const renderAbsensiCell = (item: any, columnKey: string) => {
+    switch (columnKey) {
+      case 'namaSupervisor':
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.namaSupervisor}</span>;
+      case 'totalLoginHariIni': {
+        const idLen = item.id ? String(item.id).length : 5;
+        const nameLen = (item.namaSupervisor || '').length || 10;
+        const total = 1 + ((idLen + nameLen) % 4);
+        return <span className="whitespace-nowrap flex items-center justify-center">{total}x</span>;
+      }
+      default:
+        return <span className="whitespace-nowrap">{item[columnKey]}</span>;
+    }
+  };
+
+  const dummyAbsensiData = filteredSupervisors.map((s: any, idx: number) => {
+    const isHadir = idx % 3 !== 2;
+    const isTerlambat = idx % 4 === 1;
+    let status = isHadir ? 'Hadir' : 'Tidak Hadir';
+    if (isHadir && isTerlambat) status = 'Terlambat';
+    const isCentang = idx === 2;
+
+    return {
+      ...s,
+      tanggal: '12 Agu 2026',
+      loginPagi: status === 'Tidak Hadir' ? '-' : (isCentang ? '✓' : (status === 'Terlambat' ? '08:21' : '07:58')),
+      loginSore: status === 'Tidak Hadir' ? '-' : (isCentang ? '✓' : (status === 'Terlambat' ? '-' : '16:42')),
+      status,
+      aktivitasTerakhir: status === 'Tidak Hadir' ? '-' : (isCentang ? '17:02' : (status === 'Terlambat' ? '08:24' : '16:45')),
+    };
   });
 
   return (
@@ -186,10 +228,10 @@ export const DistributorSupervisorPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
-            <div className="w-[280px] lg:w-[400px] flex-none">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
-              <div className="flex items-center gap-3">
+          <div className="flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 items-end">
+            <div className="w-full lg:w-[400px] flex-none">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Periode</label>
+              <div className="flex items-center justify-center gap-3">
                 <div className="flex-1">
                   <input 
                     type="date" 
@@ -211,10 +253,10 @@ export const DistributorSupervisorPage = () => {
             </div>
             
             {/* Modern Divider */}
-            <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
+            <div className="hidden lg:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px]"></div>
 
-            <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Area</label>
               <CustomSelect 
                 value={area} 
                 onChange={setArea} 
@@ -222,8 +264,8 @@ export const DistributorSupervisorPage = () => {
               />
             </div>
             
-            <div>
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Supervisor</label>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Supervisor</label>
               <CustomSelect 
                 value={supervisor} 
                 onChange={setSupervisor} 
@@ -231,8 +273,6 @@ export const DistributorSupervisorPage = () => {
                 showSearch={true}
               />
             </div>
-            
-            
           </div>
         </div>
 
@@ -243,13 +283,21 @@ export const DistributorSupervisorPage = () => {
           ))}
         </div>
 
-        {/* Table */}
-        <DataTable
-          title="Tabel Supervisor"
-          columns={tableColumns}
-          data={filteredSupervisors}
-          renderCell={renderTableCell}
-        />
+        {/* Tables */}
+        <div className="flex flex-col">
+          <DataTable tableLayout="auto"
+            title="Daftar Supervisor"
+            columns={tableColumns}
+            data={filteredSupervisors}
+            renderCell={renderTableCell}
+          />
+          <DataTable tableLayout="auto"
+            title="Riwayat Absensi Supervisor"
+            columns={absensiColumns}
+            data={dummyAbsensiData}
+            renderCell={renderAbsensiCell}
+          />
+        </div>
 
       </div>
 

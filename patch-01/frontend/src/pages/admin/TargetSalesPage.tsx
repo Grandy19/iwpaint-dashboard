@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Upload, Plus, CheckCircle2, XCircle, Edit3, ArrowDown, Filter, Wallet, Target, CreditCard, Users, PaintRoller, Wrench, Factory, User } from 'lucide-react';
+import { Upload, Plus, CheckCircle2, XCircle, Edit3, ArrowDown, Filter, Banknote, Target, CreditCard, Users, PaintRoller, Wrench, Factory, User } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { DataTable } from '../../components/common/DataTable';
 import { KpiCard } from '../../components/common/KpiCard';
@@ -122,7 +122,7 @@ export const TargetSalesPage = () => {
               title: 'Total Penjualan (Rp)',
               value: selectedRow.totalRealisasi,
               description: 'Total penjualan pada periode terpilih',
-              icon: Wallet,
+              icon: Banknote,
               iconColor: 'text-[#10b981]',
               iconBg: 'bg-[#dcfce7]',
               percentageLabel: `${selectedRow.percentage}%`,
@@ -177,7 +177,7 @@ export const TargetSalesPage = () => {
           },
           {
             id: 2,
-            title: isRange ? 'Total Target Periode' : 'Total Target Bulan Ini',
+            title: isRange ? 'Total Target Periode (%)' : 'Total Target Bulan Ini',
             value: perfRes.data.targetGlobal,
             description: isRange ? `Total Target periode ${startDate} s/d ${endDate}` : `Total Target ${targetMonthName} ${targetYear}`,
             icon: Target,
@@ -239,14 +239,14 @@ export const TargetSalesPage = () => {
   );
 
   const tableColumns = [
-    { key: 'sales', label: 'Sales' },
-    { key: 'area', label: 'Area' },
-    { key: 'decorative', label: 'Decorative' },
-    { key: 'automotive', label: 'Automotive' },
-    { key: 'industri', label: 'Industri' },
-    { key: 'totalTarget', label: 'Total Target' },
-    { key: 'status', label: 'Status' },
-    { key: 'aksi', label: 'Aksi' },
+    { key: 'sales', label: 'Sales', className: 'w-[16%]' },
+    { key: 'area', label: 'Area', className: 'w-[10%]' },
+    { key: 'decorative', label: 'Decorative', className: 'w-[13%]' },
+    { key: 'automotive', label: 'Automotive', className: 'w-[13%]' },
+    { key: 'industri', label: 'Industri', className: 'w-[13%]' },
+    { key: 'totalTarget', label: 'Total Target', className: 'w-[13%]' },
+    { key: 'status', label: 'Status', className: 'w-[12%]' },
+    { key: 'aksi', label: 'Aksi', align: 'center', className: 'w-[10%]' },
   ];
 
   const renderCell = (item: any, columnKey: string) => {
@@ -269,9 +269,21 @@ export const TargetSalesPage = () => {
               setModalMode('edit'); 
               setIsModalOpen(true); 
             }}
-            className="inline-flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors cursor-pointer mx-auto"
+            className={`w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm ${
+              item.status === 'Sudah Input'
+                ? 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300'
+                : 'bg-[#3b0764] text-white hover:bg-[#2e054e]'
+            }`}
           >
-            {item.status === 'Sudah Input' ? <Edit3 size={18} strokeWidth={2.5} /> : <Plus size={18} strokeWidth={2.5} />}
+            {item.status === 'Sudah Input' ? (
+              <>
+                <Edit3 size={15} /> Edit
+              </>
+            ) : (
+              <>
+                <Plus size={15} /> Input
+              </>
+            )}
           </button>
         );
       default:
@@ -315,9 +327,9 @@ export const TargetSalesPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
-            <div className="w-[280px] lg:w-[400px] flex-none">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
+          <div className="flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 items-end">
+            <div className="w-full lg:w-[400px] flex-none">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Periode</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <input 
@@ -340,10 +352,10 @@ export const TargetSalesPage = () => {
             </div>
             
             {/* Modern Divider */}
-            <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
+            <div className="hidden lg:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px]"></div>
 
-            <div className="flex-1">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Area</label>
               <CustomSelect 
                 value={area} 
                 onChange={setArea} 
@@ -351,16 +363,14 @@ export const TargetSalesPage = () => {
               />
             </div>
 
-            <div className="flex-1">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Sales</label>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Sales</label>
               <CustomSelect 
                 value={salesName} 
                 onChange={setSalesName} 
                 options={salesOptions} 
               />
             </div>
-
-            
           </div>
         </div>
 

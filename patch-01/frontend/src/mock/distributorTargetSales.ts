@@ -1,4 +1,4 @@
-import { Target, Banknote, TrendingUp, PaintRoller, Wrench, Factory, Flag } from 'lucide-react';
+import { Target, Banknote, TrendingUp, MapPin, PaintRoller, Wrench, Factory } from 'lucide-react';
 
 export const distributorTargetKpiData = [
   {
@@ -34,7 +34,7 @@ export const distributorTargetKpiData = [
     title: 'Area Mencapai Target',
     value: '5 / 8 Area',
     description: 'Jumlah area yang telah mencapai target.',
-    icon: Flag,
+    icon: MapPin,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
   }

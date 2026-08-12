@@ -1,4 +1,4 @@
-import { User, Users, Wallet } from 'lucide-react';
+import { User, Users, Banknote } from 'lucide-react';
 
 export const supervisorSalesKpiData = [
   {
@@ -24,7 +24,7 @@ export const supervisorSalesKpiData = [
     title: 'Total Transaksi',
     value: '1.245 Transaksi',
     description: 'Total transaksi dari seluruh sales pada periode aktif',
-    icon: Wallet,
+    icon: Banknote,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
   }

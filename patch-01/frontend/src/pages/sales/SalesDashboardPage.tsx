@@ -2,13 +2,14 @@ import { formatDateIndo } from '../../utils/formatters';
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, Filter, LayoutDashboard, Users, Target, Wallet, Package, Banknote, PaintRoller, Wrench, Factory } from 'lucide-react';
+import { Download, Filter, LayoutDashboard, Users, Target, Banknote, Package, PaintRoller, Wrench, Factory, TrendingUp } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
 import { RingkasanTargetCard } from '../../components/ui/RingkasanTargetCard';
 import { TopProductsCard } from '../../components/ui/TopProductsCard';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { ChartCard } from '../../components/ui/ChartCard';
+import { TopSalesPerformance } from '../../components/ui/TopSalesPerformance';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
 import { ExportModal } from '../../components/ui/ExportModal';
@@ -75,7 +76,7 @@ export const SalesDashboardPage = () => {
         },
         {
           id: 2,
-          title: 'Total Qty Penjualan',
+          title: 'Total Qty Penjualan (Kg)',
           value: `${Number(kpis.total_weight).toLocaleString('id-ID')} Kg`,
           description: 'Total qty penjualan untuk customer terpilih',
           icon: Package,
@@ -86,10 +87,11 @@ export const SalesDashboardPage = () => {
           id: 3,
           title: 'Pencapaian Target',
           value: `${targetPerfRes.data.percentage}%`,
-          description: 'Persentase pencapaian target',
-          icon: Target,
+          description: `Persentase terhadap target bulan ${targetMonthName} ${targetYear}`,
+          icon: TrendingUp,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
+          progress: targetPerfRes.data.percentage > 100 ? 100 : targetPerfRes.data.percentage,
         },
         {
           id: 4,
@@ -225,9 +227,9 @@ export const SalesDashboardPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
-            <div className="w-[280px] lg:w-[400px] flex-none">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
+          <div className="flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 items-end">
+            <div className="w-full lg:w-[400px] flex-none">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Periode</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <input 
@@ -250,10 +252,10 @@ export const SalesDashboardPage = () => {
             </div>
             
             {/* Modern Divider */}
-            <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
+            <div className="hidden lg:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px]"></div>
 
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Kategori Produk</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Kategori Produk</label>
               <CustomSelect 
                 value={kategoriProduk} 
                 onChange={setKategoriProduk} 
@@ -274,6 +276,11 @@ export const SalesDashboardPage = () => {
           <div className="lg:col-span-1">
             <RingkasanTargetCard {...ringkasanTarget} title={ringkasanTargetTitle} />
           </div>
+        </div>
+
+        {/* Top Sales Performance Section */}
+        <div className="mb-8">
+          <TopSalesPerformance />
         </div>
 
         {/* Target Realisasi Section */}

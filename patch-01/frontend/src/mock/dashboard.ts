@@ -1,4 +1,4 @@
-import { FileText, CheckCircle2, XCircle, Users, Wallet, UserCheck, User } from 'lucide-react';
+import { FileText, CheckCircle2, XCircle, Users, Banknote, UserCheck, User } from 'lucide-react';
 
 export const kpiData = [
   {
@@ -51,7 +51,7 @@ export const kpiData = [
     title: 'Total Transaksi',
     value: '85.320 Transaksi',
     description: 'Total Transaksi Keseluruhan',
-    icon: Wallet,
+    icon: Banknote,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
   }

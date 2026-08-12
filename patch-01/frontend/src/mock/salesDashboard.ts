@@ -1,4 +1,4 @@
-import { Wallet, Package, Receipt, Users, PaintRoller, Wrench, Factory, Banknote, WalletCards } from 'lucide-react';
+import { Banknote, Package, Receipt, Users, PaintRoller, Wrench, Factory, WalletCards } from 'lucide-react';
 
 export const salesDashboardKpiData = [
   {
@@ -24,7 +24,7 @@ export const salesDashboardKpiData = [
     title: 'Total Transaksi',
     value: '350 Transaksi',
     description: 'Total transaksi periode terpilih',
-    icon: Wallet,
+    icon: Banknote,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
   },

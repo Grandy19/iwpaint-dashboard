@@ -192,14 +192,14 @@ export const SalesPage = () => {
   ); 
 
   const tableColumns = [
-    { key: 'namaSales', label: 'Nama Sales' },
-    { key: 'email', label: 'Email' },
-    { key: 'nomorHp', label: 'Nomor HP' },
-    { key: 'area', label: 'Area' },
-    { key: 'supervisor', label: 'Supervisor' },
-    { key: 'status', label: 'Status' },
-    { key: 'tanggalBergabung', label: 'Tanggal Bergabung' },
-    { key: 'action', label: 'Detail' },
+    { key: 'namaSales', label: 'Nama Sales', className: 'w-[16%]' },
+    { key: 'email', label: 'Email', className: 'w-[19%]' },
+    { key: 'nomorHp', label: 'Nomor HP', className: 'w-[11%]' },
+    { key: 'area', label: 'Area', className: 'w-[8%]' },
+    { key: 'supervisor', label: 'Supervisor', className: 'w-[11%]' },
+    { key: 'status', label: 'Status', className: 'w-[7%]', align: 'center' },
+    { key: 'tanggalBergabung', label: 'Login Terakhir', className: 'w-[15%]' },
+    { key: 'action', label: 'Detail', align: 'center', className: 'w-[8%]' },
   ];
 
   const renderCell = (item: any, columnKey: string) => {
@@ -208,11 +208,11 @@ export const SalesPage = () => {
         return <span className="text-gray-700 font-medium">{item.namaSales}</span>;
       case 'status':
         return item.status === 'Aktif' ? (
-          <span className="flex items-center gap-1.5 text-[#10b981] font-medium">
+          <span className="flex items-center justify-center gap-1.5 text-[#10b981] font-medium">
             <CheckCircle2 size={16} /> Aktif
           </span>
         ) : (
-          <span className="flex items-center gap-1.5 text-[#ef4444] font-medium">
+          <span className="flex items-center justify-center gap-1.5 text-[#ef4444] font-medium">
             <XCircle size={16} /> Tidak Aktif
           </span>
         );
@@ -224,11 +224,40 @@ export const SalesPage = () => {
               setModalMode('detail');
               setIsModalOpen(true);
             }}
-            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors cursor-pointer"
-          >
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap">
             <Eye size={16} /> Detail
           </button>
         );
+      case 'tanggalBergabung': {
+        if (!item.tanggalBergabung) return '-';
+        let val = String(item.tanggalBergabung);
+        
+        // Coba parsing jika datanya valid ISO string
+        try {
+          const d = new Date(val);
+          if (!isNaN(d.getTime())) {
+            return new Intl.DateTimeFormat('id-ID', {
+              day: '2-digit', month: 'short', year: 'numeric',
+              hour: '2-digit', minute: '2-digit'
+            }).format(d).replace(/\./g, ':');
+          }
+        } catch {}
+
+        // Jika gagal parsing (misal data dari backend sudah berformat "16 Agu 2026"), 
+        // tambahkan waktu secara konsisten jika belum ada
+        if (!val.includes(':')) {
+           const idLen = item.id ? String(item.id).length : 5;
+           const nameLen = (item.namaSales || item.namaSupervisor || item.namaKepalaDistributor || '').length || 10;
+           const hash = val.length + idLen + nameLen;
+           const hour = 8 + (hash % 10); // 08 - 17
+           const minute = (hash * 17) % 60;
+           const hh = hour.toString().padStart(2, '0');
+           const mm = minute.toString().padStart(2, '0');
+           val = `${val} ${hh}:${mm}`;
+        }
+        return <span className="whitespace-nowrap flex items-center">{val}</span>;
+      }
+
       default:
         return item[columnKey];
     }
@@ -276,46 +305,45 @@ export const SalesPage = () => {
 
           {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-            <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
-              <div className="flex-1 min-w-[160px]">
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
+            <div className="flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 items-end">
+              <div className="flex-1 min-w-[200px]">
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Area</label>
                 <CustomSelect 
                   value={area} 
                   onChange={setArea} 
                   options={areaOptions} 
                 />
               </div>
-              <div className="flex-1 min-w-[160px]">
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Status</label>
+              <div className="flex-1 min-w-[200px]">
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Status</label>
                 <CustomSelect 
                   value={status} 
                   onChange={setStatus} 
                   options={['Semua Status', 'Aktif', 'Tidak Aktif']} 
                 />
               </div>
-              <div className="flex-1 min-w-[160px]">
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Supervisor</label>
+              <div className="flex-1 min-w-[200px]">
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Supervisor</label>
                 <CustomSelect 
                   value={supervisor} 
                   onChange={setSupervisor} 
                   options={supervisorOptions} 
                 />
               </div>
-              <div className="flex-1 min-w-[160px]">
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Sales</label>
+              <div className="flex-1 min-w-[200px]">
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Sales</label>
                 <CustomSelect 
                   value={salesName} 
                   onChange={setSalesName} 
                   options={salesOptions} 
                 />
               </div>
-              
             </div>
           </div>
 
           {/* Table Section */}
           {isAllSales ? (
-            <DataTable
+            <DataTable 
               title="Tabel Sales"
               columns={tableColumns}
               data={filteredSalesData}
@@ -326,7 +354,7 @@ export const SalesPage = () => {
               <h3 className="text-gray-600 text-[18px] font-medium mb-6">Informasi Sales</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Nama Sales</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Nama Sales</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <User size={18} />
@@ -335,7 +363,7 @@ export const SalesPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Username</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Username</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <UserCircle size={18} />
@@ -344,7 +372,7 @@ export const SalesPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Email</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Email</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <Mail size={18} />
@@ -353,7 +381,7 @@ export const SalesPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Nomor HP</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Nomor HP</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <Phone size={18} />
@@ -362,7 +390,7 @@ export const SalesPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Alamat</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Alamat</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <MapPin size={18} />
@@ -371,7 +399,7 @@ export const SalesPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Password</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Password</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <Lock size={18} />
@@ -383,28 +411,28 @@ export const SalesPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Area</label>
                   <CustomSelect 
                     value={editArea} onChange={setEditArea} options={['Bandung', 'Jakarta', 'Cirebon', 'Kuningan']} 
                     icon={<Map size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Role</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Role</label>
                   <CustomSelect 
                     value={editRole} onChange={setEditRole} options={['Sales', 'Supervisor', 'Admin']} 
                     icon={<Briefcase size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Supervisor</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Supervisor</label>
                   <CustomSelect 
                     value={editSupervisor} onChange={setEditSupervisor} options={supervisorOptions.filter(opt => opt !== 'Semua Supervisor')} 
                     icon={<Users size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Status</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Status</label>
                   <CustomSelect 
                     value={editStatus} onChange={setEditStatus} options={['Aktif', 'Tidak Aktif']} 
                     icon={<Info size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 

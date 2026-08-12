@@ -2,7 +2,7 @@ import { formatDateIndo } from '../../utils/formatters';
 import { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, Filter, Eye, LayoutDashboard, Users, Target, User, Map, MapPin, Receipt, Wallet, Package, CalendarClock, Briefcase, Banknote } from 'lucide-react';
+import { Download, Filter, Eye, LayoutDashboard, Users, Target, User, Map, MapPin, Receipt, Banknote, Package, CalendarClock, Briefcase, CheckCircle2, AlertCircle, XCircle, UserCheck } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
@@ -65,37 +65,38 @@ export const DistributorCustomerPage = () => {
       setSalesOptions(['Semua Sales', ...uniqueSales]);
 
       // KPIs
-      const totalSalesVal = myCustomers.reduce((acc: number, c: any) => acc + c.raw_total_penjualan, 0);
-      const totalTxVal = myCustomers.reduce((acc: number, c: any) => acc + Number(c.totalTransaksi), 0);
-      const totalCustomersVal = myCustomers.length;
+      // KPIs
+      const totalCustomerVal = myCustomers.length;
+      const customerSudahOrderVal = myCustomers.filter((c: any) => Number(c.totalTransaksi) > 0).length;
+      const customerBelumOrderVal = totalCustomerVal - customerSudahOrderVal;
 
       setKpis([
         {
           id: 1,
-          title: 'Total Penjualan (Rp)',
-          value: totalSalesVal >= 1e9 ? `Rp ${(totalSalesVal / 1e9).toFixed(1)} M` : `Rp ${(totalSalesVal / 1e6).toFixed(1)} Jt`,
-          description: 'Total penjualan customer wilayah Anda',
-          icon: Banknote,
+          title: 'Total Customer',
+          value: `${totalCustomerVal} Customer`,
+          description: 'Total customer aktif yang terdaftar',
+          icon: Users,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
         },
         {
           id: 2,
-          title: 'Total Transaksi',
-          value: `${totalTxVal.toLocaleString('id-ID')} Transaksi`,
-          description: 'Total transaksi customer wilayah Anda',
-          icon: Wallet,
+          title: 'Customer Sudah Order',
+          value: `${customerSudahOrderVal} Customer`,
+          description: 'Total customer yang sudah melakukan order',
+          icon: CheckCircle2,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
         },
         {
           id: 3,
-          title: 'Total Customer',
-          value: `${totalCustomersVal.toLocaleString('id-ID')} Customer`,
-          description: 'Total customer wilayah Anda',
-          icon: Users,
-          iconColor: 'text-[#10b981]',
-          iconBg: 'bg-[#dcfce7]',
+          title: 'Customer Belum Order',
+          value: `${customerBelumOrderVal} Customer`,
+          description: 'Total customer yang belum pernah order',
+          icon: XCircle,
+          iconColor: 'text-[#ef4444]',
+          iconBg: 'bg-[#fee2e2]',
         }
       ]);
 
@@ -215,25 +216,31 @@ export const DistributorCustomerPage = () => {
     { key: 'namaCustomer', label: 'Nama Customer' },
     { key: 'kodeCustomer', label: 'Kode Customer' },
     { key: 'alamat', label: 'Alamat' },
-    { key: 'totalTransaksi', label: 'Total Transaksi' },
-    { key: 'totalPenjualan', label: 'Total Penjualan' },
-    { key: 'detail', label: 'Detail' },
+    { key: 'totalTransaksi', label: 'Total Transaksi', align: 'center' },
+    { key: 'totalPenjualan', label: 'Total Penjualan'  },
+    { key: 'detail', label: 'Detail', align: 'center'  },
   ];
 
   const transactionColumns = [
-    { key: 'tanggal', label: 'Tanggal' },
-    { key: 'noFaktur', label: 'No. Faktur' },
-    { key: 'customer', label: 'Customer' },
-    { key: 'produk', label: 'Produk' },
-    { key: 'qty', label: 'QTY' },
-    { key: 'satuan', label: 'Satuan' },
-    { key: 'totalPenjualan', label: 'Total Penjualan' },
+    { key: 'tanggal', label: 'Tanggal', className: 'w-[120px]' },
+    { key: 'noFaktur', label: 'No. Faktur', className: 'w-[130px]' },
+    { key: 'customer', label: 'Customer', className: 'w-[150px]' },
+    { key: 'produk', label: 'Produk', className: 'w-[250px] min-w-[250px]' },
+    { key: 'qty', label: 'QTY', className: 'w-[80px]' },
+    { key: 'satuan', label: 'Satuan', className: 'w-[80px]' },
+    { key: 'totalPenjualan', label: 'Total Penjualan', className: 'w-[120px]' },
   ];
 
   const renderCustomerCell = (item: any, columnKey: string) => {
     switch (columnKey) {
       case 'namaCustomer':
-        return <span className="text-gray-700 font-medium">{item.namaCustomer}</span>;
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.namaCustomer}</span>;
+      case 'alamat':
+        return <div className="max-w-[250px] truncate" title={item.alamat}>{item.alamat}</div>;
+      case 'kodeCustomer':
+      case 'totalTransaksi':
+      case 'totalPenjualan':
+        return <div className="whitespace-nowrap">{item[columnKey]}</div>;
       case 'detail':
         return (
           <button 
@@ -241,8 +248,7 @@ export const DistributorCustomerPage = () => {
               setSelectedCustomer(item);
               setIsCustomerModalOpen(true);
             }}
-            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors cursor-pointer"
-          >
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap">
             <Eye size={16} /> Detail
           </button>
         );
@@ -251,21 +257,44 @@ export const DistributorCustomerPage = () => {
     }
   };
 
+  const formatRingkas = (val: any) => {
+    let cleanVal = val;
+    if (typeof val === 'string') {
+      cleanVal = val.replace(/[^0-9]/g, '');
+    }
+    const num = Number(cleanVal);
+    if (isNaN(num) || cleanVal === '') return val;
+    
+    if (num >= 1000000) {
+      return `Rp ${(num / 1000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })} Jt`;
+    }
+    if (num >= 1000) {
+      return `Rp ${(num / 1000).toLocaleString('id-ID', { maximumFractionDigits: 0 })} Rb`;
+    }
+    return `Rp ${num.toLocaleString('id-ID')}`;
+  };
+
   const renderTransactionCell = (item: any, columnKey: string) => {
     switch (columnKey) {
       case 'noFaktur':
-        return <span className="text-gray-700 font-medium">{item.noFaktur}</span>;
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.noFaktur}</span>;
+      case 'customer':
+        return <div className="max-w-[150px] truncate" title={item.customer}>{item.customer}</div>;
+      case 'produk':
+        return <div className="min-w-[250px] max-w-[350px] line-clamp-2" title={item.produk}>{item.produk}</div>;
+      case 'totalPenjualan':
+        return <span className="text-gray-700 whitespace-nowrap">{formatRingkas(item.totalPenjualan)}</span>;
       default:
-        return item[columnKey];
+        return <span className="whitespace-nowrap">{item[columnKey]}</span>;
     }
   };
 
-  const distributorMenuItems = [
+    const distributorMenuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/distributor-dashboard' },
-    { name: 'Supervisor', icon: User, path: '/distributor-dashboard/supervisor' },
-    { name: 'Sales', icon: Briefcase, path: '/distributor-dashboard/sales' },
+    { name: 'Sales', icon: User, path: '/distributor-dashboard/sales' },
+    { name: 'Supervisor', icon: UserCheck, path: '/distributor-dashboard/supervisor' },
     { name: 'Customer', icon: Users, path: '/distributor-dashboard/customer' },
-    { name: 'Target Sales', icon: Target, path: '/distributor-dashboard/target-sales' },
+    { name: 'Target Penjualan', icon: Target, path: '/distributor-dashboard/target-sales' },
   ];
 
   return (
@@ -276,9 +305,9 @@ export const DistributorCustomerPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
-            <div className="w-[280px] lg:w-[400px] flex-none">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
+          <div className="flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 items-end">
+            <div className="w-full lg:w-[400px] flex-none">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Periode</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <input 
@@ -301,10 +330,10 @@ export const DistributorCustomerPage = () => {
             </div>
 
             {/* Modern Divider */}
-            <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
+            <div className="hidden lg:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px]"></div>
 
-            <div className="flex-1 min-w-[160px]">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Area</label>
               <CustomSelect 
                 value={area} 
                 onChange={(val) => { setArea(val); setAppliedArea(val); }} 
@@ -312,8 +341,8 @@ export const DistributorCustomerPage = () => {
               />
             </div>
 
-            <div className="flex-1 min-w-[160px]">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Sales</label>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Sales</label>
               <CustomSelect 
                 value={sales} 
                 onChange={(val) => { setSales(val); setAppliedSales(val); }} 
@@ -323,7 +352,7 @@ export const DistributorCustomerPage = () => {
             </div>
             
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Customer</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Customer</label>
               <CustomSelect 
                 value={customer} 
                 onChange={(val) => { setCustomer(val); setAppliedCustomer(val); }} 
@@ -366,7 +395,7 @@ export const DistributorCustomerPage = () => {
             <h3 className="text-gray-600 text-[18px] font-medium mb-6">Informasi Customer</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Nama Customer</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Nama Customer</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <User size={18} />
@@ -375,7 +404,7 @@ export const DistributorCustomerPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Area</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Map size={18} />
@@ -384,7 +413,7 @@ export const DistributorCustomerPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Sales yang Menangani</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Sales yang Menangani</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Users size={18} />
@@ -393,7 +422,7 @@ export const DistributorCustomerPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Alamat</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Alamat</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <MapPin size={18} />
@@ -402,7 +431,7 @@ export const DistributorCustomerPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Total Transaksi</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Total Transaksi</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Receipt size={18} />
@@ -411,16 +440,16 @@ export const DistributorCustomerPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Total Penjualan</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Total Penjualan</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Wallet size={18} />
+                    <Banknote size={18} />
                   </div>
                   <input type="text" value={selectedCustomerData?.totalPenjualan || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Total QTY</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Total QTY</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Package size={18} />
@@ -429,7 +458,7 @@ export const DistributorCustomerPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Transaksi Terakhir</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Transaksi Terakhir</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <CalendarClock size={18} />

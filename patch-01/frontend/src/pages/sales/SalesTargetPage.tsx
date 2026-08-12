@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, LayoutDashboard, Users, Target, CheckCircle2, XCircle, Wallet, Scale, PaintRoller, Wrench, Factory, TrendingUp, Flag } from 'lucide-react';
+import { Download, LayoutDashboard, Users, Target, CheckCircle2, XCircle, Banknote, Scale, PaintRoller, Wrench, Factory, TrendingUp, Flag } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { RingkasanTargetCard } from '../../components/ui/RingkasanTargetCard';
 import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
@@ -50,7 +50,7 @@ export const SalesTargetPage = () => {
       setKpiData([
         {
           id: 1,
-          title: 'Target Penjualan',
+          title: 'Target Penjualan (RP)',
           value: formatCurrency(rawTarget),
           description: `Target penjualan bulan ${targetMonthName} ${targetYear}`,
           icon: Target,
@@ -59,16 +59,16 @@ export const SalesTargetPage = () => {
         },
         {
           id: 2,
-          title: 'Realisasi Penjualan',
+          title: 'Realisasi Penjualan (RP)',
           value: formatCurrency(rawRealisasi),
           description: 'Total penjualan periode aktif',
-          icon: Wallet,
+          icon: Banknote,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
         },
         {
           id: 3,
-          title: 'Pencapaian Target',
+          title: 'Pencapaian Target (%)',
           value: `${percentage}%`,
           description: `Persentase terhadap target bulan ${targetMonthName} ${targetYear}`,
           icon: TrendingUp,
@@ -78,7 +78,7 @@ export const SalesTargetPage = () => {
         },
         {
           id: 4,
-          title: 'Sisa Target',
+          title: 'Sisa Target (RP)',
           value: formatCurrency(finalSisa),
           description: 'Nilai penjualan yang masih harus dicapai',
           icon: Flag,
@@ -166,7 +166,7 @@ export const SalesTargetPage = () => {
     { key: 'periode', label: 'Periode', className: 'w-[22%]' },
     { key: 'target', label: 'Target', className: 'w-[20%]' },
     { key: 'realisasi', label: 'Realisasi', className: 'w-[20%]' },
-    { key: 'pencapaian', label: 'Pencapaian', className: 'w-[18%]' },
+    { key: 'pencapaian', label: 'Pencapaian %', className: 'w-[18%]' },
     { key: 'status', label: 'Status', className: 'w-[20%]' },
   ];
 
@@ -179,17 +179,17 @@ export const SalesTargetPage = () => {
       case 'realisasi':
         return <span className="text-gray-800 font-semibold whitespace-nowrap">{formatShortCurrency(item.realisasi)}</span>;
       case 'pencapaian': {
-        const pctNum = parseFloat(item.pencapaian) || 0;
-        const isReached = pctNum >= 100 || item.status === 'Tercapai';
+        const perc = parseFloat(String(item.pencapaian).replace('%', '')) || 0;
+        const colorClass = perc >= 100 ? 'text-[#10b981]' : 'text-blue-600';
+        const barColor = perc >= 100 ? 'bg-[#10b981]' : 'bg-blue-600';
+        
         return (
-          <div className="flex items-center gap-2">
-            <span className={`font-semibold text-sm min-w-[42px] ${isReached ? 'text-emerald-600' : 'text-blue-600'}`}>
-              {item.pencapaian}
-            </span>
-            <div className="w-16 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+          <div className="flex items-center justify-start gap-3 w-full">
+            <span className={`font-bold w-[40px] text-left shrink-0 ${colorClass}`}>{perc}%</span>
+            <div className="w-[60px] h-2 bg-gray-100 rounded-full overflow-hidden shrink-0">
               <div 
-                className={`h-full rounded-full ${isReached ? 'bg-emerald-500' : 'bg-blue-500'}`}
-                style={{ width: `${Math.min(pctNum, 100)}%` }}
+                className={`h-full rounded-full transition-all duration-500 ${barColor}`} 
+                style={{ width: `${Math.min(perc, 100)}%` }}
               />
             </div>
           </div>

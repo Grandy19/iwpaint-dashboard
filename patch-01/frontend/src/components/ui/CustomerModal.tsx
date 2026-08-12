@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { X, User, Users, Receipt, Package, Map, MapPin, Wallet, CalendarClock, Trash2, CheckCircle2 } from 'lucide-react';
+import React, { useState , useEffect} from 'react';
+import ReactDOM from 'react-dom';
+import { X, User, Users, Receipt, Package, Map, MapPin, Banknote, CalendarClock, Trash2, CheckCircle2 } from 'lucide-react';
 
 interface CustomerModalProps {
   isOpen: boolean;
@@ -8,6 +9,17 @@ interface CustomerModalProps {
 }
 
 export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, data }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   // Fallback data for fields not in the table
@@ -16,11 +28,11 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
   const transaksiTerakhir = data?.transaksiTerakhir || '13 Juli 2026';
   const totalTransaksiLabel = data?.totalTransaksi ? `${data.totalTransaksi} Transaksi` : '';
 
-  return (
+  return ReactDOM.createPortal(
     <>
       {/* Main Modal */}
       <div 
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4 sm:p-6 md:p-8"
+        className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4 sm:p-6 md:p-8"
         onClick={onClose}
       >
         <div 
@@ -34,8 +46,8 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
             <X size={16} />
           </button>
           
-          <div className="mb-8 flex justify-between items-center">
-            <h3 className="text-gray-600 text-[18px] font-medium">
+          <div className="mb-8 border-b border-slate-100 pb-4">
+            <h3 className="text-slate-500 text-[13px] font-bold tracking-wider uppercase">
               Informasi Customer
             </h3>
           </div>
@@ -45,7 +57,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
             {/* Kolom Kiri */}
             {/* Nama Customer */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Nama Customer</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Nama Customer</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <User size={16} />
@@ -61,7 +73,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
 
             {/* Area (Kolom Kanan) */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Area</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Area</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <Map size={16} />
@@ -77,7 +89,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
 
             {/* Sales yang Menangani */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Sales yang Menangani</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Sales yang Menangani</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <Users size={16} />
@@ -93,7 +105,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
 
             {/* Alamat */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Alamat</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Alamat</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <MapPin size={16} />
@@ -109,7 +121,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
 
             {/* Total Transaksi */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Total Transaksi</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Total Transaksi</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <Receipt size={16} />
@@ -125,10 +137,10 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
 
             {/* Total Penjualan */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Total Penjualan</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Total Penjualan</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <Wallet size={16} />
+                  <Banknote size={16} />
                 </div>
                 <input 
                   type="text" 
@@ -141,7 +153,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
 
             {/* Total QTY */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Total QTY</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Total QTY</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <Package size={16} />
@@ -157,7 +169,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
 
             {/* Transaksi Terakhir */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Transaksi Terakhir</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Transaksi Terakhir</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <CalendarClock size={16} />
@@ -175,5 +187,5 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, onClose, d
         </div>
       </div>
     </>
-  );
+  , document.body);
 };

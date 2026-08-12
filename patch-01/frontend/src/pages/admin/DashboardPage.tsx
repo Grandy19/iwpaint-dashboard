@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { CheckCircle2, XCircle, Eye, Download, Wallet, CreditCard, Scale, Target, FileText, Users, User, Upload } from 'lucide-react';
+import { CheckCircle2, XCircle, Eye, Download, Banknote, CreditCard, Scale, Target, FileText, Users, User, Upload } from 'lucide-react';
 import { DataTable } from '../../components/common/DataTable';
 import { KpiCard } from '../../components/common/KpiCard';
 import { ProgressCard } from '../../components/common/ProgressCard';
@@ -107,7 +107,7 @@ export const DashboardPage = () => {
           title: 'Total Penjualan (Rp)',
           value: formatCurrency(Number(totalSalesRp)),
           description: 'Total Penjualan Keseluruhan',
-          icon: Wallet,
+          icon: Banknote,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
         }
@@ -225,8 +225,7 @@ export const DashboardPage = () => {
         return (
           <button 
             onClick={() => navigate('/import')}
-            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors cursor-pointer whitespace-nowrap"
-          >
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap">
             <Eye size={16} /> Detail
           </button>
         );
@@ -291,7 +290,7 @@ export const DashboardPage = () => {
               { key: 'date', label: 'Tanggal Import', className: 'w-[26%]' },
               { key: 'rows', label: 'Jumlah Data', className: 'w-[17%]' },
               { key: 'status', label: 'Status', className: 'w-[17%]' },
-              { key: 'detail', label: 'Detail', className: 'w-[10%]' },
+              { key: 'detail', label: 'Detail', align: 'center', className: 'w-[10%]' },
             ]}
             data={historyImports}
             renderCell={renderHistoryCell}

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { X, Target, Banknote, TrendingUp, PaintRoller, Wrench, Factory } from 'lucide-react';
 
 interface AreaTargetModalProps {
@@ -8,6 +9,17 @@ interface AreaTargetModalProps {
 }
 
 export const AreaTargetModal: React.FC<AreaTargetModalProps> = ({ isOpen, onClose, data }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen || !data) return null;
 
   const categoryIcons: Record<string, any> = {
@@ -16,8 +28,8 @@ export const AreaTargetModal: React.FC<AreaTargetModalProps> = ({ isOpen, onClos
     'Industri': Factory
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
@@ -102,5 +114,5 @@ export const AreaTargetModal: React.FC<AreaTargetModalProps> = ({ isOpen, onClos
         </div>
       </div>
     </div>
-  );
+  , document.body);
 };

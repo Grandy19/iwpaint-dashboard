@@ -1,4 +1,4 @@
-import { Wallet, Package, Users, Target, PaintRoller, Wrench, Factory, Banknote, User, Flag } from 'lucide-react';
+import { Banknote, Package, Users, Target, PaintRoller, Wrench, Factory, User, Flag } from 'lucide-react';
 
 export const supervisorKpiData = [
   {

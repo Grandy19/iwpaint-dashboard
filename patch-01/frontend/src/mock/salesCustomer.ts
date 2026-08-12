@@ -1,4 +1,4 @@
-import { Banknote, Wallet, Package } from 'lucide-react';
+import { Banknote, Package } from 'lucide-react';
 
 export const customerKpiData = [
   {
@@ -15,7 +15,7 @@ export const customerKpiData = [
     title: 'Total Transaksi',
     value: '350 Transaksi',
     description: 'Total transaksi filter terpilih', // Match the mockup typo or specific text
-    icon: Wallet,
+    icon: Banknote,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
   },

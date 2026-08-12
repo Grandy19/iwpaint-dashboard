@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { X, User, UserCircle, Mail, Phone, Lock, Eye, EyeOff, Map, Briefcase, Info, Users, Save, CheckCircle2, XCircle, MapPin, ChevronDown, Search, Trash2, Target, Tag, TrendingUp } from 'lucide-react';
 import { CustomSelect } from './CustomSelect';
 import { DataTable } from '../common/DataTable';
@@ -31,6 +32,17 @@ const salesOptions: SalesOption[] = [
 ];
 
 export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClose, data, onSave, mode = 'edit' }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   // Kiri
   const [namaSupervisor, setNamaSupervisor] = useState('');
   const [email, setEmail] = useState('');
@@ -173,7 +185,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
     { key: 'namaSales', label: 'Sales', className: 'w-[22%]' },
     { key: 'target', label: 'Target', className: 'w-[20%]' },
     { key: 'realisasi', label: 'Realisasi', className: 'w-[20%]' },
-    { key: 'pencapaian', label: 'Pencapaian', className: 'w-[18%]' },
+    { key: 'pencapaian', label: 'Pencapaian %', className: 'w-[18%]' },
     { key: 'status', label: 'Status', className: 'w-[20%]' },
   ] : [
     { key: 'namaSales', label: 'Nama Sales', className: 'w-[24%]' },
@@ -240,11 +252,11 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
     salesDisplayText = `${selectedSales.length} Terpilih`;
   }
 
-  return (
+  return ReactDOM.createPortal(
     <>
       {/* Main Modal */}
       <div 
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4 sm:p-6 md:p-8"
+        className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-[1px] p-4 sm:p-6 md:p-8"
         onClick={onClose}
       >
         <div 
@@ -258,8 +270,8 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             <X size={16} />
           </button>
           
-          <div className="mb-8">
-            <h3 className="text-gray-600 text-[18px] font-medium">
+          <div className="mb-8 border-b border-slate-100 pb-4">
+            <h3 className="text-slate-500 text-[13px] font-bold tracking-wider uppercase">
               {data ? 'Informasi Supervisor' : 'Tambah Supervisor'}
             </h3>
           </div>
@@ -270,7 +282,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
 
             {/* Nama Supervisor */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Nama Supervisor</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Nama Supervisor</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <User size={16} />
@@ -289,7 +301,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             {/* Username (Not in view_target) */}
             {mode !== 'view_target' && (
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Username</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Username</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <UserCircle size={16} />
@@ -308,7 +320,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
 
             {/* Kode Supervisor */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Kode Supervisor</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Kode Supervisor</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <Tag size={16} />
@@ -327,7 +339,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             {/* Email (Not in view_target) */}
             {mode !== 'view_target' && (
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Email</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Email</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Mail size={16} />
@@ -347,7 +359,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             {/* Nomor HP (Not in view_target) */}
             {mode !== 'view_target' && (
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Nomor HP</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Nomor HP</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Phone size={16} />
@@ -367,7 +379,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             {/* Alamat (Not in view_target) */}
             {mode !== 'view_target' && (
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Alamat</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Alamat</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <MapPin size={16} />
@@ -386,7 +398,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
 
             {/* Area */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">Area</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Area</label>
               {(mode === 'view_only' || mode === 'view_target' || mode === 'detail') ? (
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
@@ -409,7 +421,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             {/* Role (Not in view_target) */}
             {mode !== 'view_target' && (
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Role</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Role</label>
                 {(mode === 'view_only' || mode === 'detail') ? (
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
@@ -432,7 +444,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
 
             {/* Sales */}
             <div>
-              <label className="block text-[13px] text-[#475569] font-medium mb-2">{(mode === 'view_only' || mode === 'view_target') ? 'Jumlah Sales' : 'Sales'}</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">{(mode === 'view_only' || mode === 'view_target') ? 'Jumlah Sales' : 'Sales'}</label>
               {(mode === 'view_only' || mode === 'view_target' || mode === 'detail') ? (
                 <div 
                   onClick={() => setShowViewSalesModal(true)}
@@ -463,7 +475,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             {/* Target Penjualan */}
             {(mode === 'view_only' || mode === 'detail') && (
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Target Penjualan</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Target Penjualan</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Target size={16} />
@@ -476,7 +488,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             {/* Realisasi */}
             {mode === 'view_only' && (
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Realisasi</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Realisasi</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <CheckCircle2 size={16} />
@@ -489,7 +501,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
             {/* Password (Not in view_target) */}
             {mode === 'edit' && (
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Password</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Password</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Lock size={16} />
@@ -517,7 +529,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
           {mode === 'view_target' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 mb-8 mt-2">
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Target</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Target</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Target size={16} />
@@ -526,7 +538,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Realisasi</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Realisasi</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <CheckCircle2 size={16} />
@@ -535,7 +547,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Qty Penjualan</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Qty Penjualan</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <CheckCircle2 size={16} />
@@ -544,7 +556,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] text-[#475569] font-medium mb-2">Pencapaian</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Pencapaian</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <TrendingUp size={16} />
@@ -588,7 +600,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
       {/* Sub-Modal View Sales (Read-Only) */}
       {/* ============================================================ */}
       {showViewSalesModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-[2px]" onClick={() => setShowViewSalesModal(false)}>
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 backdrop-blur-[2px]" onClick={() => setShowViewSalesModal(false)}>
           <div className="bg-white rounded-2xl w-[700px] shadow-2xl relative flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100">
@@ -618,7 +630,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
       {/* Sub-Modal Pemilihan Sales */}
       {/* ============================================================ */}
       {showSalesModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-[2px]" onClick={handleCloseSalesModal}>
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 backdrop-blur-[2px]" onClick={handleCloseSalesModal}>
           <div className="bg-white rounded-2xl w-[450px] shadow-2xl relative flex flex-col" onClick={(e) => e.stopPropagation()}>
             
             {/* Header */}
@@ -717,7 +729,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
 
       {/* Confirm Modal (Main Save) */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowConfirm(false)}>
+        <div className="fixed inset-0 z-[1010] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowConfirm(false)}>
           <div className="bg-white rounded-2xl w-[400px] p-8 shadow-xl relative text-center" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Simpan</h3>
             <p className="text-gray-600 mb-8">Apakah Anda ingin menyimpan data tersebut?</p>
@@ -741,7 +753,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
 
       {/* Success Alert Modal */}
       {showSuccess && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+        <div className="fixed inset-0 z-[1020] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
           <div className="bg-white rounded-2xl w-[350px] p-8 shadow-xl relative text-center">
             <div className="w-16 h-16 bg-green-100 text-[#52b788] rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 size={32} />
@@ -754,7 +766,7 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
 
       {/* Delete Confirm Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowDeleteConfirm(false)}>
+        <div className="fixed inset-0 z-[1020] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowDeleteConfirm(false)}>
           <div className="bg-white rounded-2xl w-[400px] p-8 shadow-xl relative text-center" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Hapus</h3>
             <p className="text-gray-600 mb-8">Apakah Anda ingin menghapus user tersebut?</p>
@@ -789,5 +801,5 @@ export const SupervisorModal: React.FC<SupervisorModalProps> = ({ isOpen, onClos
         </div>
       )}
     </>
-  );
+  , document.body);
 };

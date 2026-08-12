@@ -1,4 +1,4 @@
-import { Target, Wallet, TrendingUp, UserCheck, PaintRoller, Wrench, Factory } from 'lucide-react';
+import { Target, Banknote, TrendingUp, UserCheck, PaintRoller, Wrench, Factory } from 'lucide-react';
 
 export const supervisorTargetKpiData = [
   {
@@ -15,7 +15,7 @@ export const supervisorTargetKpiData = [
     title: 'Realisasi Penjualan Tim',
     value: 'Rp 200 Jt',
     description: 'Total realisasi penjualan seluruh tim',
-    icon: Wallet,
+    icon: Banknote,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
   },

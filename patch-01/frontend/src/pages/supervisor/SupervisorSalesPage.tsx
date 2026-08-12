@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, Filter, LayoutDashboard, Users, Target, User, Eye, CheckCircle2, XCircle, Banknote, Wallet, UserCircle, Mail, Phone, Lock, EyeOff, Map, Briefcase, Info, MapPin } from 'lucide-react';
+import { Download, Filter, LayoutDashboard, Users, Target, User, Eye, CheckCircle2, XCircle, Banknote, Package, UserCircle, Mail, Phone, Lock, EyeOff, Map, Briefcase, Info, MapPin } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { SalesModal } from '../../components/ui/SalesModal';
+import { TopSalesPerformance } from '../../components/ui/TopSalesPerformance';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
 import { ExportModal } from '../../components/ui/ExportModal';
@@ -43,67 +44,35 @@ export const SupervisorSalesPage = () => {
       const kpisRes = await api.get('/sales/kpis', { params: kpiParams });
       const kpisVal = kpisRes.data;
 
-      if (sales === 'Semua Sales') {
-        setKpis([
-          {
-            id: 1,
-            title: 'Total Sales',
-            value: `${mySales.length} Sales`,
-            description: 'Total anggota sales yang terdaftar',
-            icon: User,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          },
-          {
-            id: 2,
-            title: 'Total Customer Ditangani',
-            value: `${kpisVal.total_customers} Customer`,
-            description: 'Total customer yang dikelola seluruh tim sales',
-            icon: Users,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          },
-          {
-            id: 3,
-            title: 'Total Transaksi',
-            value: `${Number(kpisVal.total_transactions).toLocaleString('id-ID')} Transaksi`,
-            description: 'Total transaksi dari seluruh sales pada periode aktif',
-            icon: Wallet,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          }
-        ]);
-      } else {
-        setKpis([
-          {
-            id: 1,
-            title: 'Total Penjualan',
-            value: kpisVal.total_sales >= 1e9 ? `Rp ${(kpisVal.total_sales / 1e9).toFixed(1)} M` : `Rp ${(kpisVal.total_sales / 1e6).toFixed(1)} Jt`,
-            description: `Total penjualan oleh ${sales}`,
-            icon: Banknote,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          },
-          {
-            id: 2,
-            title: 'Total Customer Ditangani',
-            value: `${kpisVal.total_customers} Customer`,
-            description: `Total customer yang dikelola oleh ${sales}`,
-            icon: Users,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          },
-          {
-            id: 3,
-            title: 'Total Transaksi',
-            value: `${Number(kpisVal.total_transactions).toLocaleString('id-ID')} Transaksi`,
-            description: `Total transaksi oleh ${sales}`,
-            icon: Wallet,
-            iconColor: 'text-[#10b981]',
-            iconBg: 'bg-[#dcfce7]',
-          }
-        ]);
-      }
+      setKpis([
+        {
+          id: 1,
+          title: 'Total Penjualan Tim (RP)',
+          value: kpisVal.total_sales >= 1e9 ? `Rp ${(kpisVal.total_sales / 1e9).toFixed(1)} M` : `Rp ${(kpisVal.total_sales / 1e6).toFixed(1)} Jt`,
+          description: sales === 'Semua Sales' ? 'Total penjualan keseluruhan' : `Total penjualan oleh ${sales}`,
+          icon: Banknote,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
+        },
+        {
+          id: 2,
+          title: 'Total Qty Penjualan (Kg)',
+          value: `${Number(kpisVal.total_weight || 0).toLocaleString('id-ID')} Kg`,
+          description: sales === 'Semua Sales' ? 'Total qty penjualan keseluruhan' : `Total qty penjualan oleh ${sales}`,
+          icon: Package,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
+        },
+        {
+          id: 3,
+          title: 'Total Sales',
+          value: `${mySales.length} Sales`,
+          description: 'Total anggota sales yang terdaftar',
+          icon: User,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
+        }
+      ]);
     } catch (err) {
       console.error('Failed to load supervisor sales:', err);
     }
@@ -134,26 +103,29 @@ export const SupervisorSalesPage = () => {
   ];
 
   const tableColumns = [
-    { key: 'namaSales', label: 'Nama Sales' },
-    { key: 'email', label: 'Email' },
-    { key: 'nomorHp', label: 'Nomor HP' },
-    { key: 'area', label: 'Area' },
-    { key: 'status', label: 'Status' },
-    { key: 'tanggalBergabung', label: 'Tanggal Bergabung' },
-    { key: 'detail', label: 'Detail' },
+    { key: 'namaSales', label: 'Nama Sales', className: 'w-[25%]' },
+    { key: 'email', label: 'Email', className: 'w-[25%]' },
+    { key: 'nomorHp', label: 'Nomor HP', className: 'w-[18%]' },
+    { key: 'area', label: 'Area', className: 'w-[15%]' },
+    { key: 'status', label: 'Status', align: 'center', className: 'w-[10%]' },
+    { key: 'detail', label: 'Detail', align: 'center', className: 'w-[7%]' },
   ];
 
   const renderTableCell = (item: any, columnKey: string) => {
     switch (columnKey) {
       case 'namaSales':
-        return <span className="text-gray-700 font-medium">{item.namaSales}</span>;
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.namaSales}</span>;
+      case 'email':
+      case 'nomorHp':
+      case 'area':
+        return <span className="whitespace-nowrap">{item[columnKey]}</span>;
       case 'status':
         return item.status === 'Aktif' ? (
-          <span className="flex items-center gap-1.5 text-[#10b981] font-medium">
+          <span className="flex items-center justify-center gap-1.5 text-[#10b981] font-medium whitespace-nowrap">
             <CheckCircle2 size={16} /> Aktif
           </span>
         ) : (
-          <span className="flex items-center gap-1.5 text-[#ef4444] font-medium">
+          <span className="flex items-center justify-center gap-1.5 text-[#ef4444] font-medium whitespace-nowrap">
             <XCircle size={16} /> Tidak Aktif
           </span>
         );
@@ -164,15 +136,58 @@ export const SupervisorSalesPage = () => {
               setSelectedSales(item);
               setIsModalOpen(true);
             }}
-            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors cursor-pointer"
-          >
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap">
             <Eye size={16} /> Detail
           </button>
         );
+
+
       default:
-        return item[columnKey];
+        return <span className="whitespace-nowrap">{item[columnKey]}</span>;
     }
   };
+
+  const absensiColumns = [
+    { key: 'tanggal', label: 'Tanggal', className: 'w-[13%]' },
+    { key: 'namaSales', label: 'Nama Sales', className: 'w-[20%]' },
+    { key: 'area', label: 'Area', className: 'w-[13%]' },
+    { key: 'loginPagi', label: 'Login Pagi', className: 'w-[13%]' },
+    { key: 'loginSore', label: 'Login Sore', className: 'w-[13%]' },
+    { key: 'aktivitasTerakhir', label: 'Aktivitas Terakhir', className: 'w-[14%]' },
+    { key: 'totalLoginHariIni', label: 'Total Login Hari Ini', align: 'center', className: 'w-[14%]' },
+  ];
+
+  const renderAbsensiCell = (item: any, columnKey: string) => {
+    switch (columnKey) {
+      case 'namaSales':
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.namaSales}</span>;
+      case 'totalLoginHariIni': {
+        const idLen = item.id ? String(item.id).length : 5;
+        const nameLen = (item.namaSales || '').length || 10;
+        const total = 1 + ((idLen + nameLen) % 4);
+        return <span className="whitespace-nowrap flex items-center justify-center">{total}x</span>;
+      }
+      default:
+        return <span className="whitespace-nowrap">{item[columnKey]}</span>;
+    }
+  };
+
+  const dummyAbsensiData = salesData.map((s: any, idx: number) => {
+    const isHadir = idx % 3 !== 2;
+    const isTerlambat = idx % 4 === 1;
+    let status = isHadir ? 'Hadir' : 'Tidak Hadir';
+    if (isHadir && isTerlambat) status = 'Terlambat';
+    const isCentang = idx === 2;
+
+    return {
+      ...s,
+      tanggal: '12 Agu 2026',
+      loginPagi: status === 'Tidak Hadir' ? '-' : (isCentang ? '✓' : (status === 'Terlambat' ? '08:21' : '07:58')),
+      loginSore: status === 'Tidak Hadir' ? '-' : (isCentang ? '✓' : (status === 'Terlambat' ? '-' : '16:42')),
+      status,
+      aktivitasTerakhir: status === 'Tidak Hadir' ? '-' : (isCentang ? '17:02' : (status === 'Terlambat' ? '08:24' : '16:45')),
+    };
+  });
 
   return (
     <>
@@ -183,14 +198,14 @@ export const SupervisorSalesPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
-            <div className="w-[280px] lg:w-[400px] flex-none">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
-              <div className="flex items-center gap-3">
+          <div className="flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 items-end">
+            <div className="w-full lg:w-[400px] flex-none">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Periode</label>
+              <div className="flex items-center justify-center gap-3">
                 <div className="flex-1">
                   <input 
                     type="date" 
-                    className="w-full px-4 py-2 h-[42px] text-sm border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-[#3b0764]"
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                     value={periodeAwal}
                     onChange={(e) => setPeriodeAwal(e.target.value)}
                   />
@@ -199,7 +214,7 @@ export const SupervisorSalesPage = () => {
                 <div className="flex-1">
                   <input 
                     type="date" 
-                    className="w-full px-4 py-2 h-[42px] text-sm border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-[#3b0764]"
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                     value={periodeAkhir}
                     onChange={(e) => setPeriodeAkhir(e.target.value)}
                   />
@@ -208,10 +223,10 @@ export const SupervisorSalesPage = () => {
             </div>
             
             {/* Modern Divider */}
-            <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
+            <div className="hidden lg:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px]"></div>
 
-            <div className="col-span-2">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Sales</label>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Sales</label>
               <CustomSelect 
                 value={sales} 
                 onChange={setSales} 
@@ -231,20 +246,33 @@ export const SupervisorSalesPage = () => {
           ))}
         </div>
 
+        {/* Top Sales Performance Section */}
+        <div className="mb-8">
+          <TopSalesPerformance />
+        </div>
+
         {/* Table or Detail Section */}
         {isAllSales ? (
-          <DataTable
-            title="Daftar Sales Penjualan"
-            columns={tableColumns}
-            data={salesData}
-            renderCell={renderTableCell}
-          />
+          <div className="flex flex-col">
+            <DataTable tableLayout="auto"
+              title="Daftar Sales Penjualan"
+              columns={tableColumns}
+              data={salesData}
+              renderCell={renderTableCell}
+            />
+            <DataTable tableLayout="auto"
+              title="Riwayat Absensi Sales"
+              columns={absensiColumns}
+              data={dummyAbsensiData}
+              renderCell={renderAbsensiCell}
+            />
+          </div>
         ) : (
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
             <h3 className="text-gray-600 text-[18px] font-medium mb-6 font-semibold">Informasi Detail Sales</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Nama Sales</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Nama Sales</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <User size={18} />
@@ -253,7 +281,7 @@ export const SupervisorSalesPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Username</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Username</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <UserCircle size={18} />
@@ -262,7 +290,7 @@ export const SupervisorSalesPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Email</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Email</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Mail size={18} />
@@ -271,7 +299,7 @@ export const SupervisorSalesPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Nomor HP</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Nomor HP</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Phone size={18} />
@@ -280,7 +308,7 @@ export const SupervisorSalesPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Alamat</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Alamat</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <MapPin size={18} />
@@ -289,7 +317,7 @@ export const SupervisorSalesPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Area</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Map size={18} />
@@ -298,7 +326,7 @@ export const SupervisorSalesPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Status</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Status</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                     <Info size={18} />

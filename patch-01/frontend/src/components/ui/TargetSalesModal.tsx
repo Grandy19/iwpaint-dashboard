@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { PaintRoller, Wrench, Factory, X, Save, CheckCircle2 } from 'lucide-react';
 import { CustomSelect } from './CustomSelect';
 
@@ -12,6 +13,17 @@ interface TargetSalesModalProps {
 }
 
 export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onClose, mode, data, onSave, salesList }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   const [tahun, setTahun] = useState('2026');
   const [bulan, setBulan] = useState('Juli');
   const [area, setArea] = useState('Semua Area');
@@ -124,21 +136,21 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
 
   if (!isOpen) return null;
 
-  return (
+  return ReactDOM.createPortal(
     <>
       <div 
-        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm"
+        className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-[1px]"
         onClick={onClose}
       >
         <div 
-          className="bg-white rounded-3xl w-[800px] p-8 shadow-2xl relative border border-slate-100"
+          className="bg-white rounded-2xl w-[800px] p-8 shadow-xl relative"
           onClick={(e) => e.stopPropagation()}
         >
           <button 
             onClick={onClose}
-            className="absolute top-6 right-6 text-slate-400 bg-slate-50 border border-slate-100 rounded-full p-1.5 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all"
+            className="absolute top-4 right-4 text-red-500 border border-red-500 rounded-full p-1 hover:bg-red-50 transition-colors"
           >
-            <X size={18} strokeWidth={2.5} />
+            <X size={16} />
           </button>
           <div className="mb-8 border-b border-slate-100 pb-4">
             <h3 className="text-slate-500 text-[13px] font-bold tracking-wider uppercase">
@@ -149,19 +161,19 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
           {/* Top Information Section */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="col-span-1">
-              <label className="block text-[13px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Tahun</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Tahun</label>
               <CustomSelect value={tahun} onChange={setTahun} options={['2026', '2025']} />
             </div>
             <div className="col-span-1">
-              <label className="block text-[13px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Bulan</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Bulan</label>
               <CustomSelect value={bulan} onChange={setBulan} options={['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']} />
             </div>
             <div className="col-span-1">
-              <label className="block text-[13px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Area</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Area</label>
               <CustomSelect value={area} onChange={setArea} options={['Semua Area', 'Kuningan', 'Bandung', 'Jakarta']} />
             </div>
             <div className="col-span-1">
-              <label className="block text-[13px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Sales</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Sales</label>
               <CustomSelect value={salesName} onChange={setSalesName} options={salesList.length > 0 ? salesList : ['Semua Sales']} />
             </div>
           </div>
@@ -171,7 +183,7 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
             
             <div className="flex flex-col gap-6">
               <div>
-                <label className="block text-[13px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Decorative</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Decorative</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
                     <PaintRoller size={18} strokeWidth={2} />
@@ -187,7 +199,7 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
               </div>
 
               <div>
-                <label className="block text-[13px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Automotive</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Automotive</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
                     <Wrench size={18} strokeWidth={2} />
@@ -205,7 +217,7 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
 
             <div className="flex flex-col gap-6">
               <div>
-                <label className="block text-[13px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Industri</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Industri</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
                     <Factory size={18} strokeWidth={2} />
@@ -221,10 +233,9 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
               </div>
 
               {/* Total Target Card */}
-              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border border-blue-100/50 p-6 shadow-sm h-[106px] flex flex-col justify-center relative overflow-hidden group">
-                <div className="absolute -right-4 -top-4 w-24 h-24 bg-blue-400/10 rounded-full blur-xl group-hover:bg-blue-400/20 transition-all duration-500"></div>
-                <span className="text-[13px] text-blue-600/70 font-bold uppercase tracking-wider mb-1">Total Target</span>
-                <span className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-cyan-600 tracking-tight">{totalTarget || 'Rp 0'}</span>
+              <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6 shadow-sm h-[106px] flex flex-col justify-center relative overflow-hidden group">
+                <span className="text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-1">Total Target</span>
+                <span className="text-3xl font-extrabold text-gray-800 tracking-tight">{totalTarget || 'Rp 0'}</span>
               </div>
             </div>
             
@@ -238,9 +249,9 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
             <button 
               onClick={handleSimpanClick}
               disabled={isSaving}
-              className="w-[200px] bg-gradient-to-r from-emerald-500 to-teal-400 shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-0.5 disabled:bg-slate-300 disabled:shadow-none disabled:transform-none disabled:cursor-not-allowed text-white py-3.5 rounded-2xl font-bold tracking-wide transition-all duration-300 flex items-center justify-center gap-2"
+              className="w-[160px] bg-[#52b788] hover:bg-[#40916c] disabled:bg-slate-300 disabled:cursor-not-allowed text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
             >
-              <Save size={18} strokeWidth={2.5} />
+              <Save size={16} />
               Simpan Target
             </button>
           </div>
@@ -250,7 +261,7 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
 
       {/* Confirm Modal */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowConfirm(false)}>
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={() => setShowConfirm(false)}>
           <div className="bg-white rounded-2xl w-[400px] p-8 shadow-xl relative text-center" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Simpan</h3>
             <p className="text-gray-600 mb-8">Apakah Anda ingin menyimpan data tersebut?</p>
@@ -274,7 +285,7 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
 
       {/* Success Alert Modal */}
       {showSuccess && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+        <div className="fixed inset-0 z-[1010] flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
           <div className="bg-white rounded-2xl w-[350px] p-8 shadow-xl relative text-center">
             <div className="w-16 h-16 bg-green-100 text-[#52b788] rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 size={32} />
@@ -285,5 +296,5 @@ export const TargetSalesModal: React.FC<TargetSalesModalProps> = ({ isOpen, onCl
         </div>
       )}
     </>
-  );
+  , document.body);
 };

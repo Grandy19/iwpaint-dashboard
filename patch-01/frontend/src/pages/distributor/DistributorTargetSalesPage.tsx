@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, Filter, CheckCircle2, XCircle, Eye, Wallet, Scale, PaintRoller, Wrench, Factory, Target, LayoutDashboard, User, Users, Banknote, TrendingUp, Flag } from 'lucide-react';
+import { Download, Filter, CheckCircle2, XCircle, Eye, Banknote, Scale, PaintRoller, Wrench, Factory, Target, LayoutDashboard, User, Users, TrendingUp, MapPin, UserCheck } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
@@ -135,7 +135,7 @@ export const DistributorTargetSalesPage = () => {
       setKpis([
         {
           id: 1,
-          title: 'Target Penjualan Area',
+          title: 'Target Penjualan Area (Rp)',
           value: totalTargetVal >= 1e6 ? `Rp ${(totalTargetVal / 1e6).toFixed(1)} Jt` : `Rp ${totalTargetVal.toLocaleString('id-ID')}`,
           description: 'Total Target Penjualan Area',
           icon: Target,
@@ -144,7 +144,7 @@ export const DistributorTargetSalesPage = () => {
         },
         {
           id: 2,
-          title: 'Realisasi Penjualan Area',
+          title: 'Realisasi Penjualan Area (RP)',
           value: totalRealisasiVal >= 1e6 ? `Rp ${(totalRealisasiVal / 1e6).toFixed(1)} Jt` : `Rp ${totalRealisasiVal.toLocaleString('id-ID')}`,
           description: 'Total Realisasi Penjualan Area',
           icon: Banknote,
@@ -153,7 +153,7 @@ export const DistributorTargetSalesPage = () => {
         },
         {
           id: 3,
-          title: 'Pencapaian Target Area',
+          title: 'Pencapaian Target Area (%)',
           value: `${globalPercentage}%`,
           description: 'Persentase Pencapaian Area',
           icon: TrendingUp,
@@ -166,7 +166,7 @@ export const DistributorTargetSalesPage = () => {
           title: 'Area Mencapai Target',
           value: `${achievedAreas} Area`,
           description: 'Jumlah Area yang Mencapai Target',
-          icon: Flag,
+          icon: MapPin,
           iconColor: 'text-[#10b981]',
           iconBg: 'bg-[#dcfce7]',
         }
@@ -248,22 +248,56 @@ export const DistributorTargetSalesPage = () => {
   );
 
   const areaColumns = [
-    { key: 'area', label: 'Area' },
-    { key: 'target', label: 'Target' },
-    { key: 'realisasi', label: 'Realisasi' },
-    { key: 'qty', label: 'Qty' },
-    { key: 'pencapaian', label: 'Pencapaian' },
-    { key: 'status', label: 'Status' },
-    { key: 'detail', label: 'Detail' },
+    { key: 'area', label: 'Area', className: 'w-[14%]' },
+    { key: 'target', label: 'Target', className: 'w-[14%]' },
+    { key: 'realisasi', label: 'Realisasi', className: 'w-[18%]' },
+    { key: 'qty', label: 'Qty', className: 'w-[12%]' },
+    { key: 'pencapaian', label: 'Pencapaian %', className: 'w-[18%]' },
+    { key: 'status', label: 'Status', className: 'w-[15%]' },
+    { key: 'detail', label: 'Detail', align: 'center', className: 'w-[9%]' },
   ];
 
   const historyColumns = [
-    { key: 'periode', label: 'Periode' },
-    { key: 'target', label: 'Target' },
-    { key: 'realisasi', label: 'Realisasi' },
-    { key: 'pencapaian', label: 'Pencapaian' },
-    { key: 'status', label: 'Status' },
+    { key: 'periode', label: 'Periode', className: 'w-[12%]' },
+    { key: 'target', label: 'Target', className: 'w-[20%]' },
+    { key: 'realisasi', label: 'Realisasi', className: 'w-[20%]' },
+    { key: 'pencapaian', label: 'Pencapaian %', className: 'w-[22%]' },
+    { key: 'status', label: 'Status', className: 'w-[15%]' },
+    { key: 'detail', label: 'Detail', align: 'center', className: 'w-[11%]' },
   ];
+
+  const renderHistoryCell = (item: any, columnKey: string) => {
+    switch (columnKey) {
+      case 'status':
+        return renderStatusBadge(item.status);
+      case 'pencapaian': {
+        const perc = parseFloat(String(item.pencapaian).replace('%', '')) || 0;
+        const colorClass = perc >= 100 ? 'text-[#10b981]' : 'text-blue-600';
+        const barColor = perc >= 100 ? 'bg-[#10b981]' : 'bg-blue-600';
+        
+        return (
+          <div className="flex items-center justify-start gap-3 w-full">
+            <span className={`font-bold w-[40px] ${colorClass}`}>{perc}%</span>
+            <div className="w-[60px] h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div 
+                className={`h-full rounded-full transition-all duration-500 ${barColor}`} 
+                style={{ width: `${Math.min(perc, 100)}%` }}
+              />
+            </div>
+          </div>
+        );
+      }
+      case 'detail':
+        return (
+          <button 
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap">
+            <Eye size={16} /> Detail
+          </button>
+        );
+      default:
+        return item[columnKey];
+    }
+  };
 
   const renderStatusBadge = (status: string) => {
     const isTercapai = status === 'Tercapai';
@@ -282,8 +316,23 @@ export const DistributorTargetSalesPage = () => {
     switch (columnKey) {
       case 'status':
         return renderStatusBadge(item.status);
-      case 'pencapaian':
-        return <span className="font-semibold text-gray-700">{item.pencapaian}</span>;
+      case 'pencapaian': {
+        const perc = parseFloat(String(item.pencapaian).replace('%', '')) || 0;
+        const colorClass = perc >= 100 ? 'text-[#10b981]' : 'text-blue-600';
+        const barColor = perc >= 100 ? 'bg-[#10b981]' : 'bg-blue-600';
+        
+        return (
+          <div className="flex items-center justify-start gap-3 w-full">
+            <span className={`font-bold w-[40px] ${colorClass}`}>{perc}%</span>
+            <div className="w-[60px] h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div 
+                className={`h-full rounded-full transition-all duration-500 ${barColor}`} 
+                style={{ width: `${Math.min(perc, 100)}%` }}
+              />
+            </div>
+          </div>
+        );
+      }
       case 'detail':
         return (
           <button 
@@ -291,8 +340,7 @@ export const DistributorTargetSalesPage = () => {
               setSelectedArea(item);
               setIsModalOpen(true);
             }}
-            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors cursor-pointer"
-          >
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap">
             <Eye size={16} /> Detail
           </button>
         );
@@ -301,12 +349,12 @@ export const DistributorTargetSalesPage = () => {
     }
   };
 
-  const distributorMenuItems = [
+    const distributorMenuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/distributor-dashboard' },
-    { name: 'Supervisor', icon: User, path: '/distributor-dashboard/supervisor' },
-    { name: 'Sales', icon: Users, path: '/distributor-dashboard/sales' },
+    { name: 'Sales', icon: User, path: '/distributor-dashboard/sales' },
+    { name: 'Supervisor', icon: UserCheck, path: '/distributor-dashboard/supervisor' },
     { name: 'Customer', icon: Users, path: '/distributor-dashboard/customer' },
-    { name: 'Target Sales', icon: Target, path: '/distributor-dashboard/target-sales' },
+    { name: 'Target Penjualan', icon: Target, path: '/distributor-dashboard/target-sales' },
   ];
 
   const filteredTargets = targetsList.filter((t: any) => {
@@ -323,10 +371,10 @@ export const DistributorTargetSalesPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
-            <div className="w-[280px] lg:w-[400px] flex-none">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
-              <div className="flex items-center gap-3">
+          <div className="flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 items-end">
+            <div className="w-full lg:w-[400px] flex-none">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Periode</label>
+              <div className="flex items-center justify-start gap-3 w-full">
                 <div className="flex-1">
                   <input 
                     type="date" 
@@ -348,10 +396,10 @@ export const DistributorTargetSalesPage = () => {
             </div>
             
             {/* Modern Divider */}
-            <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
+            <div className="hidden lg:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px]"></div>
 
-            <div className="flex-1">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Area</label>
               <CustomSelect 
                 value={area} 
                 onChange={(val) => { setArea(val); setAppliedArea(val); }} 
@@ -360,7 +408,7 @@ export const DistributorTargetSalesPage = () => {
             </div>
             
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Supervisor</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Supervisor</label>
               <CustomSelect 
                 value={supervisor} 
                 onChange={(val) => { setSupervisor(val); setAppliedSupervisor(val); }} 
@@ -395,23 +443,23 @@ export const DistributorTargetSalesPage = () => {
           />
         </div>
 
-        {/* Area Target Performance Table */}
+        {/* Table Area */}
         <div className="mb-8">
           <DataTable
-            title="Tabel Performa Target Per-Area"
-            columns={areaColumns}
             data={filteredTargets}
+            columns={areaColumns}
             renderCell={renderCell}
+            title="Tabel Performa Target Per-Area"
           />
         </div>
 
-        {/* Riwayat Target */}
+        {/* History Table */}
         <div className="mb-8">
           <DataTable
-            title="Riwayat Target"
+            title="Tabel Riwayat Target"
             columns={historyColumns}
             data={historyData}
-            renderCell={renderCell}
+            renderCell={renderHistoryCell}
           />
         </div>
 

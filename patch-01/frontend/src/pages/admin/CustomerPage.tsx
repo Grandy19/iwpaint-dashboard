@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Upload, Filter, Eye, Package, Download, User, Users, Receipt, Map, MapPin, Wallet, CalendarClock, CreditCard , CheckCircle, AlertCircle} from 'lucide-react';
+import { Upload, Filter, Eye, Package, Download, User, Users, Receipt, Map, MapPin, Banknote, CalendarClock, CreditCard, CheckCircle, CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
 import { CustomSelect } from '../../components/ui/CustomSelect';
 import { KpiCard } from '../../components/common/KpiCard';
 import { DataTable } from '../../components/common/DataTable';
@@ -67,18 +67,18 @@ export const CustomerPage = () => {
           title: 'Customer Sudah Order',
           value: `${customerSudahOrderVal.toLocaleString('id-ID')} Customer`,
           description: 'Total customer yang sudah melakukan order',
-          icon: CheckCircle,
-          iconColor: 'text-[#3b82f6]',
-          iconBg: 'bg-[#dbeafe]',
+          icon: CheckCircle2,
+          iconColor: 'text-[#10b981]',
+          iconBg: 'bg-[#dcfce7]',
         },
         {
           id: 3,
           title: 'Customer Belum Order',
           value: `${customerBelumOrderVal.toLocaleString('id-ID')} Customer`,
           description: 'Total customer yang belum pernah order',
-          icon: AlertCircle,
-          iconColor: 'text-[#f59e0b]',
-          iconBg: 'bg-[#fef3c7]',
+          icon: XCircle,
+          iconColor: 'text-[#ef4444]',
+          iconBg: 'bg-[#fee2e2]',
         }
       ]);
     } catch (err) {
@@ -136,25 +136,31 @@ export const CustomerPage = () => {
     { key: 'kodeCustomer', label: 'Kode Customer' },
     { key: 'sales', label: 'Sales' },
     { key: 'area', label: 'Area' },
-    { key: 'totalTransaksi', label: 'Total Transaksi' },
-    { key: 'totalPenjualan', label: 'Total Penjualan' },
-    { key: 'detail', label: 'Detail' },
+    { key: 'totalTransaksi', label: 'Total Transaksi', align: 'center' },
+    { key: 'totalPenjualan', label: 'Total Penjualan'  },
+    { key: 'detail', label: 'Detail', align: 'center'  },
   ];
 
   const transactionColumns = [
-    { key: 'tanggal', label: 'Tanggal' },
-    { key: 'noFaktur', label: 'No. Faktur' },
-    { key: 'customer', label: 'Customer' },
-    { key: 'produk', label: 'Produk' },
-    { key: 'qty', label: 'QTY' },
-    { key: 'satuan', label: 'Satuan' },
-    { key: 'totalPenjualan', label: 'Total Penjualan' },
+    { key: 'tanggal', label: 'Tanggal', className: 'w-[120px]' },
+    { key: 'noFaktur', label: 'No. Faktur', className: 'w-[130px]' },
+    { key: 'customer', label: 'Customer', className: 'w-[150px]' },
+    { key: 'produk', label: 'Produk', className: 'w-[250px] min-w-[250px]' },
+    { key: 'qty', label: 'QTY', className: 'w-[80px]' },
+    { key: 'satuan', label: 'Satuan', className: 'w-[80px]' },
+    { key: 'totalPenjualan', label: 'Total Penjualan', className: 'w-[120px]' },
   ];
 
   const renderCustomerCell = (item: any, columnKey: string) => {
     switch (columnKey) {
       case 'namaCustomer':
-        return <span className="text-gray-700 font-medium">{item.namaCustomer}</span>;
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.namaCustomer}</span>;
+      case 'alamat':
+        return <div className="max-w-[250px] truncate" title={item.alamat}>{item.alamat}</div>;
+      case 'kodeCustomer':
+      case 'totalTransaksi':
+      case 'totalPenjualan':
+        return <div className="whitespace-nowrap">{item[columnKey]}</div>;
       case 'detail':
         return (
           <button 
@@ -162,8 +168,7 @@ export const CustomerPage = () => {
               setSelectedCustomer(item);
               setIsCustomerModalOpen(true);
             }}
-            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors cursor-pointer"
-          >
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap">
             <Eye size={16} /> Detail
           </button>
         );
@@ -172,12 +177,35 @@ export const CustomerPage = () => {
     }
   };
 
+  const formatRingkas = (val: any) => {
+    let cleanVal = val;
+    if (typeof val === 'string') {
+      cleanVal = val.replace(/[^0-9]/g, '');
+    }
+    const num = Number(cleanVal);
+    if (isNaN(num) || cleanVal === '') return val;
+    
+    if (num >= 1000000) {
+      return `Rp ${(num / 1000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })} Jt`;
+    }
+    if (num >= 1000) {
+      return `Rp ${(num / 1000).toLocaleString('id-ID', { maximumFractionDigits: 0 })} Rb`;
+    }
+    return `Rp ${num.toLocaleString('id-ID')}`;
+  };
+
   const renderTransactionCell = (item: any, columnKey: string) => {
     switch (columnKey) {
       case 'noFaktur':
-        return <span className="text-gray-700 font-medium">{item.noFaktur}</span>;
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.noFaktur}</span>;
+      case 'customer':
+        return <div className="max-w-[150px] truncate" title={item.customer}>{item.customer}</div>;
+      case 'produk':
+        return <div className="min-w-[250px] max-w-[350px] line-clamp-2" title={item.produk}>{item.produk}</div>;
+      case 'totalPenjualan':
+        return <span className="text-gray-700 whitespace-nowrap">{formatRingkas(item.totalPenjualan)}</span>;
       default:
-        return item[columnKey];
+        return <span className="whitespace-nowrap">{item[columnKey]}</span>;
     }
   };
 
@@ -196,69 +224,69 @@ export const CustomerPage = () => {
           
           {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-            <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
-              <div className="w-[280px] lg:w-[400px] flex-none">
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <input 
-                      type="date" 
-                      value={periodeAwal} 
-                      onChange={(e) => setPeriodeAwal(e.target.value)} 
-                      className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
-                    />
-                  </div>
-                  <span className="text-gray-400 font-bold">-</span>
-                  <div className="flex-1">
-                    <input 
-                      type="date" 
-                      value={periodeAkhir} 
-                      onChange={(e) => setPeriodeAkhir(e.target.value)} 
-                      className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
-                    />
-                  </div>
+            <div className="flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 items-end">
+            <div className="w-full lg:w-[400px] flex-none">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Periode</label>
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <input 
+                    type="date" 
+                    value={periodeAwal} 
+                    onChange={(e) => setPeriodeAwal(e.target.value)} 
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                  />
+                </div>
+                <span className="text-gray-400 font-bold">-</span>
+                <div className="flex-1">
+                  <input 
+                    type="date" 
+                    value={periodeAkhir} 
+                    onChange={(e) => setPeriodeAkhir(e.target.value)} 
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                  />
                 </div>
               </div>
-              
-              {/* Modern Divider */}
-              <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
+            </div>
+            
+            {/* Modern Divider */}
+            <div className="hidden lg:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px]"></div>
 
-              <div className="flex-1 min-w-[160px]">
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
-                <CustomSelect 
-                  value={area} 
-                  onChange={setArea} 
-                  options={areaOptions} 
-                />
-              </div>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Area</label>
+              <CustomSelect 
+                value={area} 
+                onChange={setArea} 
+                options={areaOptions} 
+              />
+            </div>
 
-              <div className="flex-1 min-w-[160px]">
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Sales</label>
-                <CustomSelect 
-                  value={salesName} 
-                  onChange={setSalesName} 
-                  options={salesOptions} 
-                />
-              </div>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Sales</label>
+              <CustomSelect 
+                value={salesName} 
+                onChange={setSalesName} 
+                options={salesOptions} 
+              />
+            </div>
 
-              <div className="flex-1 min-w-[160px]">
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Customer</label>
-                <CustomSelect 
-                  value={customerName} 
-                  onChange={setCustomerName} 
-                  options={customerOptions} 
-                />
-              </div>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Customer</label>
+              <CustomSelect 
+                value={customerName} 
+                onChange={setCustomerName} 
+                options={customerOptions} 
+              />
+            </div>
             </div>
           </div>
 
           {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 mt-8">
             {kpis.map((kpi) => {
               if (isAllCustomers) return <KpiCard key={kpi.id} {...kpi} />;
               
               if (kpi.id === 1) {
-                return <KpiCard key={kpi.id} {...kpi} title="Total Penjualan (Rp)" icon={Wallet} iconColor="text-[#10b981]" iconBg="bg-[#dcfce7]" value={selectedCustomerData?.totalPenjualan || 'Rp 0 Jt'} description="Total penjualan untuk customer terpilih" />;
+                return <KpiCard key={kpi.id} {...kpi} title="Total Penjualan (Rp)" icon={Banknote} iconColor="text-[#10b981]" iconBg="bg-[#dcfce7]" value={selectedCustomerData?.totalPenjualan || 'Rp 0 Jt'} description="Total penjualan untuk customer terpilih" />;
               }
               if (kpi.id === 2) {
                 return <KpiCard key={kpi.id} {...kpi} title="Total Transaksi" icon={CreditCard} iconColor="text-[#10b981]" iconBg="bg-[#dcfce7]" value={selectedCustomerData?.totalTransaksi ? `${selectedCustomerData.totalTransaksi} Transaksi` : '0 Transaksi'} description="Total transaksi untuk customer terpilih" />;
@@ -332,7 +360,7 @@ export const CustomerPage = () => {
                   <label className="block text-sm text-[#475569] font-medium mb-2">Total Penjualan</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                      <Wallet size={18} />
+                      <Banknote size={18} />
                     </div>
                     <input type="text" value={selectedCustomerData?.totalPenjualan || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                   </div>

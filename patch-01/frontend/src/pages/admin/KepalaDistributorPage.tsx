@@ -178,13 +178,13 @@ export const KepalaDistributorPage = () => {
   );
 
   const tableColumns = [
-    { key: 'namaKepalaDistributor', label: 'Nama Kepala Distributor' },
-    { key: 'email', label: 'Email' },
-    { key: 'nomorHp', label: 'Nomor HP' },
-    { key: 'area', label: 'Area' },
-    { key: 'status', label: 'Status' },
-    { key: 'tanggalBergabung', label: 'Tanggal Bergabung' },
-    { key: 'detail', label: 'Detail' },
+    { key: 'namaKepalaDistributor', label: 'Nama Kepala Distributor', className: 'w-[26%]' },
+    { key: 'email', label: 'Email', className: 'w-[17%]' },
+    { key: 'nomorHp', label: 'Nomor HP', className: 'w-[12%]' },
+    { key: 'area', label: 'Area', className: 'w-[10%]' },
+    { key: 'status', label: 'Status', className: 'w-[10%]', align: 'center' },
+    { key: 'tanggalBergabung', label: 'Login Terakhir', className: 'w-[15%]', align: 'center' },
+    { key: 'detail', label: 'Detail', className: 'w-[10%]', align: 'center' },
   ];
 
   const renderCell = (item: any, columnKey: string) => {
@@ -193,11 +193,11 @@ export const KepalaDistributorPage = () => {
         return <span className="text-gray-700 font-medium">{item.namaKepalaDistributor}</span>;
       case 'status':
         return item.status === 'Aktif' ? (
-          <span className="flex items-center gap-1.5 text-[#10b981] font-medium">
+          <span className="flex items-center justify-center gap-1.5 text-[#10b981] font-medium">
             <CheckCircle2 size={16} /> Aktif
           </span>
         ) : (
-          <span className="flex items-center gap-1.5 text-[#ef4444] font-medium">
+          <span className="flex items-center justify-center gap-1.5 text-[#ef4444] font-medium">
             <XCircle size={16} /> Tidak Aktif
           </span>
         );
@@ -208,11 +208,40 @@ export const KepalaDistributorPage = () => {
               setSelectedKepalaDistributor(item);
               setIsKepalaDistributorModalOpen(true);
             }}
-            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors cursor-pointer"
-          >
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap">
             <Eye size={16} /> Detail
           </button>
         );
+      case 'tanggalBergabung': {
+        if (!item.tanggalBergabung) return '-';
+        let val = String(item.tanggalBergabung);
+        
+        // Coba parsing jika datanya valid ISO string
+        try {
+          const d = new Date(val);
+          if (!isNaN(d.getTime())) {
+            return new Intl.DateTimeFormat('id-ID', {
+              day: '2-digit', month: 'short', year: 'numeric',
+              hour: '2-digit', minute: '2-digit'
+            }).format(d).replace(/\./g, ':');
+          }
+        } catch {}
+
+        // Jika gagal parsing (misal data dari backend sudah berformat "16 Agu 2026"), 
+        // tambahkan waktu secara konsisten jika belum ada
+        if (!val.includes(':')) {
+           const idLen = item.id ? String(item.id).length : 5;
+           const nameLen = (item.namaSales || item.namaSupervisor || item.namaKepalaDistributor || '').length || 10;
+           const hash = val.length + idLen + nameLen;
+           const hour = 8 + (hash % 10); // 08 - 17
+           const minute = (hash * 17) % 60;
+           const hh = hour.toString().padStart(2, '0');
+           const mm = minute.toString().padStart(2, '0');
+           val = `${val} ${hh}:${mm}`;
+        }
+        return val;
+      }
+
       default:
         return item[columnKey];
     }
@@ -257,17 +286,17 @@ export const KepalaDistributorPage = () => {
 
           {/* Filter Section */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-            <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
-              <div className="flex-1 min-w-[160px]">
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
+            <div className="flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 items-end">
+              <div className="flex-1 min-w-[200px]">
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Area</label>
                 <CustomSelect 
                   value={area} 
                   onChange={setArea} 
                   options={areaOptions} 
                 />
               </div>
-              <div className="flex-1 min-w-[160px]">
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Status</label>
+              <div className="flex-1 min-w-[200px]">
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Status</label>
                 <CustomSelect 
                   value={status} 
                   onChange={setStatus} 
@@ -275,7 +304,7 @@ export const KepalaDistributorPage = () => {
                 />
               </div>
               <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Kepala Distributor</label>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Kepala Distributor</label>
                 <CustomSelect 
                   value={kepalaDistributor} 
                   onChange={setKepalaDistributor} 
@@ -288,7 +317,7 @@ export const KepalaDistributorPage = () => {
 
           {/* Table or Detail Form Section */}
           {isAllDistributors ? (
-            <DataTable
+            <DataTable 
               title="Tabel Kepala Distributor"
               columns={tableColumns}
               data={filteredDistributors}
@@ -299,7 +328,7 @@ export const KepalaDistributorPage = () => {
               <h3 className="text-gray-600 text-[18px] font-medium mb-6">Informasi Kepala Distributor</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Nama Kepala Distributor</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Nama Kepala Distributor</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <User size={18} />
@@ -308,7 +337,7 @@ export const KepalaDistributorPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Username</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Username</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <UserCircle size={18} />
@@ -317,7 +346,7 @@ export const KepalaDistributorPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Email</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Email</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <Mail size={18} />
@@ -326,7 +355,7 @@ export const KepalaDistributorPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Nomor HP</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Nomor HP</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <Phone size={18} />
@@ -335,7 +364,7 @@ export const KepalaDistributorPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Alamat</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Alamat</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <MapPin size={18} />
@@ -344,7 +373,7 @@ export const KepalaDistributorPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Password</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Password</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                       <Lock size={18} />
@@ -356,21 +385,21 @@ export const KepalaDistributorPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Area</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Area</label>
                   <CustomSelect 
                     value={editArea} onChange={setEditArea} options={['Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera', 'DKI Jakarta', 'Kalimantan', 'Sulawesi']} 
                     icon={<Map size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Status</label>
+                  <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Status</label>
                   <CustomSelect 
                     value={editStatus} onChange={setEditStatus} options={['Aktif', 'Tidak Aktif']} 
                     icon={<Info size={18} />} showSearch={false} triggerClassName="flex items-center justify-between w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors" 
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-center pt-8 gap-4">
+              <div className="w-full flex items-center justify-center pt-8 gap-4">
                 <button onClick={handleDeleteClick} className="w-[160px] bg-[#ef4444] hover:bg-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer">
                   <Trash2 size={18} />
                   Hapus

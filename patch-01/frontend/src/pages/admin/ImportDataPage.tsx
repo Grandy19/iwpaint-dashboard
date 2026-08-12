@@ -61,7 +61,7 @@ export const ImportDataPage = () => {
     { key: 'date', label: 'Tanggal Import' },
     { key: 'rows', label: 'Jumlah Data' },
     { key: 'status', label: 'Status' },
-    { key: 'detail', label: 'Detail' },
+    { key: 'detail', label: 'Detail', align: 'center'  },
   ];
 
   const renderHistoryCell = (item: any, columnKey: string) => {
@@ -80,8 +80,7 @@ export const ImportDataPage = () => {
         return (
           <button 
             onClick={() => navigate('/')}
-            className="flex items-center gap-1.5 text-gray-400 hover:text-[#3b0764] transition-colors"
-          >
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap">
             <Eye size={16} /> Detail
           </button>
         );
@@ -129,9 +128,9 @@ export const ImportDataPage = () => {
 
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
-            <div className="w-[280px] lg:w-[400px] flex-none">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
+          <div className="flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 items-end">
+            <div className="w-full lg:w-[400px] flex-none">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Periode</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <input 
@@ -162,10 +161,10 @@ export const ImportDataPage = () => {
             </div>
             
             {/* Modern Divider */}
-            <div className="hidden sm:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px] -ml-2 mr-2"></div>
+            <div className="hidden lg:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px]"></div>
 
-            <div className="flex-1 min-w-[160px]">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Status</label>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Status</label>
               <CustomSelect 
                 value={status} 
                 onChange={setStatus} 
@@ -174,7 +173,7 @@ export const ImportDataPage = () => {
             </div>
 
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Cari Nama File</label>
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Cari Nama File</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search size={16} className="text-gray-400" />

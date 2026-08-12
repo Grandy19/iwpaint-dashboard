@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, LayoutDashboard, Users, Target, CheckCircle2, XCircle, Filter, Eye, Wallet, Scale, CreditCard, PaintRoller, Wrench, Factory, User, TrendingUp, UserCheck } from 'lucide-react';
+import { Download, LayoutDashboard, Users, Target, CheckCircle2, XCircle, Filter, Eye, Banknote, Scale, CreditCard, PaintRoller, Wrench, Factory, User, TrendingUp, UserCheck } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { RingkasanTargetCard } from '../../components/ui/RingkasanTargetCard';
 import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
@@ -69,7 +69,7 @@ export const SupervisorTargetPage = () => {
               title: 'Total Penjualan (Rp)',
               value: selectedRow.totalRealisasi,
               description: `Total realisasi oleh ${appliedSales}`,
-              icon: Wallet,
+              icon: Banknote,
               iconColor: 'text-[#10b981]',
               iconBg: 'bg-[#dcfce7]',
             },
@@ -138,7 +138,7 @@ export const SupervisorTargetPage = () => {
         setKpiData([
           {
             id: 1,
-            title: 'Target Penjualan Tim',
+            title: 'Target Penjualan Tim (RP)',
             value: targetTim,
             description: 'Total target penjualan tim Anda',
             icon: Target,
@@ -147,16 +147,16 @@ export const SupervisorTargetPage = () => {
           },
           {
             id: 2,
-            title: 'Realisasi Penjualan Tim',
+            title: 'Realisasi Penjualan Tim (RP)',
             value: realisasiTim,
             description: 'Total realisasi penjualan tim Anda',
-            icon: Wallet,
+            icon: Banknote,
             iconColor: 'text-[#10b981]',
             iconBg: 'bg-[#dcfce7]',
           },
           {
             id: 3,
-            title: 'Pencapaian Target Tim',
+            title: 'Pencapaian Target Tim (%)',
             value: `${pencapaianTim}%`,
             description: 'Persentase pencapaian target tim',
             icon: TrendingUp,
@@ -240,12 +240,12 @@ export const SupervisorTargetPage = () => {
   );
 
   const performaColumns = [
-    { key: 'sales', label: 'Sales', className: 'w-[15%]' },
-    { key: 'totalTarget', label: 'Target', className: 'w-[15%]' },
-    { key: 'realisasi', label: 'Realisasi', className: 'w-[15%]' },
-    { key: 'percentage', label: 'Pencapaian', className: 'w-[15%]' },
-    { key: 'status', label: 'Status', className: 'w-[20%]' },
-    { key: 'detail', label: 'Detail', className: 'w-[10%] text-center' },
+    { key: 'sales', label: 'Sales', className: 'w-[18%]' },
+    { key: 'totalTarget', label: 'Target', className: 'w-[18%]' },
+    { key: 'realisasi', label: 'Realisasi', className: 'w-[20%]' },
+    { key: 'percentage', label: 'Pencapaian %', className: 'w-[20%]' },
+    { key: 'status', label: 'Status', className: 'w-[15%]' },
+    { key: 'detail', label: 'Detail', align: 'center', className: 'w-[9%]' },
   ];
 
   const renderPerformaCell = (item: any, columnKey: string) => {
@@ -264,6 +264,23 @@ export const SupervisorTargetPage = () => {
             <XCircle size={16} /> Belum Input
           </span>
         );
+      case 'percentage': {
+        const perc = Number(item.percentage) || 0;
+        const colorClass = perc >= 100 ? 'text-[#10b981]' : 'text-blue-600';
+        const barColor = perc >= 100 ? 'bg-[#10b981]' : 'bg-blue-600';
+        
+        return (
+          <div className="flex items-center justify-start gap-3 w-full">
+            <span className={`font-bold w-[40px] ${colorClass}`}>{perc}%</span>
+            <div className="w-[60px] h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div 
+                className={`h-full rounded-full transition-all duration-500 ${barColor}`} 
+                style={{ width: `${Math.min(perc, 100)}%` }}
+              />
+            </div>
+          </div>
+        );
+      }
       case 'detail':
         return (
           <button 
@@ -284,9 +301,8 @@ export const SupervisorTargetPage = () => {
                 setShowSalesModal(true);
               }
             }}
-            className="flex items-center justify-center text-gray-400 hover:text-[#3b0764] transition-colors w-full cursor-pointer"
-          >
-            <Eye size={18} />
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap">
+            <Eye size={16} /> Detail
           </button>
         );
       default:
@@ -295,11 +311,12 @@ export const SupervisorTargetPage = () => {
   };
 
   const historyColumns = [
-    { key: 'periode', label: 'Periode', className: 'w-[15%]' },
+    { key: 'periode', label: 'Periode', className: 'w-[12%]' },
     { key: 'target', label: 'Target', className: 'w-[20%]' },
     { key: 'realisasi', label: 'Realisasi', className: 'w-[20%]' },
-    { key: 'pencapaian', label: 'Pencapaian', className: 'w-[20%]' },
-    { key: 'status', label: 'Status', className: 'w-[25%]' },
+    { key: 'pencapaian', label: 'Pencapaian %', className: 'w-[22%]' },
+    { key: 'status', label: 'Status', className: 'w-[15%]' },
+    { key: 'detail', label: 'Detail', align: 'center', className: 'w-[11%]' },
   ];
 
   const renderHistoryCell = (item: any, columnKey: string) => {
@@ -315,6 +332,30 @@ export const SupervisorTargetPage = () => {
           <span className="flex items-center gap-1.5 text-[#ef4444] text-sm font-medium">
             <XCircle size={16} /> Belum Tercapai
           </span>
+        );
+      case 'pencapaian': {
+        const perc = Number(item.pencapaian) || 0;
+        const colorClass = perc >= 100 ? 'text-[#10b981]' : 'text-blue-600';
+        const barColor = perc >= 100 ? 'bg-[#10b981]' : 'bg-blue-600';
+        
+        return (
+          <div className="flex items-center justify-start gap-3 w-full">
+            <span className={`font-bold w-[40px] ${colorClass}`}>{perc}%</span>
+            <div className="w-[60px] h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div 
+                className={`h-full rounded-full transition-all duration-500 ${barColor}`} 
+                style={{ width: `${Math.min(perc, 100)}%` }}
+              />
+            </div>
+          </div>
+        );
+      }
+      case 'detail':
+        return (
+          <button 
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap">
+            <Eye size={16} /> Detail
+          </button>
         );
       default:
         return <span className="text-gray-600">{item[columnKey]}</span>;
@@ -341,16 +382,16 @@ export const SupervisorTargetPage = () => {
         
         {/* Filter Section */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 mt-4">
-          <div className="flex flex-nowrap gap-4 lg:gap-6 items-end overflow-x-auto pb-2">
-            <div className="flex-1">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Periode</label>
-              <div className="flex items-center gap-3">
+          <div className="flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 items-end">
+            <div className="w-full lg:w-[400px] flex-none">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Periode</label>
+              <div className="flex items-center justify-start gap-3 w-full">
                 <div className="flex-1">
                   <input 
                     type="date" 
                     value={periodeAwal} 
                     onChange={(e) => setPeriodeAwal(e.target.value)} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                   />
                 </div>
                 <span className="text-gray-400 font-bold">-</span>
@@ -359,14 +400,17 @@ export const SupervisorTargetPage = () => {
                     type="date" 
                     value={periodeAkhir} 
                     onChange={(e) => setPeriodeAkhir(e.target.value)} 
-                    className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
+                    className="w-full px-4 py-2 h-[42px] text-sm bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-[#3b0764] focus:ring-1 focus:ring-[#3b0764] transition-colors"
                   />
                 </div>
               </div>
             </div>
             
-            <div className="col-span-2">
-              <label className="block text-sm text-[#475569] font-medium mb-2 whitespace-nowrap">Sales</label>
+            {/* Modern Divider */}
+            <div className="hidden lg:block w-[2px] h-[32px] bg-slate-200 rounded-full mb-[5px]"></div>
+
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Sales</label>
               <CustomSelect 
                 value={sales} 
                 onChange={(val) => { setSales(val); setAppliedSales(val); }} 
@@ -397,7 +441,7 @@ export const SupervisorTargetPage = () => {
         <div className="mb-8">
           <TargetRealisasiCard 
             data={targetRealisasi} 
-            title="Target vs Realisasi" 
+            title="Target vs Realisasi Bulan Ini"
           />
         </div>
 
@@ -414,7 +458,7 @@ export const SupervisorTargetPage = () => {
         {/* History Table */}
         <div className="mb-8">
           <DataTable
-            title="Riwayat Target"
+            title="Tabel Riwayat Target"
             columns={historyColumns}
             data={historyData}
             renderCell={renderHistoryCell}

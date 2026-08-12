@@ -1,4 +1,4 @@
-import { Banknote, Target, Users } from 'lucide-react';
+import { Banknote, Target, Users, UserCheck } from 'lucide-react';
 
 export const distributorSupervisorKpiData = [
   {
@@ -25,7 +25,7 @@ export const distributorSupervisorKpiData = [
     title: 'Total Supervisor',
     value: '8 Supervisor',
     description: 'Total supervisor yang mengelola area distribusi.',
-    icon: Users,
+    icon: UserCheck,
     iconColor: 'text-[#10b981]',
     iconBg: 'bg-[#dcfce7]',
   }

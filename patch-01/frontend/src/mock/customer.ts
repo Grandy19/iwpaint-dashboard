@@ -1,4 +1,4 @@
-import { Wallet, CreditCard, Users } from 'lucide-react';
+import { Banknote, CreditCard, Users } from 'lucide-react';
 
 export const customerKpiData = [
   {
@@ -6,7 +6,7 @@ export const customerKpiData = [
     title: 'Total Penjualan (Rp)',
     value: 'Rp 250 Jt',
     description: 'Total penjualan keseluruhan',
-    icon: Wallet,
+    icon: Banknote,
   },
   {
     id: 2,

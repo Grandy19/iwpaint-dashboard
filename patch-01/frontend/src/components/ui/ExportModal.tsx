@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { CheckCircle2 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
@@ -15,7 +16,13 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, fileN
   useEffect(() => {
     if (isOpen) {
       setStep(1);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen]);
 
   const handleExport = async () => {
@@ -116,8 +123,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, fileN
 
   if (!isOpen) return null;
 
-  return (
-    <div ref={overlayRef} className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={step === 1 ? onClose : undefined}>
+  return ReactDOM.createPortal(
+    <div ref={overlayRef} className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-[1px]" onClick={step === 1 ? onClose : undefined}>
       {step === 1 && (
         <div className="bg-white rounded-2xl w-[400px] p-8 shadow-xl relative text-center" onClick={(e) => e.stopPropagation()}>
           <h3 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Export</h3>
@@ -149,5 +156,5 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, fileN
         </div>
       )}
     </div>
-  );
+  , document.body);
 };
