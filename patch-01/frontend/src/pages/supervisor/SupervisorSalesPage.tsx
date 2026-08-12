@@ -26,6 +26,7 @@ export const SupervisorSalesPage = () => {
   const [salesData, setSalesData] = useState<any[]>([]);
   const [kpis, setKpis] = useState<any[]>([]);
   const [salesOptions, setSalesOptions] = useState<string[]>(['Semua Sales']);
+  const [absensiData, setAbsensiData] = useState<any[]>([]);
 
   const loadData = async () => {
     if (!user) return;
@@ -43,6 +44,14 @@ export const SupervisorSalesPage = () => {
       }
       const kpisRes = await api.get('/sales/kpis', { params: kpiParams });
       const kpisVal = kpisRes.data;
+
+      // Load attendance
+      const attRes = await api.get(`/attendance?supervisor_name=${user.name}`);
+      let absensiList = attRes.data.data;
+      if (sales !== 'Semua Sales') {
+        absensiList = absensiList.filter((s: any) => s.sales === sales);
+      }
+      setAbsensiData(absensiList);
 
       setKpis([
         {
@@ -160,34 +169,24 @@ export const SupervisorSalesPage = () => {
   const renderAbsensiCell = (item: any, columnKey: string) => {
     switch (columnKey) {
       case 'namaSales':
-        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.namaSales}</span>;
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.sales}</span>;
+      case 'tanggal':
+        return <span className="whitespace-nowrap">{new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>;
+      case 'loginPagi':
+        return <span className="whitespace-nowrap">{item.has_pagi ? '✓' : '-'}</span>;
+      case 'loginSore':
+        return <span className="whitespace-nowrap">{item.has_sore ? '✓' : '-'}</span>;
+      case 'aktivitasTerakhir':
+        if (!item.last_activity) return <span className="whitespace-nowrap">-</span>;
+        const lastAct = new Date(item.last_activity);
+        return <span className="whitespace-nowrap">{lastAct.getHours().toString().padStart(2, '0')}:{lastAct.getMinutes().toString().padStart(2, '0')}</span>;
       case 'totalLoginHariIni': {
-        const idLen = item.id ? String(item.id).length : 5;
-        const nameLen = (item.namaSales || '').length || 10;
-        const total = 1 + ((idLen + nameLen) % 4);
-        return <span className="whitespace-nowrap flex items-center justify-center">{total}x</span>;
+        return <span className="whitespace-nowrap flex items-center justify-center">{item.login_count}x</span>;
       }
       default:
         return <span className="whitespace-nowrap">{item[columnKey]}</span>;
     }
   };
-
-  const dummyAbsensiData = salesData.map((s: any, idx: number) => {
-    const isHadir = idx % 3 !== 2;
-    const isTerlambat = idx % 4 === 1;
-    let status = isHadir ? 'Hadir' : 'Tidak Hadir';
-    if (isHadir && isTerlambat) status = 'Terlambat';
-    const isCentang = idx === 2;
-
-    return {
-      ...s,
-      tanggal: '12 Agu 2026',
-      loginPagi: status === 'Tidak Hadir' ? '-' : (isCentang ? '✓' : (status === 'Terlambat' ? '08:21' : '07:58')),
-      loginSore: status === 'Tidak Hadir' ? '-' : (isCentang ? '✓' : (status === 'Terlambat' ? '-' : '16:42')),
-      status,
-      aktivitasTerakhir: status === 'Tidak Hadir' ? '-' : (isCentang ? '17:02' : (status === 'Terlambat' ? '08:24' : '16:45')),
-    };
-  });
 
   return (
     <>
@@ -263,7 +262,7 @@ export const SupervisorSalesPage = () => {
             <DataTable tableLayout="auto"
               title="Riwayat Absensi Sales"
               columns={absensiColumns}
-              data={dummyAbsensiData}
+              data={absensiData}
               renderCell={renderAbsensiCell}
             />
           </div>

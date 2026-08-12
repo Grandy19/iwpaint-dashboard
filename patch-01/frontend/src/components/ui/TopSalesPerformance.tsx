@@ -1,28 +1,101 @@
-import React from 'react';
-import { Trophy, User, ArrowUp, Crown } from 'lucide-react';
-
-// --- MOCK DATA ---
-const topSalesData = [
-  { id: 1, rank: 1, name: 'Andi', area: 'Bandung', penjualan: 485000000, pencapaian: 112, initials: 'AN', avatar: 'https://ui-avatars.com/api/?name=Andi&background=3b82f6&color=fff' },
-  { id: 2, rank: 2, name: 'Budi', area: 'Kuningan', penjualan: 420000000, pencapaian: 104, initials: 'BU', avatar: 'https://ui-avatars.com/api/?name=Budi&background=10b981&color=fff' },
-  { id: 3, rank: 3, name: 'Deni', area: 'Tasikmalaya', penjualan: 385000000, pencapaian: 98, initials: 'DE', avatar: 'https://ui-avatars.com/api/?name=Deni&background=f59e0b&color=fff' },
-  { id: 4, rank: 4, name: 'Dewi Lestari', area: 'Semarang', penjualan: 350000000, pencapaian: 95, initials: 'DL' },
-  { id: 5, rank: 5, name: 'Reza Rahadian', area: 'Medan', penjualan: 320000000, pencapaian: 92, initials: 'RR' },
-  { id: 6, rank: 6, name: 'Hendra Setiawan', area: 'Bali', penjualan: 303000000, pencapaian: 88, initials: 'HS' },
-  { id: 7, rank: 7, name: 'Grandy', area: 'Bandung', penjualan: 285000000, pencapaian: 82, initials: 'GR', isMe: true },
-  { id: 8, rank: 8, name: 'Joko Anwar', area: 'Palembang', penjualan: 250000000, pencapaian: 75, initials: 'JA' },
-];
-
-const formatRupiah = (angka: number) => {
-  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
-};
+import React, { useState, useEffect } from 'react';
+import { Trophy, Crown } from 'lucide-react';
+import api from '../../utils/api';
+import { useAuth } from '../../context/AuthContext';
 
 const formatJuta = (angka: number) => {
   return `Rp ${(angka / 1000000).toFixed(0)} Jt`;
 };
 
-export const TopSalesPerformance: React.FC = () => {
-  
+interface TopSalesPerformanceProps {
+  periodeAwal?: string;
+  periodeAkhir?: string;
+  kategoriProduk?: string;
+}
+
+export const TopSalesPerformance: React.FC<TopSalesPerformanceProps> = ({
+  periodeAwal = '2026-01-01',
+  periodeAkhir = '2026-12-31',
+  kategoriProduk = 'Semua Kategori'
+}) => {
+  const { user } = useAuth();
+  const [topSalesData, setTopSalesData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        setIsLoading(true);
+        // Selalu gunakan bulan saat ini terlepas dari periode yang difilter
+        const dateObj = new Date(); // Current date instead of periodeAwal
+        const targetYear = dateObj.getFullYear() || 2026;
+        const monthNamesInd = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const targetMonthName = monthNamesInd[dateObj.getMonth()] || "Juli";
+
+        const targetRes = await api.get('/targets', { 
+          params: { 
+            salesman: 'Semua Sales', 
+            tahun: targetYear, 
+            bulan_nama: targetMonthName
+            // Tidak mengirim periodeAwal & periodeAkhir agar backend menggunakan bulan_nama
+          } 
+        });
+
+        const rawData = targetRes.data.data || [];
+        
+        // Selalu hitung dari semua kategori, abaikan kategoriProduk
+        const mappedData = rawData.map((s: any) => {
+          let totalRealisasi = s.realisasi_deco + s.realisasi_auto + s.realisasi_ind;
+          let totalTarget = s.raw_target_deco + s.raw_target_auto + s.raw_target_ind;
+
+          const rawPercentage = totalTarget > 0 ? (totalRealisasi / totalTarget) * 100 : 0;
+          const percentage = Math.min(Math.round(rawPercentage), 100);
+
+          return {
+            id: s.id,
+            name: s.sales,
+            area: s.area,
+            penjualan: totalRealisasi,
+            pencapaian: percentage,
+            isMe: user?.name === s.sales,
+            initials: s.sales.substring(0, 2).toUpperCase(),
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(s.sales)}&background=random&color=fff`
+          };
+        });
+
+        // Sort by total penjualan descending
+        mappedData.sort((a: any, b: any) => b.penjualan - a.penjualan);
+        
+        // Assign ranks
+        const rankedData = mappedData.map((item: any, idx: number) => ({
+          ...item,
+          rank: idx + 1
+        }));
+
+        setTopSalesData(rankedData);
+      } catch (error) {
+        console.error("Failed to load leaderboard data", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLeaderboard();
+  }, [user?.name]); // Hapus dependensi periode & kategori agar hanya mount sekali (current month)
+
+  if (isLoading) {
+    return <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-[400px] flex items-center justify-center text-slate-500">Memuat Leaderboard...</div>;
+  }
+
+  if (topSalesData.length === 0) {
+    return <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-[400px] flex items-center justify-center text-slate-500">Tidak ada data leaderboard</div>;
+  }
+
+  // Handle case where there are fewer than 3 top sales
+  const top1 = topSalesData.length > 0 ? topSalesData[0] : null;
+  const top2 = topSalesData.length > 1 ? topSalesData[1] : null;
+  const top3 = topSalesData.length > 2 ? topSalesData[2] : null;
+
   return (
     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 relative overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -38,59 +111,65 @@ export const TopSalesPerformance: React.FC = () => {
           <div className="flex justify-center items-end gap-3 mt-6 px-4 flex-1">
             
             {/* Rank 2 */}
-            <div className="flex flex-col items-center w-[28%] max-w-[110px] h-full justify-end relative group">
-              <div className="flex flex-col items-center mb-3 transition-transform group-hover:-translate-y-1">
-                <div className="w-14 h-14 rounded-full border-2 border-white shadow-md relative mb-2">
-                  <img src={topSalesData[1].avatar} alt="Rank 2" className="w-full h-full rounded-full object-cover" />
-                  <div className="absolute -bottom-1 -right-1 bg-slate-700 rounded-full p-1 border border-slate-600">
-                    <Crown size={10} className="text-slate-300" />
+            {top2 ? (
+              <div className="flex flex-col items-center w-[28%] max-w-[110px] h-full justify-end relative group">
+                <div className="flex flex-col items-center mb-3 transition-transform group-hover:-translate-y-1">
+                  <div className="w-14 h-14 rounded-full border-2 border-white shadow-md relative mb-2">
+                    <img src={top2.avatar} alt="Rank 2" className="w-full h-full rounded-full object-cover" />
+                    <div className="absolute -bottom-1 -right-1 bg-slate-700 rounded-full p-1 border border-slate-600">
+                      <Crown size={10} className="text-slate-300" />
+                    </div>
                   </div>
+                  <h4 className="font-bold text-slate-800 text-[13px] truncate w-full text-center" title={top2.name}>{top2.name}</h4>
+                  <p className="font-semibold text-slate-500 text-[12px]">{top2.pencapaian}%</p>
                 </div>
-                <h4 className="font-bold text-slate-800 text-[13px] truncate w-full text-center">{topSalesData[1].name}</h4>
-                <p className="font-semibold text-slate-500 text-[12px]">{topSalesData[1].pencapaian}%</p>
+                {/* Box Podium */}
+                <div className="w-full h-[120px] bg-emerald-500 rounded-t-xl flex justify-center pt-3 shadow-[inset_0_2px_4px_rgba(255,255,255,0.1)]">
+                  <span className="text-white font-bold text-xl">2</span>
+                </div>
               </div>
-              {/* Box Podium */}
-              <div className="w-full h-[120px] bg-emerald-500 rounded-t-xl flex justify-center pt-3 shadow-[inset_0_2px_4px_rgba(255,255,255,0.1)]">
-                <span className="text-white font-bold text-xl">2</span>
-              </div>
-            </div>
+            ) : <div className="w-[28%] max-w-[110px]"></div>}
 
             {/* Rank 1 */}
-            <div className="flex flex-col items-center w-[32%] max-w-[130px] h-full justify-end relative group">
-              <div className="absolute top-[20%] opacity-20 w-32 h-32 bg-amber-400 rounded-full blur-2xl pointer-events-none"></div>
-              <div className="flex flex-col items-center mb-3 transition-transform group-hover:-translate-y-1 relative z-10">
-                <div className="w-16 h-16 rounded-full border-[3px] border-amber-400 shadow-lg relative mb-2">
-                  <img src={topSalesData[0].avatar} alt="Rank 1" className="w-full h-full rounded-full object-cover" />
-                  <div className="absolute -bottom-1.5 -right-1.5 bg-amber-500 rounded-full p-1.5 border border-amber-400 shadow-sm">
-                    <Crown size={12} className="text-white" />
+            {top1 ? (
+              <div className="flex flex-col items-center w-[32%] max-w-[130px] h-full justify-end relative group">
+                <div className="absolute top-[20%] opacity-20 w-32 h-32 bg-amber-400 rounded-full blur-2xl pointer-events-none"></div>
+                <div className="flex flex-col items-center mb-3 transition-transform group-hover:-translate-y-1 relative z-10">
+                  <div className="w-16 h-16 rounded-full border-[3px] border-amber-400 shadow-lg relative mb-2">
+                    <img src={top1.avatar} alt="Rank 1" className="w-full h-full rounded-full object-cover" />
+                    <div className="absolute -bottom-1.5 -right-1.5 bg-amber-500 rounded-full p-1.5 border border-amber-400 shadow-sm">
+                      <Crown size={12} className="text-white" />
+                    </div>
                   </div>
+                  <h4 className="font-bold text-slate-800 text-[14px] truncate w-full text-center" title={top1.name}>{top1.name}</h4>
+                  <p className="font-semibold text-slate-500 text-[12px]">{top1.pencapaian}%</p>
                 </div>
-                <h4 className="font-bold text-slate-800 text-[14px] truncate w-full text-center">{topSalesData[0].name}</h4>
-                <p className="font-semibold text-slate-500 text-[12px]">{topSalesData[0].pencapaian}%</p>
+                {/* Box Podium */}
+                <div className="w-full h-[160px] bg-yellow-400 rounded-t-xl flex justify-center pt-4 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)]">
+                  <span className="text-slate-800 font-bold text-2xl">1</span>
+                </div>
               </div>
-              {/* Box Podium */}
-              <div className="w-full h-[160px] bg-yellow-400 rounded-t-xl flex justify-center pt-4 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)]">
-                <span className="text-slate-800 font-bold text-2xl">1</span>
-              </div>
-            </div>
+            ) : <div className="w-[32%] max-w-[130px]"></div>}
 
             {/* Rank 3 */}
-            <div className="flex flex-col items-center w-[28%] max-w-[110px] h-full justify-end relative group">
-              <div className="flex flex-col items-center mb-3 transition-transform group-hover:-translate-y-1">
-                <div className="w-14 h-14 rounded-full border-2 border-white shadow-md relative mb-2">
-                  <img src={topSalesData[2].avatar} alt="Rank 3" className="w-full h-full rounded-full object-cover" />
-                  <div className="absolute -bottom-1 -right-1 bg-orange-800 rounded-full p-1 border border-orange-700">
-                    <Crown size={10} className="text-orange-200" />
+            {top3 ? (
+              <div className="flex flex-col items-center w-[28%] max-w-[110px] h-full justify-end relative group">
+                <div className="flex flex-col items-center mb-3 transition-transform group-hover:-translate-y-1">
+                  <div className="w-14 h-14 rounded-full border-2 border-white shadow-md relative mb-2">
+                    <img src={top3.avatar} alt="Rank 3" className="w-full h-full rounded-full object-cover" />
+                    <div className="absolute -bottom-1 -right-1 bg-orange-800 rounded-full p-1 border border-orange-700">
+                      <Crown size={10} className="text-orange-200" />
+                    </div>
                   </div>
+                  <h4 className="font-bold text-slate-800 text-[13px] truncate w-full text-center" title={top3.name}>{top3.name}</h4>
+                  <p className="font-semibold text-slate-500 text-[12px]">{top3.pencapaian}%</p>
                 </div>
-                <h4 className="font-bold text-slate-800 text-[13px] truncate w-full text-center">{topSalesData[2].name}</h4>
-                <p className="font-semibold text-slate-500 text-[12px]">{topSalesData[2].pencapaian}%</p>
+                {/* Box Podium */}
+                <div className="w-full h-[90px] bg-blue-500 rounded-t-xl flex justify-center pt-3 shadow-[inset_0_2px_4px_rgba(255,255,255,0.1)]">
+                  <span className="text-white font-bold text-xl">3</span>
+                </div>
               </div>
-              {/* Box Podium */}
-              <div className="w-full h-[90px] bg-blue-500 rounded-t-xl flex justify-center pt-3 shadow-[inset_0_2px_4px_rgba(255,255,255,0.1)]">
-                <span className="text-white font-bold text-xl">3</span>
-              </div>
-            </div>
+            ) : <div className="w-[28%] max-w-[110px]"></div>}
             
           </div>
 

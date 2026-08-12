@@ -28,6 +28,7 @@ export const DistributorSalesPage = () => {
   const [kpis, setKpis] = useState<any[]>([]);
   const [salesOptions, setSalesOptions] = useState<string[]>(['Semua Sales']);
   const [supervisorOptions, setSupervisorOptions] = useState<string[]>(['Semua Supervisor']);
+  const [absensiData, setAbsensiData] = useState<any[]>([]);
 
   const loadData = async () => {
     if (!user) return;
@@ -94,6 +95,20 @@ export const DistributorSalesPage = () => {
           iconBg: 'bg-[#dcfce7]',
         }
       ]);
+
+      // Load attendance
+      const attRes = await api.get(`/attendance?area=${myArea}`);
+      let absensiList = attRes.data.data;
+      if (supervisor !== 'Semua Supervisor') {
+        absensiList = absensiList.filter((s: any) => {
+           const salesObj = allSales.find((sale: any) => sale.namaSales === s.sales);
+           return salesObj && salesObj.supervisor === supervisor;
+        });
+      }
+      if (sales !== 'Semua Sales') {
+        absensiList = absensiList.filter((s: any) => s.sales === sales);
+      }
+      setAbsensiData(absensiList);
 
     } catch (err) {
       console.error('Failed to load distributor sales list:', err);
@@ -190,34 +205,24 @@ export const DistributorSalesPage = () => {
   const renderAbsensiCell = (item: any, columnKey: string) => {
     switch (columnKey) {
       case 'namaSales':
-        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.namaSales}</span>;
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.sales}</span>;
+      case 'tanggal':
+        return <span className="whitespace-nowrap">{new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>;
+      case 'loginPagi':
+        return <span className="whitespace-nowrap">{item.has_pagi ? '✓' : '-'}</span>;
+      case 'loginSore':
+        return <span className="whitespace-nowrap">{item.has_sore ? '✓' : '-'}</span>;
+      case 'aktivitasTerakhir':
+        if (!item.last_activity) return <span className="whitespace-nowrap">-</span>;
+        const lastAct = new Date(item.last_activity);
+        return <span className="whitespace-nowrap">{lastAct.getHours().toString().padStart(2, '0')}:{lastAct.getMinutes().toString().padStart(2, '0')}</span>;
       case 'totalLoginHariIni': {
-        const idLen = item.id ? String(item.id).length : 5;
-        const nameLen = (item.namaSales || '').length || 10;
-        const total = 1 + ((idLen + nameLen) % 4);
-        return <span className="whitespace-nowrap flex items-center justify-center">{total}x</span>;
+        return <span className="whitespace-nowrap flex items-center justify-center">{item.login_count}x</span>;
       }
       default:
         return <span className="whitespace-nowrap">{item[columnKey]}</span>;
     }
   };
-
-  const dummyAbsensiData = filteredSalesData.map((s: any, idx: number) => {
-    const isHadir = idx % 3 !== 2;
-    const isTerlambat = idx % 4 === 1;
-    let status = isHadir ? 'Hadir' : 'Tidak Hadir';
-    if (isHadir && isTerlambat) status = 'Terlambat';
-    const isCentang = idx === 2;
-
-    return {
-      ...s,
-      tanggal: '12 Agu 2026',
-      loginPagi: status === 'Tidak Hadir' ? '-' : (isCentang ? '✓' : (status === 'Terlambat' ? '08:21' : '07:58')),
-      loginSore: status === 'Tidak Hadir' ? '-' : (isCentang ? '✓' : (status === 'Terlambat' ? '-' : '16:42')),
-      status,
-      aktivitasTerakhir: status === 'Tidak Hadir' ? '-' : (isCentang ? '17:02' : (status === 'Terlambat' ? '08:24' : '16:45')),
-    };
-  });
 
   return (
     <>
@@ -300,7 +305,7 @@ export const DistributorSalesPage = () => {
             <DataTable tableLayout="auto"
               title="Riwayat Absensi Sales"
               columns={absensiColumns}
-              data={dummyAbsensiData}
+              data={absensiData}
               renderCell={renderAbsensiCell}
             />
           </div>

@@ -30,8 +30,9 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/targets', require('./routes/targetRoutes'));
 app.use('/api/customers', require('./routes/customerRoutes'));
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/sales', salesRoutes);
+app.use('/api/dashboard', require('./routes/dashboardRoutes'));
+app.use('/api/sales', require('./routes/salesRoutes'));
+app.use('/api/attendance', require('./routes/attendanceRoutes'));
 app.use('/api/salesmen', require('./routes/salesmanRoutes'));
 app.use('/api', importRoutes);
 

@@ -89,7 +89,7 @@ export const CustomerPage = () => {
   const loadTransactions = async () => {
     try {
       let url = '/customers/transactions';
-      const params: any = {};
+      const params: any = { periodeAwal, periodeAkhir };
       if (customerName !== 'Semua Customer') params.customerName = customerName;
       if (salesName !== 'Semua Sales') params.salesName = salesName;
       if (area !== 'Semua Area') params.area = area;

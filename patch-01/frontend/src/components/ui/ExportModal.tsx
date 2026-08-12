@@ -64,33 +64,44 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, fileN
         (header as HTMLElement).style.backdropFilter = 'none';
       }
 
-      // Wait for reflow
-      await new Promise(r => setTimeout(r, 300));
+      // Force a standard desktop width to prevent Recharts from squeezing/cutting off
+      const origWidth = element.style.width;
+      const exportWidth = 1440;
+      element.style.width = `${exportWidth}px`;
 
-      // Capture at actual content width, then scale to fit A4 landscape
-      const contentWidth = element.scrollWidth;
+      // Wait for reflow and Recharts adjustment
+      await new Promise(r => setTimeout(r, 500));
+      
+      // Measure actual height AFTER reflow
+      const exportHeight = element.scrollHeight;
+
+      // Calculate precise PDF dimensions in mm (1px ≈ 0.264583mm)
+      // Add a tiny 20px buffer to height to absolutely prevent 2nd page break spillage
+      const pdfWidth = exportWidth * 0.264583;
+      const pdfHeight = (exportHeight + 20) * 0.264583;
 
       const opt = {
-        margin:       [8, 8, 8, 8],  // mm margins
+        margin:       [0, 0, 0, 0],
         filename:     fileName,
-        image:        { type: 'jpeg' as const, quality: 0.92 },
+        image:        { type: 'jpeg' as const, quality: 0.98 },
         html2canvas:  {
           scale: 2,
           useCORS: true,
-          windowWidth: contentWidth,
+          windowWidth: exportWidth,
           scrollY: 0,
           scrollX: 0,
           backgroundColor: '#f8fafc',
           logging: false,
         },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' as const },
-        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+        jsPDF:        { unit: 'mm', format: [pdfWidth, pdfHeight], orientation: 'portrait' as const },
+        pagebreak:    { mode: ['avoid-all'] }
       };
 
       const generatePdf = typeof html2pdf === 'function' ? html2pdf : (html2pdf as any).default;
       await generatePdf().set(opt).from(element).save();
 
       // Restore original styles
+      element.style.width = origWidth;
       element.style.marginLeft = origMarginLeft;
       element.style.padding = origPadding;
       if (actionDiv) actionDiv.style.display = origActionDisplay;

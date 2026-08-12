@@ -183,7 +183,7 @@ export const KepalaDistributorPage = () => {
     { key: 'nomorHp', label: 'Nomor HP', className: 'w-[12%]' },
     { key: 'area', label: 'Area', className: 'w-[10%]' },
     { key: 'status', label: 'Status', className: 'w-[10%]', align: 'center' },
-    { key: 'tanggalBergabung', label: 'Login Terakhir', className: 'w-[15%]', align: 'center' },
+    { key: 'last_activity', label: 'Login Terakhir', className: 'w-[15%]', align: 'center' },
     { key: 'detail', label: 'Detail', className: 'w-[10%]', align: 'center' },
   ];
 
@@ -212,11 +212,10 @@ export const KepalaDistributorPage = () => {
             <Eye size={16} /> Detail
           </button>
         );
-      case 'tanggalBergabung': {
-        if (!item.tanggalBergabung) return '-';
-        let val = String(item.tanggalBergabung);
+      case 'last_activity': {
+        if (!item.last_activity) return '-';
+        let val = String(item.last_activity);
         
-        // Coba parsing jika datanya valid ISO string
         try {
           const d = new Date(val);
           if (!isNaN(d.getTime())) {
@@ -226,19 +225,6 @@ export const KepalaDistributorPage = () => {
             }).format(d).replace(/\./g, ':');
           }
         } catch {}
-
-        // Jika gagal parsing (misal data dari backend sudah berformat "16 Agu 2026"), 
-        // tambahkan waktu secara konsisten jika belum ada
-        if (!val.includes(':')) {
-           const idLen = item.id ? String(item.id).length : 5;
-           const nameLen = (item.namaSales || item.namaSupervisor || item.namaKepalaDistributor || '').length || 10;
-           const hash = val.length + idLen + nameLen;
-           const hour = 8 + (hash % 10); // 08 - 17
-           const minute = (hash * 17) % 60;
-           const hh = hour.toString().padStart(2, '0');
-           const mm = minute.toString().padStart(2, '0');
-           val = `${val} ${hh}:${mm}`;
-        }
         return val;
       }
 

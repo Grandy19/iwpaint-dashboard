@@ -1,4 +1,10 @@
-const pool = require("../config/db");
+import os
+
+model_path = r"e:\laragon\www\Project IWPAINT\iwpaint-dashboard\patch-01\backend\models\salesModel.js"
+controller_path = r"e:\laragon\www\Project IWPAINT\iwpaint-dashboard\patch-01\backend\controllers\salesController.js"
+
+# Rewrite salesModel.js
+model_content = """const pool = require("../config/db");
 
 function mapKategoriDB(k) {
   if (!k) return k;
@@ -106,10 +112,6 @@ async function fetchSalesKpis(salesmen, filters = {}) {
     query += " AND p.kategori = ?";
     params.push(mapKategoriDB(filters.kategori));
   }
-  if (filters.customerName && filters.customerName !== 'Semua Customer') {
-    query += " AND c.nama_customer = ?";
-    params.push(filters.customerName);
-  }
 
   const [rows] = await pool.query(query, params);
   return rows[0] || { total_sales: 0, total_weight_kg: 0, total_transactions: 0, total_customers: 0 };
@@ -139,10 +141,6 @@ async function fetchContributionByIndustry(salesmen, filters = {}) {
     query += " AND p.kategori = ?";
     params.push(mapKategoriDB(filters.kategori));
   }
-  if (filters.customerName && filters.customerName !== 'Semua Customer') {
-    query += " AND c.nama_customer = ?";
-    params.push(filters.customerName);
-  }
 
   query += " GROUP BY COALESCE(p.kategori, 'UNKNOWN') ORDER BY total_sales DESC";
   
@@ -159,7 +157,6 @@ async function fetchTopProducts(salesmen, filters = {}, limit = 10) {
       COALESCE(SUM(f.qty), 0) AS total_quantity
     FROM sales_transactions f
     LEFT JOIN products p ON p.product_id = f.product_id
-    LEFT JOIN customers c ON c.customer_id = f.customer_id
     LEFT JOIN users u ON u.user_id = f.salesman_id
     WHERE u.name IN (?)
   `;
@@ -177,10 +174,6 @@ async function fetchTopProducts(salesmen, filters = {}, limit = 10) {
     query += " AND p.kategori = ?";
     params.push(mapKategoriDB(filters.kategori));
   }
-  if (filters.customerName && filters.customerName !== 'Semua Customer') {
-    query += " AND c.nama_customer = ?";
-    params.push(filters.customerName);
-  }
 
   query += `
     GROUP BY p.nama_produk, p.kode_produk
@@ -194,20 +187,12 @@ async function fetchTopProducts(salesmen, filters = {}, limit = 10) {
 }
 
 async function fetchSalesTrend(salesmen, filters = {}) {
-  let groupValSql = "MONTH(f.tanggal)";
-  if (filters.periode === 'Hari') groupValSql = "DATE(f.tanggal)";
-  else if (filters.periode === 'Tahun') groupValSql = "YEAR(f.tanggal)";
-
-  let valueSql = "COALESCE(SUM(f.netto), 0)";
-  if (filters.jenisData === 'Kuantitas') valueSql = "COALESCE(SUM(f.qty), 0)";
-
   let query = `
     SELECT
-      ${groupValSql} AS group_val,
-      ${valueSql} AS value
+      MONTH(f.tanggal) AS group_val,
+      COALESCE(SUM(f.netto), 0) AS value
     FROM sales_transactions f
     LEFT JOIN products p ON p.product_id = f.product_id
-    LEFT JOIN customers c ON c.customer_id = f.customer_id
     LEFT JOIN users u ON u.user_id = f.salesman_id
     WHERE u.name IN (?) AND f.tanggal IS NOT NULL
   `;
@@ -225,12 +210,8 @@ async function fetchSalesTrend(salesmen, filters = {}) {
     query += " AND p.kategori = ?";
     params.push(mapKategoriDB(filters.kategori));
   }
-  if (filters.customerName && filters.customerName !== 'Semua Customer') {
-    query += " AND c.nama_customer = ?";
-    params.push(filters.customerName);
-  }
 
-  query += ` GROUP BY ${groupValSql} ORDER BY group_val ASC`;
+  query += " GROUP BY MONTH(f.tanggal) ORDER BY group_val ASC";
   
   const [rows] = await pool.query(query, params);
   return rows;
@@ -265,10 +246,6 @@ async function fetchCustomerTransactions(salesmen, filters = {}) {
   if (filters.kategori) {
     query += " AND p.kategori = ?";
     params.push(mapKategoriDB(filters.kategori));
-  }
-  if (filters.customerName && filters.customerName !== 'Semua Customer') {
-    query += " AND c.nama_customer = ?";
-    params.push(filters.customerName);
   }
 
   query += " ORDER BY f.tanggal DESC LIMIT 100";
@@ -320,48 +297,6 @@ async function getBestSalesmanLeaderboard(filters = {}) {
   return rows;
 }
 
-async function fetchSalesTopSalesmen(salesmen, filters = {}, limit = 10) {
-  let query = `
-    SELECT
-      s.kode_salesman,
-      u.name AS nama_salesman,
-      COALESCE(SUM(f.netto), 0) AS total_sales
-    FROM sales_transactions f
-    LEFT JOIN users u ON u.user_id = f.salesman_id
-    LEFT JOIN salesmen s ON s.salesman_id = u.user_id
-    LEFT JOIN products p ON p.product_id = f.product_id
-    WHERE u.name IN (?)
-  `;
-  const params = [salesmen];
-
-  if (filters.periodeAwal) {
-    query += " AND f.tanggal >= ?";
-    params.push(filters.periodeAwal);
-  }
-  if (filters.periodeAkhir) {
-    query += " AND f.tanggal <= ?";
-    params.push(filters.periodeAkhir);
-  }
-  if (filters.kategori) {
-    query += " AND p.kategori = ?";
-    params.push(mapKategoriDB(filters.kategori));
-  }
-  if (filters.customerName && filters.customerName !== 'Semua Customer') {
-    query += " AND c.nama_customer = ?";
-    params.push(filters.customerName);
-  }
-
-  query += `
-    GROUP BY s.kode_salesman, u.name
-    ORDER BY total_sales DESC
-    LIMIT ?
-  `;
-  params.push(limit);
-
-  const [rows] = await pool.query(query, params);
-  return rows;
-}
-
 module.exports = {
   getSalesmenForFilter,
   fetchSalesmenList,
@@ -369,7 +304,13 @@ module.exports = {
   fetchContributionByIndustry,
   fetchTopProducts,
   fetchSalesTrend,
-  fetchSalesTopSalesmen,
   fetchCustomerTransactions,
   getBestSalesmanLeaderboard
 };
+"""
+
+with open(model_path, "w", encoding="utf-8") as f:
+    f.write(model_content)
+
+
+print("Updated salesModel.js and salesController.js")

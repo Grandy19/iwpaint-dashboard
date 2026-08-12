@@ -109,6 +109,40 @@ export const ImportDataPage = () => {
     return true;
   });
 
+  const totalFiles = historyData.length;
+  const successFiles = historyData.filter(item => item.status === 'success' || item.status === 'Berhasil').length;
+  const failedFiles = historyData.filter(item => item.status === 'failed' || item.status === 'Gagal').length;
+
+  const dynamicKpiData = [
+    {
+      id: 1,
+      title: 'Total File Import',
+      value: `${totalFiles} File`,
+      description: 'Jumlah seluruh file yang pernah diimport',
+      icon: FileText,
+      iconColor: 'text-[#10b981]',
+      iconBg: 'bg-[#dcfce7]',
+    },
+    {
+      id: 2,
+      title: 'Import Berhasil',
+      value: `${successFiles} File`,
+      description: 'Jumlah file yang berhasil diproses',
+      icon: CheckCircle2,
+      iconColor: 'text-[#10b981]',
+      iconBg: 'bg-[#dcfce7]',
+    },
+    {
+      id: 3,
+      title: 'Import Gagal',
+      value: `${failedFiles} File`,
+      description: 'Status Gagal',
+      icon: XCircle,
+      iconColor: 'text-[#ef4444]',
+      iconBg: 'bg-[#fee2e2]',
+    }
+  ];
+
   return (
     <MainLayout>
       <Topbar 
@@ -121,7 +155,7 @@ export const ImportDataPage = () => {
         
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 pt-4">
-          {kpiData.slice(0, 3).map((kpi) => (
+          {dynamicKpiData.map((kpi) => (
             <KpiCard key={kpi.id} {...kpi} />
           ))}
         </div>

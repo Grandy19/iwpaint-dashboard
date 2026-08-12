@@ -39,6 +39,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  useEffect(() => {
+    if (user && user.id && isAuthenticated) {
+      const pingActivity = async () => {
+        try {
+          await api.post('/attendance/ping', { userId: user.id });
+        } catch (e) {
+          console.error("Failed to ping activity", e);
+        }
+      };
+      
+      pingActivity();
+      
+      const interval = setInterval(pingActivity, 5 * 60 * 1000); // Ping every 5 minutes
+      return () => clearInterval(interval);
+    }
+  }, [user?.id, isAuthenticated]);
+
   const login = async (email: string, password: string): Promise<User> => {
     const response = await api.post('/auth/login', { email, password });
     const newUser = response.data.user;

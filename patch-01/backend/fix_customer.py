@@ -1,4 +1,8 @@
-const pool = require("../config/db");
+import os
+
+controller_path = r"e:\laragon\www\Project IWPAINT\iwpaint-dashboard\patch-01\backend\controllers\customerController.js"
+
+content = """const pool = require("../config/db");
 
 async function getCustomers(req, res, next) {
   try {
@@ -170,89 +174,14 @@ async function getCustomerList(req, res, next) {
   }
 }
 
-async function getCustomerTransactions(req, res, next) {
-  try {
-    const { customerName, salesName, area, periodeAwal, periodeAkhir } = req.query;
-    
-    let sql = `
-      SELECT 
-        f.tanggal, 
-        f.nofaktur as noFaktur, 
-        c.nama_customer as customer, 
-        p.nama_produk as produk, 
-        f.qty, 
-        p.satuan_kecil as satuan,
-        f.netto as totalPenjualan
-      FROM sales_transactions f
-      LEFT JOIN customers c ON f.customer_id = c.customer_id
-      LEFT JOIN products p ON f.product_id = p.product_id
-      LEFT JOIN salesmen s ON f.salesman_id = s.salesman_id
-      LEFT JOIN users u ON s.salesman_id = u.user_id
-      LEFT JOIN supervisors sup ON s.supervisor_id = sup.supervisor_id
-      LEFT JOIN users sup_user ON sup.supervisor_id = sup_user.user_id
-      WHERE 1=1
-    `;
-    const params = [];
-
-    if (customerName && customerName !== "Semua Customer") {
-      sql += " AND c.nama_customer = ?";
-      params.push(customerName);
-    }
-
-    if (salesName && salesName !== "Semua Sales") {
-      sql += " AND u.name = ?";
-      params.push(salesName);
-    }
-
-    if (area && area !== "Semua Area") {
-      let matchedAreas = [area];
-      if (area === "Jawa Barat") matchedAreas = ["Bandung", "Cirebon", "Kuningan", "Tasikmalaya", "Garut", "Bogor"];
-      else if (area === "DKI Jakarta") matchedAreas = ["Jakarta"];
-      else if (area === "Jawa Tengah") matchedAreas = ["Semarang"];
-      else if (area === "Jawa Timur") matchedAreas = ["Surabaya"];
-      else if (area === "Sumatera") matchedAreas = ["Medan"];
-      
-      sql += " AND sup.area IN (?)";
-      params.push(matchedAreas);
-    }
-
-    if (periodeAwal) {
-      sql += " AND DATE(f.tanggal) >= ?";
-      params.push(periodeAwal);
-    }
-    
-    if (periodeAkhir) {
-      sql += " AND DATE(f.tanggal) <= ?";
-      params.push(periodeAkhir);
-    }
-
-    sql += " ORDER BY f.tanggal DESC LIMIT 1000";
-
-    const [rows] = await pool.query(sql, params);
-
-    const formattedRows = rows.map(r => {
-      const d = new Date(r.tanggal);
-      const formattedDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-      return {
-        tanggal: formattedDate,
-        noFaktur: r.noFaktur,
-        customer: r.customer,
-        produk: r.produk,
-        qty: r.qty ? Number(r.qty).toLocaleString('id-ID') : '0',
-        satuan: r.satuan || 'Pcs',
-        totalPenjualan: r.totalPenjualan || 0
-      };
-    });
-
-    res.json({ data: formattedRows });
-  } catch(err) {
-    next(err);
-  }
-}
-
 module.exports = {
   getCustomers,
   getCustomerKPIs,
-  getCustomerList,
-  getCustomerTransactions
+  getCustomerList
 };
+"""
+
+with open(controller_path, "w", encoding="utf-8") as f:
+    f.write(content)
+
+print("Updated customerController.js")

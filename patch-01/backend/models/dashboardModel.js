@@ -2,16 +2,22 @@ const pool = require("../config/db");
 
 async function fetchTotalSales(salesmen) {
   const query = salesmen 
-    ? "SELECT COALESCE(SUM(netto), 0) AS total_sales FROM fact_sales WHERE nama_salesman IN (?)" 
-    : "SELECT COALESCE(SUM(netto), 0) AS total_sales FROM fact_sales";
+    ? `SELECT COALESCE(SUM(f.netto), 0) AS total_sales 
+       FROM sales_transactions f 
+       LEFT JOIN users u ON u.user_id = f.salesman_id 
+       WHERE u.name IN (?)`
+    : "SELECT COALESCE(SUM(netto), 0) AS total_sales FROM sales_transactions";
   const [rows] = await pool.query(query, salesmen ? [salesmen] : []);
   return rows[0].total_sales;
 }
 
 async function fetchTotalTransactions(salesmen) {
   const query = salesmen 
-    ? "SELECT COUNT(DISTINCT nofaktur) AS total_transactions FROM fact_sales WHERE nama_salesman IN (?)" 
-    : "SELECT COUNT(DISTINCT nofaktur) AS total_transactions FROM fact_sales";
+    ? `SELECT COUNT(DISTINCT f.nofaktur) AS total_transactions 
+       FROM sales_transactions f 
+       LEFT JOIN users u ON u.user_id = f.salesman_id 
+       WHERE u.name IN (?)`
+    : "SELECT COUNT(DISTINCT nofaktur) AS total_transactions FROM sales_transactions";
   const [rows] = await pool.query(query, salesmen ? [salesmen] : []);
   return rows[0].total_transactions;
 }
@@ -19,9 +25,9 @@ async function fetchTotalTransactions(salesmen) {
 async function fetchTotalQtyWeight(salesmen) {
   const query = `
     SELECT COALESCE(SUM(f.qty * COALESCE(p.berat, 1.0)), 0) AS total_weight_kg 
-    FROM fact_sales f
-    LEFT JOIN dim_products p ON (p.id = f.product_id OR p.kode_produk = f.kode_barang)
-    ${salesmen ? "WHERE f.nama_salesman IN (?)" : ""}
+    FROM sales_transactions f
+    LEFT JOIN products p ON p.product_id = f.product_id
+    ${salesmen ? "LEFT JOIN users u ON u.user_id = f.salesman_id WHERE u.name IN (?)" : ""}
   `;
   const [rows] = await pool.query(query, salesmen ? [salesmen] : []);
   return rows[0].total_weight_kg;
@@ -30,14 +36,14 @@ async function fetchTotalQtyWeight(salesmen) {
 async function fetchBestSellerProducts(salesmen, limit = 10) {
   const query = `
     SELECT
-      COALESCE(p.nama_produk, f.nama_barang) AS nama_produk,
-      COALESCE(p.kode_produk, f.kode_barang) AS kode_produk,
+      p.nama_produk AS nama_produk,
+      p.kode_produk AS kode_produk,
       COALESCE(SUM(f.netto), 0) AS total_sales,
       COALESCE(SUM(f.qty), 0) AS total_quantity
-    FROM fact_sales f
-    LEFT JOIN dim_products p ON (p.id = f.product_id OR p.kode_produk = f.kode_barang)
-    ${salesmen ? "WHERE f.nama_salesman IN (?)" : ""}
-    GROUP BY COALESCE(p.nama_produk, f.nama_barang), COALESCE(p.kode_produk, f.kode_barang)
+    FROM sales_transactions f
+    LEFT JOIN products p ON p.product_id = f.product_id
+    ${salesmen ? "LEFT JOIN users u ON u.user_id = f.salesman_id WHERE u.name IN (?)" : ""}
+    GROUP BY p.nama_produk, p.kode_produk
     ORDER BY total_sales DESC
     LIMIT ?
   `;
@@ -51,9 +57,9 @@ async function fetchContributionByDistributor(salesmen) {
     SELECT
       COALESCE(p.kategori, 'UNKNOWN') AS kategori,
       COALESCE(SUM(f.netto), 0) AS total_sales
-    FROM fact_sales f
-    LEFT JOIN dim_products p ON (p.id = f.product_id OR p.kode_produk = f.kode_barang)
-    ${salesmen ? "WHERE f.nama_salesman IN (?)" : ""}
+    FROM sales_transactions f
+    LEFT JOIN products p ON p.product_id = f.product_id
+    ${salesmen ? "LEFT JOIN users u ON u.user_id = f.salesman_id WHERE u.name IN (?)" : ""}
     GROUP BY COALESCE(p.kategori, 'UNKNOWN')
     ORDER BY total_sales DESC
   `;
@@ -61,29 +67,15 @@ async function fetchContributionByDistributor(salesmen) {
   return rows;
 }
 
-async function fetchSalesByValue(salesmen) {
+async function fetchSalesTrend(salesmen) {
   const query = `
     SELECT
-      MONTH(tanggal) AS month_num,
-      COALESCE(SUM(netto), 0) AS total_sales
-    FROM fact_sales
-    WHERE ${salesmen ? "nama_salesman IN (?) AND" : ""} tanggal IS NOT NULL
-    GROUP BY MONTH(tanggal)
-    ORDER BY month_num
-  `;
-  const [rows] = await pool.query(query, salesmen ? [salesmen] : []);
-  return rows;
-}
-
-async function fetchSalesPerSales(salesmen) {
-  const query = `
-    SELECT
-      nama_salesman,
-      COALESCE(SUM(netto), 0) AS total_penjualan
-    FROM fact_sales
-    ${salesmen ? "WHERE nama_salesman IN (?)" : ""}
-    GROUP BY nama_salesman
-    ORDER BY total_penjualan DESC
+      MONTH(f.tanggal) AS group_val,
+      COALESCE(SUM(f.netto), 0) AS value
+    FROM sales_transactions f
+    ${salesmen ? "LEFT JOIN users u ON u.user_id = f.salesman_id WHERE u.name IN (?)" : ""}
+    GROUP BY MONTH(f.tanggal)
+    ORDER BY group_val ASC
   `;
   const [rows] = await pool.query(query, salesmen ? [salesmen] : []);
   return rows;
@@ -95,6 +87,5 @@ module.exports = {
   fetchTotalQtyWeight,
   fetchBestSellerProducts,
   fetchContributionByDistributor,
-  fetchSalesByValue,
-  fetchSalesPerSales,
+  fetchSalesTrend
 };

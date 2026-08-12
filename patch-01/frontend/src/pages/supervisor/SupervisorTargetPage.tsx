@@ -222,7 +222,7 @@ export const SupervisorTargetPage = () => {
 
   useEffect(() => {
     loadData();
-  }, [user, appliedSales, refreshKey]);
+  }, [user, appliedSales, periodeAwal, periodeAkhir, refreshKey]);
 
   const handleFilter = () => {
     setAppliedSales(sales);

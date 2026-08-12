@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 exports.getAvailableSalesmen = async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT kode_salesman, nama_salesman FROM dim_salesman ORDER BY nama_salesman ASC');
+    const [rows] = await db.query('SELECT s.kode_salesman, u.name AS nama_salesman FROM salesmen s JOIN users u ON s.salesman_id = u.user_id WHERE u.role = "sales" ORDER BY u.name ASC');
     res.json({
       success: true,
       data: rows

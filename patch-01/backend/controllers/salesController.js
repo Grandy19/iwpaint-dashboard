@@ -61,7 +61,13 @@ async function getSalesTrend(req, res, next) {
 
     const MONTH_NAMES = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     const labels = rows.map((r) => {
-      if (periode === 'Hari' || periode === 'Tahun') return r.group_val;
+      if (periode === 'Hari') {
+        const d = new Date(r.group_val);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        return `${day}/${month}`;
+      }
+      if (periode === 'Tahun') return r.group_val;
       return MONTH_NAMES[(r.group_val || 1) - 1];
     });
     const values = rows.map((r) => toNumber(r.value));
@@ -76,7 +82,7 @@ async function getSalesTopProducts(req, res, next) {
   try {
     const { salesman, supervisor, area, periodeAwal, periodeAkhir, kategori, customerName } = req.query;
     const salesmen = await model.getSalesmenForFilter(salesman, supervisor, area);
-    const rows = await model.fetchSalesTopProducts(salesmen, { periodeAwal, periodeAkhir, kategori, customerName });
+    const rows = await model.fetchTopProducts(salesmen, { periodeAwal, periodeAkhir, kategori, customerName });
 
     const data = rows.map((r) => ({
       nama_produk: r.nama_produk,

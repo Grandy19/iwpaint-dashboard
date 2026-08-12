@@ -280,7 +280,11 @@ export const SalesDashboardPage = () => {
 
         {/* Top Sales Performance Section */}
         <div className="mb-8">
-          <TopSalesPerformance />
+          <TopSalesPerformance 
+            periodeAwal={periodeAwal} 
+            periodeAkhir={periodeAkhir} 
+            kategoriProduk={kategoriProduk} 
+          />
         </div>
 
         {/* Target Realisasi Section */}
