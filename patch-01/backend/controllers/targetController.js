@@ -501,48 +501,104 @@ async function getTargetPerformance(req, res, next) {
 
 async function getTargetHistory(req, res, next) {
   try {
-    const { salesman, tahun = 2026 } = req.query;
-    if (!salesman) return res.json({ data: [] });
-
-    // Get salesman_id
-    const [uRows] = await pool.query(
-      "SELECT s.salesman_id FROM users u JOIN salesmen s ON u.user_id = s.salesman_id WHERE u.name = ?",
-      [salesman]
-    );
-    if (uRows.length === 0) return res.json({ data: [] });
-    const salesmanId = uRows[0].salesman_id;
-    
-    // Get targets for this salesman in the given year
-    const [targetRows] = await pool.query(
-      "SELECT bulan_nama, (target_deco + target_auto + target_ind) as total_target FROM salesman_targets WHERE salesman_id = ? AND tahun = ? ORDER BY target_id DESC",
-      [salesmanId, tahun]
-    );
-    
-    const result = [];
+    const { salesman, supervisor, tahun = 2026 } = req.query;
     const indMonths = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    
-    for (const t of targetRows) {
-      const monthNum = indMonths.indexOf(t.bulan_nama) + 1;
-      let total_realisasi = 0;
+    const result = [];
+
+    if (salesman && salesman !== "Semua Sales") {
+      // Single salesman history
+      const [uRows] = await pool.query(
+        "SELECT s.salesman_id FROM users u JOIN salesmen s ON u.user_id = s.salesman_id WHERE u.name = ?",
+        [salesman]
+      );
+      if (uRows.length === 0) return res.json({ data: [] });
+      const salesmanId = uRows[0].salesman_id;
       
-      if (monthNum > 0) {
-        const [realRows] = await pool.query(
-          "SELECT COALESCE(SUM(netto), 0) as total FROM sales_transactions WHERE salesman_id = ? AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?",
-          [salesmanId, monthNum, tahun]
-        );
-        total_realisasi = Number(realRows[0].total || 0);
+      const [targetRows] = await pool.query(
+        "SELECT bulan_nama, tahun, (target_deco + target_auto + target_ind) as total_target FROM salesman_targets WHERE salesman_id = ? AND tahun = ? ORDER BY target_id DESC",
+        [salesmanId, tahun]
+      );
+      
+      for (const t of targetRows) {
+        const monthNum = indMonths.indexOf(t.bulan_nama) + 1;
+        let total_realisasi = 0;
+        
+        if (monthNum > 0) {
+          const [realRows] = await pool.query(
+            "SELECT COALESCE(SUM(netto), 0) as total FROM sales_transactions WHERE salesman_id = ? AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?",
+            [salesmanId, monthNum, t.tahun || tahun]
+          );
+          total_realisasi = Number(realRows[0].total || 0);
+        }
+        
+        const total_target = Number(t.total_target || 0);
+        const pencapaian = total_target > 0 ? (total_realisasi / total_target) * 100 : 0;
+        
+        result.push({
+          bulan_nama: t.bulan_nama,
+          tahun: t.tahun || Number(tahun),
+          periode: `${t.bulan_nama} ${t.tahun || tahun}`,
+          target: total_target,
+          realisasi: total_realisasi,
+          pencapaian: pencapaian.toFixed(1) + '%',
+          status: pencapaian >= 100 ? 'Tercapai' : 'Belum Tercapai'
+        });
       }
-      
-      const total_target = Number(t.total_target || 0);
-      const pencapaian = total_target > 0 ? (total_realisasi / total_target) * 100 : 0;
-      
-      result.push({
-        periode: `${t.bulan_nama} ${tahun}`,
-        target: total_target,
-        realisasi: total_realisasi,
-        pencapaian: pencapaian.toFixed(1) + '%',
-        status: pencapaian >= 100 ? 'Tercapai' : 'Belum Tercapai'
-      });
+    } else {
+      // All sales under supervisor (or overall)
+      let userIds = [];
+      if (supervisor && supervisor !== "Semua Supervisor") {
+        const [uRows] = await pool.query(
+          `SELECT u.user_id 
+           FROM users u 
+           JOIN salesmen s ON u.user_id = s.salesman_id 
+           JOIN supervisors sup ON s.supervisor_id = sup.supervisor_id 
+           JOIN users sup_user ON sup.supervisor_id = sup_user.user_id 
+           WHERE u.role = 'sales' AND sup_user.name = ?`,
+          [supervisor]
+        );
+        userIds = uRows.map(r => r.user_id);
+      } else {
+        const [uRows] = await pool.query("SELECT user_id FROM users WHERE role = 'sales'");
+        userIds = uRows.map(r => r.user_id);
+      }
+
+      if (userIds.length === 0) return res.json({ data: [] });
+
+      const [targetRows] = await pool.query(
+        `SELECT bulan_nama, tahun, SUM(target_deco + target_auto + target_ind) as total_target 
+         FROM salesman_targets 
+         WHERE salesman_id IN (?) AND tahun = ? 
+         GROUP BY bulan_nama, tahun 
+         ORDER BY MIN(target_id) DESC`,
+        [userIds, tahun]
+      );
+
+      for (const t of targetRows) {
+        const monthNum = indMonths.indexOf(t.bulan_nama) + 1;
+        let total_realisasi = 0;
+
+        if (monthNum > 0) {
+          const [realRows] = await pool.query(
+            "SELECT COALESCE(SUM(netto), 0) as total FROM sales_transactions WHERE salesman_id IN (?) AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?",
+            [userIds, monthNum, t.tahun || tahun]
+          );
+          total_realisasi = Number(realRows[0].total || 0);
+        }
+
+        const total_target = Number(t.total_target || 0);
+        const pencapaian = total_target > 0 ? (total_realisasi / total_target) * 100 : 0;
+
+        result.push({
+          bulan_nama: t.bulan_nama,
+          tahun: t.tahun || Number(tahun),
+          periode: `${t.bulan_nama} ${t.tahun || tahun}`,
+          target: total_target,
+          realisasi: total_realisasi,
+          pencapaian: pencapaian.toFixed(1) + '%',
+          status: pencapaian >= 100 ? 'Tercapai' : 'Belum Tercapai'
+        });
+      }
     }
     
     res.json({ data: result });
