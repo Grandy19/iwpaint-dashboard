@@ -265,17 +265,18 @@ export const SupervisorTargetPage = () => {
           </span>
         );
       case 'percentage': {
-        const perc = Number(item.percentage) || 0;
+        const rawPerc = Number(item.percentage) || 0;
+        const perc = Math.min(Math.round(rawPerc), 100);
         const colorClass = perc >= 100 ? 'text-[#10b981]' : 'text-blue-600';
         const barColor = perc >= 100 ? 'bg-[#10b981]' : 'bg-blue-600';
         
         return (
           <div className="flex items-center justify-start gap-3 w-full">
-            <span className={`font-bold w-[40px] ${colorClass}`}>{perc}%</span>
+            <span className={`font-bold w-[45px] ${colorClass}`}>{perc}%</span>
             <div className="w-[60px] h-2 bg-gray-100 rounded-full overflow-hidden">
               <div 
                 className={`h-full rounded-full transition-all duration-500 ${barColor}`} 
-                style={{ width: `${Math.min(perc, 100)}%` }}
+                style={{ width: `${perc}%` }}
               />
             </div>
           </div>
@@ -319,32 +320,78 @@ export const SupervisorTargetPage = () => {
     { key: 'detail', label: 'Detail', align: 'center', className: 'w-[11%]' },
   ];
 
+  const handleDetailClick = (item: any) => {
+    let month = item.bulan_nama;
+    let year = item.tahun;
+
+    if (!month || !year) {
+      const parts = (item.periode || '').trim().split(' ');
+      if (parts.length >= 2) {
+        month = parts[0];
+        year = parseInt(parts[1], 10);
+      }
+    }
+
+    if (month && year) {
+      const monthNamesInd = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      const monthIdx = monthNamesInd.indexOf(month);
+      if (monthIdx !== -1) {
+        const mStr = String(monthIdx + 1).padStart(2, '0');
+        setPeriodeAwal(`${year}-${mStr}-01`);
+        setPeriodeAkhir(`${year}-${mStr}-30`);
+      }
+    }
+  };
+
+  const formatShortCurrency = (val: any) => {
+    if (val === null || val === undefined || val === '') return 'Rp 0';
+    if (typeof val === 'string') {
+      return val.replace('.', ',');
+    }
+    const num = Number(val) || 0;
+    if (num >= 1e9) {
+      return `Rp ${(num / 1e9).toFixed(1).replace(/\.0$/, '').replace('.', ',')} M`;
+    }
+    if (num >= 1e6) {
+      return `Rp ${(num / 1e6).toFixed(1).replace(/\.0$/, '').replace('.', ',')} Jt`;
+    }
+    if (num >= 1e3) {
+      return `Rp ${(num / 1e3).toFixed(1).replace(/\.0$/, '').replace('.', ',')} Rb`;
+    }
+    return `Rp ${num.toLocaleString('id-ID')}`;
+  };
+
   const renderHistoryCell = (item: any, columnKey: string) => {
     switch (columnKey) {
       case 'periode':
-        return <span className="text-gray-700 font-medium">{item.periode}</span>;
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{item.periode}</span>;
+      case 'target':
+        return <span className="text-gray-700 font-medium whitespace-nowrap">{formatShortCurrency(item.target)}</span>;
+      case 'realisasi':
+        return <span className="text-gray-800 font-semibold whitespace-nowrap">{formatShortCurrency(item.realisasi)}</span>;
       case 'status':
         return item.status === 'Tercapai' ? (
-          <span className="flex items-center gap-1.5 text-[#10b981] text-sm font-medium">
+          <span className="flex items-center gap-1.5 text-[#10b981] text-sm font-medium whitespace-nowrap">
             <CheckCircle2 size={16} /> Tercapai
           </span>
         ) : (
-          <span className="flex items-center gap-1.5 text-[#ef4444] text-sm font-medium">
+          <span className="flex items-center gap-1.5 text-[#ef4444] text-sm font-medium whitespace-nowrap">
             <XCircle size={16} /> Belum Tercapai
           </span>
         );
       case 'pencapaian': {
-        const perc = Number(item.pencapaian) || 0;
+        const rawPerc = parseFloat(String(item.pencapaian).replace('%', '')) || 0;
+        const perc = Math.min(Math.round(rawPerc), 100);
         const colorClass = perc >= 100 ? 'text-[#10b981]' : 'text-blue-600';
         const barColor = perc >= 100 ? 'bg-[#10b981]' : 'bg-blue-600';
         
         return (
           <div className="flex items-center justify-start gap-3 w-full">
-            <span className={`font-bold w-[40px] ${colorClass}`}>{perc}%</span>
+            <span className={`font-bold w-[45px] ${colorClass}`}>{perc}%</span>
             <div className="w-[60px] h-2 bg-gray-100 rounded-full overflow-hidden">
               <div 
                 className={`h-full rounded-full transition-all duration-500 ${barColor}`} 
-                style={{ width: `${Math.min(perc, 100)}%` }}
+                style={{ width: `${perc}%` }}
               />
             </div>
           </div>
@@ -353,7 +400,9 @@ export const SupervisorTargetPage = () => {
       case 'detail':
         return (
           <button 
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap">
+            onClick={() => handleDetailClick(item)}
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap"
+          >
             <Eye size={16} /> Detail
           </button>
         );

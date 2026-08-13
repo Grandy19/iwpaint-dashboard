@@ -92,7 +92,7 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
         setPassword('**********');
         setAlamat(data.alamat || 'Jl. Jendral Sudirman No. 123');
         setArea(data.area || 'Bandung');
-        setRole('Sales');
+        setRole(data.role ? (data.role.charAt(0).toUpperCase() + data.role.slice(1)) : 'Sales');
         setSupervisor(data.supervisor || 'Andi');
         setStatus(data.status || 'Aktif');
         setKodeSalesman(data.kodeSalesman || '');
@@ -431,6 +431,28 @@ export const SalesModal: React.FC<SalesModalProps> = ({ isOpen, onClose, mode: m
                     onChange={setRole}
                     options={['Sales', 'Supervisor', 'Admin']}
                     icon={<Briefcase size={16} />}
+                    triggerClassName="flex items-center justify-between w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
+                    showSearch={false}
+                  />
+                )}
+              </div>
+
+              {/* Status */}
+              <div>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2">Status</label>
+                {mode === 'view_only' ? (
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Info size={16} />
+                    </div>
+                    <input type="text" value={status} readOnly className="w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
+                  </div>
+                ) : (
+                  <CustomSelect 
+                    value={status}
+                    onChange={setStatus}
+                    options={['Aktif', 'Tidak Aktif']}
+                    icon={<Info size={16} />}
                     triggerClassName="flex items-center justify-between w-full pl-10 pr-4 py-2.5 text-[14px] bg-white border border-gray-200 rounded-xl text-gray-800 cursor-pointer focus-within:ring-1 focus-within:ring-[#3b0764] focus-within:border-[#3b0764] transition-colors"
                     showSearch={false}
                   />

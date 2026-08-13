@@ -1,9 +1,9 @@
 import React from 'react';
 
-interface Column {
+export interface Column {
   key: string;
   label: string;
-  align?: 'left' | 'center' | 'right';
+  align?: 'left' | 'center' | 'right' | string;
   className?: string;
 }
 

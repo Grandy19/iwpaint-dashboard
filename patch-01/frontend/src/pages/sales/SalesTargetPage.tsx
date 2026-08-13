@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { Topbar } from '../../components/layout/Topbar';
-import { Download, LayoutDashboard, Users, Target, CheckCircle2, XCircle, Banknote, Scale, PaintRoller, Wrench, Factory, TrendingUp, Flag } from 'lucide-react';
+import { Download, LayoutDashboard, Users, Target, CheckCircle2, XCircle, Banknote, Scale, PaintRoller, Wrench, Factory, TrendingUp, Flag, Eye } from 'lucide-react';
 import { KpiCard } from '../../components/common/KpiCard';
 import { RingkasanTargetCard } from '../../components/ui/RingkasanTargetCard';
 import { TargetRealisasiCard } from '../../components/ui/TargetRealisasiCard';
@@ -18,14 +18,15 @@ export const SalesTargetPage = () => {
   const [targetRealisasi, setTargetRealisasi] = useState<any[]>([]);
   const [historyData, setHistoryData] = useState<any[]>([]);
 
-  const loadData = async () => {
+  const monthNamesInd = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+  const now = new Date();
+  const [selectedMonth, setSelectedMonth] = useState<string>(monthNamesInd[now.getMonth()]);
+  const [selectedYear, setSelectedYear] = useState<number>(now.getFullYear());
+
+  const loadData = async (targetMonthName = selectedMonth, targetYear = selectedYear) => {
     if (!user) return;
     try {
       const salesmanName = user.name;
-      const now = new Date();
-      const targetYear = now.getFullYear();
-      const monthNamesInd = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-      const targetMonthName = monthNamesInd[now.getMonth()];
       const params = { salesman: salesmanName, tahun: targetYear, bulan_nama: targetMonthName };
 
       // Load performance summary
@@ -131,8 +132,26 @@ export const SalesTargetPage = () => {
   };
 
   useEffect(() => {
-    loadData();
-  }, [user]);
+    loadData(selectedMonth, selectedYear);
+  }, [user, selectedMonth, selectedYear]);
+
+  const handleDetailClick = (item: any) => {
+    let month = item.bulan_nama;
+    let year = item.tahun;
+
+    if (!month || !year) {
+      const parts = (item.periode || '').trim().split(' ');
+      if (parts.length >= 2) {
+        month = parts[0];
+        year = parseInt(parts[1], 10);
+      }
+    }
+
+    if (month && year) {
+      setSelectedMonth(month);
+      setSelectedYear(year);
+    }
+  };
 
   const ActionButtons = (
     <button 
@@ -163,11 +182,12 @@ export const SalesTargetPage = () => {
   };
 
   const historyColumns = [
-    { key: 'periode', label: 'Periode', className: 'w-[22%]' },
-    { key: 'target', label: 'Target', className: 'w-[20%]' },
-    { key: 'realisasi', label: 'Realisasi', className: 'w-[20%]' },
-    { key: 'pencapaian', label: 'Pencapaian %', className: 'w-[18%]' },
-    { key: 'status', label: 'Status', className: 'w-[20%]' },
+    { key: 'periode', label: 'Periode' },
+    { key: 'target', label: 'Target' },
+    { key: 'realisasi', label: 'Realisasi' },
+    { key: 'pencapaian', label: 'Pencapaian %' },
+    { key: 'status', label: 'Status' },
+    { key: 'detail', label: 'Detail', align: 'center' as const },
   ];
 
   const renderHistoryCell = (item: any, columnKey: string) => {
@@ -205,6 +225,15 @@ export const SalesTargetPage = () => {
             <XCircle size={16} /> Belum Tercapai
           </span>
         );
+      case 'detail':
+        return (
+          <button 
+            onClick={() => handleDetailClick(item)}
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer shadow-sm border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 whitespace-nowrap"
+          >
+            <Eye size={16} /> Detail
+          </button>
+        );
       default:
         return item[columnKey];
     }
@@ -221,7 +250,7 @@ export const SalesTargetPage = () => {
       <MainLayout sidebarItems={salesMenuItems}>
         <Topbar 
           title="Target Penjualan" 
-          subtitle="Pantau pencapaian target penjualan Anda pada bulan ini." 
+          subtitle={`Pantau pencapaian target penjualan Anda pada bulan ${selectedMonth} ${selectedYear}.`} 
           actionButton={ActionButtons} 
         />
 
@@ -245,7 +274,7 @@ export const SalesTargetPage = () => {
         <div className="mb-8">
           <TargetRealisasiCard 
             data={targetRealisasi} 
-            title="Target vs Realisasi" 
+            title={`Target vs Realisasi (${selectedMonth} ${selectedYear})`} 
           />
         </div>
 

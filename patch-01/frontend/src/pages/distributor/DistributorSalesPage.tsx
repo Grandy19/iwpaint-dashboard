@@ -385,6 +385,20 @@ export const DistributorSalesPage = () => {
                   <input type="text" value={selectedSalesData?.status || ''} readOnly className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" />
                 </div>
               </div>
+              <div>
+                <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 whitespace-nowrap">Role</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <Briefcase size={18} />
+                  </div>
+                  <input 
+                    type="text" 
+                    value={selectedSalesData?.role ? (selectedSalesData.role.charAt(0).toUpperCase() + selectedSalesData.role.slice(1)) : 'Sales'} 
+                    readOnly 
+                    className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none transition-colors" 
+                  />
+                </div>
+              </div>
             </div>
           </div>
         )}
